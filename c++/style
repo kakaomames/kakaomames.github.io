@@ -1,0 +1,253 @@
+@import "http://";
+@charset "utf-8";
+
+/***** default styles
+*******************************************/
+
+body {
+	font-size			: 13px;
+	*font-size			: small; 	/* IE7 */
+	*font				: x-small; 	/* IE6 */
+}
+
+* {line-height: 1.6;font-size: 100%;}
+
+html {
+	padding				: 0px;
+	margin				: 0px;
+}
+
+body {
+	text-align			: left;
+	color				: #5D5D5D;
+	margin				: 0 auto;
+	background-image		: url("./img/back.gif");
+	padding				: 0;
+	font-family			: Verdana, Arial, "�ｽq�ｽ�ｽ�ｽM�ｽm�ｽp�ｽS Pro W3","�ｽl�ｽr �ｽS�ｽV�ｽb�ｽN", sans-serif;
+}
+
+p {
+	line-height			: 1.9;
+	text-align			: justify;
+	text-justify		: distribute;
+}
+
+p, ul, ol, dl, table, pre {
+	font-size			: 100%;
+	letter-spacing		: 0.02em;
+}
+
+img {
+	border				: 0;
+	vertical-align		: bottom;
+}
+
+h1 {
+	font-size			: 160%;
+	font-weight			: normal;
+	margin				: 0px 0px 5px 0px;
+	padding				: 0;
+}
+
+h2 {
+	font-size			: 100%;
+	font-weight			: normal;
+	margin				: 0;
+	padding				: 0;
+
+}
+
+h3 {
+	font-size			: 130%;
+	font-weight			: normal;
+	margin				: 1.5em 0 1em 0;
+	padding				: 0px 0px 0px 10px;
+	border-left			: 5px solid #BBEEFF;
+	border-bottom		: 1px dotted #CCCCCC;
+	background-repeat	: no-repeat;
+}
+
+h4 {
+	font-size			: 90%;
+	font-weight			: bold;
+	padding				: 0px 0px 0px 10px;
+ 	border-left			: 18px solid #BBEEFF;
+}
+
+#out{
+	margin				: 0 auto 0px auto;
+	width				: 1024px;
+	background-color		: #FFFFFF;
+	border				: 1px solid #999999;
+	min-width			: 1024px;
+}
+
+
+#header {
+	height				: 110px;
+	border-bottom		: 1px solid #999999;
+	padding				: 10px 20px 0px 20px;
+	background-color	: #DDEEFF;
+}
+
+#header a,a:link,a:visited,a:active{
+	color: #5D5D5D;
+	text-decoration: none;
+}
+
+#header  a:hover{
+	color				: #FF0000;
+	text-decoration		: none;
+}
+
+
+#main{
+	width				: 78%;
+	height				: 100%;
+	float				: left;
+	padding				: 5px 10px 5px 10px;
+	background-color	: #FFFFFF;
+	border-right		: 1px solid #999999;
+}
+
+#main a {
+	text-decoration		: none;
+}
+
+#main a:link {
+	color				: #337ED2;
+	text-decoration		: none;
+}
+
+#main a:visited {
+	color				: #56AEE1;
+	text-decoration		: none;
+}
+
+#main a:hover {
+	color				: #337ED2;
+	text-decoration		: none;
+}
+
+#right{
+	float				: right;
+	width				: 18%
+	padding				: 0px 15px 5px 5px;
+	background-color	: #FFFFFF;
+	margin-right		: 10px;
+}
+
+#right hr{
+	border-width		: 1px 0 0 0;
+	border-style		: dotted;
+	border-color		: #999999;
+	height				: 1px;
+	clear				: both;
+}
+
+#right a,a:link,a:visited,a:active{
+	color				: #337ED2;
+	text-decoration		: none;
+}
+
+#right a:hover{
+	color				: #FF0000;
+	text-decoration		: none;
+}
+
+#right h4 {
+	font-size			: 90%;
+	font-weight			: bold;
+	text-align			: center;
+	padding				: 0 0 0px 10px;
+ 	border-left			: 18px solid #BBEEFF;
+ 	border-right		: 18px solid #BBEEFF;
+}
+
+#right ul{
+	margin-left			: 15px;
+	padding				: 0px;
+}
+
+#right li{
+	list-style-type:dot;
+	color				: #5D5D5D;
+}
+
+#footer{
+	clear				: both;
+	height				: 80px;
+	border-top			: 1px solid #999999;
+	padding				: 5px;
+	text-align			: center;
+	background-color		: #DDEEFF;
+}
+
+#tab table{
+	width				: 100%
+	border				: 1px #999999 solid; 
+	border-collapse			: collapse;
+	table-layout			: auto;
+}
+
+#tab th{
+    padding				: 0.3em 1em;
+    text-align				: center;
+    border				: 1px #999999 solid; 
+}
+
+#tab td{
+    padding				: 0.3em 1em;
+    border				: 1px #999999 solid; 
+}
+
+#tab caption{
+	text-align			: left;
+	font-weight			: bold;
+}
+
+#source{
+    padding				: 0.3em 0.3em;
+    border-width			: 1px;
+    border-style			: solid;
+    border-color			: #777777;
+    color				: #2222BB;
+}
+
+
+#result
+{
+    margin-top				: 0em;
+    margin-bottom			: 1em;
+    padding				: 0.3em 1em;
+    background-color			: #EFEFEF;
+    border-width			: 1px;
+    border-style			: solid;
+    border-color			: #777777;
+    padding				: 1em;
+    font-weight				: bold; 
+    font				: bold normal 120%/125% "�ｽl�ｽr �ｽS�ｽV�ｽb�ｽN";
+}
+
+
+#menu  {
+	text-align			: right;
+	font-size			: 100%;
+	color				: #CCCCCC;
+
+}
+
+#menu ul{
+	text-align			: left;
+	padding				: 0px;
+}
+
+#menu li{
+	margin-left			: 0px;
+	display				: inline;
+}
+
+#menu a,a:link,a:visited,a:hover,a:active{
+	color: #5D5D5D;
+	text-decoration: none;
+}
