@@ -1,0 +1,312 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>一週間で身につくC言語の基本|第１日目：名前空間</title>
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="keywords" content="C++言語,HelloWorld,cin.cout,string" lang="ja" xml:lang="ja">
+<meta name="description" content="C++言語の最も基本となるプログラムである、HelloWorldをストリームの処理を行って実行する方法について説明する。また、cin,coutの使い方や、stringの使い方にいても言及する。" lang="ja" xml:lang="ja">
+<meta http-equiv="content-style-type" content="text/css">
+<meta http-equiv="content-script-type" content="text/javascript">
+<meta http-equiv="content-language" content="ja">
+<link rel="stylesheet" type="text/css" href="./style_files/style.css">
+<link rel="shortcut icon" type="image/ico" href="./style_files/img/favicon.ico">
+<link type="text/css" rel="stylesheet" href="styles/shCore.css">
+<link type="text/css" rel="stylesheet" href="styles/shThemeEclipse.css">
+	<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-149EFET2SP&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script type="text/javascript" src="scripts/shCore.js"></script>
+	<script type="text/javascript" src="scripts/shBrushCpp.js"></script>
+	<script type="text/javascript" src="scripts/shBrushPlain.js"></script>
+	<script type="text/javascript">
+	    SyntaxHighlighter.config.clipboardSwf = 'scripts/clipboard.swf';
+	    SyntaxHighlighter.all();
+	    SyntaxHighlighter.defaults['toolbar'] = false;
+	</script>
+	<!-- google analytics -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ 
+	  ga('create', 'UA-48887342-2', 'sevendays-study.com');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<div id="out">
+	<div id="header">
+		
+                <div style="width: 500px;display: inline-block;">
+                    <h1><a href="index.html">一週間で身につくC++言語の基本</a></h1>
+                    <h2>第１日目：名前空間</h2>
+                </div>
+                <div style="float:right;text-align: center;display: inline-block;">
+                    <a href="http://shift-system.jp/"><img src="../img/logo.png"><br>シフトシステム株式会社</a>
+                </div>
+<!--		<div align="right" style="float:right;">
+			<table>
+		<tr>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="http://www.facebook.com/sharer.php?u=http://cpp-lang.sevendays-study.com/"><img src="./style_files/img/facebook.gif"></a></td>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="http://twitter.com/share?url=http://cpp-lang.sevendays-study.com/&text=一週間で身につくC＋＋言語の基本～おさえておきたいプログラミングの基本#programmer_study" target="_blank"><img src="./style_files/img/twitter.gif"></a></td>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="https://plus.google.com/share?url={http://cpp-lang.sevendays-study.com/}" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img src="./style_files/img/google_plus.gif"></a></td>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="http://b.hatena.ne.jp/entry/http://cpp-lang.sevendays-study.com/" class="hatena-bookmark-button" data-hatena-bookmark-title="一週間で身につくC＋＋言語の基本" data-hatena-bookmark-layout="simple" title="このエントリーをはてなブックマークに追加"><img src="./style_files/img/hatebu.gif"></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></td>
+		</tr>
+	</table>		</div>-->
+	</div><!-- header -->
+	<div id="main">
+		<div id="menu">
+			<table width="100%">
+				<tbody><tr>
+					<td>
+						<ul>
+							<li><a href="index.html">トップページ</a> &gt;</li>
+							<li><a href="day1.html">第１日目：名前空間</a></li>
+						</ul>
+					</td>
+					<td>
+						<a href="day0.html">0日目</a> | <a href="day1.html">1日目</a> | <a href="day2.html">2日目</a> | <a href="day3.html">3日目</a> | <a href="day4.html">4日目</a> | <a href="day5.html">5日目</a> | <a href="day6.html">6日目</a> | <a href="day7.html">7日目</a>
+					</td>
+				</tr>
+			</tbody></table>
+		</div><!-- menu -->
+		<!-- udem-banner -->
+		<div id="udemy-banner">
+			<a href="https://www.udemy.com/course/cc-lubmn/?referralCode=2908165580C9767F5A55"><img src="img/udemy.png"></a>
+		</div>
+		<!-- udemy banner -->
+		<h3>HelloWorld</h3>
+		<h4>C++言語版HelloWorld</h4>
+		<p>C言語の入門は、"HelloWorld."の表示から始まりました。C++も、C言語同様、HelloWorldの表示からはじめてみましょう。C++言語は、C言語の機能をそのまま受けつぎ拡張したものなので、C言語と同じく<b>printf()</b>関数を用いることができます。しかし、ここでは、あえてC++独自の表現方法を用いてプログラムを記述してみましょう。</p>
+<!--		<table width="100%">
+			<tr align="center">
+				<td>
+					<script type="text/javascript">
+					amazon_ad_tag = "s03ef-22"; amazon_ad_width = "728"; amazon_ad_height = "90"; amazon_ad_logo = "hide";//</script>
+					<script type="text/javascript" src="http://ir-jp.amazon-adsystem.com/s/ads.js"></script>
+				</td>
+			</tr>
+		</table> table -->
+		<h4>サンプルプログラム</h4>
+		<p>C++で同様のプログラムを書くと以下のようになります。なお、<u>C++言語のソースファイルの拡張子は、<b>.cpp</b>となっています</u>ので、間違えないようにしてください。</p>
+		<b>list1-1：main.cpp</b>
+		<div id="source">
+<div><div id="highlighter_670756" class="syntaxhighlighter  c"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="c preprocessor">#include &lt;iostream&gt;</code></div><div class="line number2 index1 alt1">&nbsp;</div><div class="line number3 index2 alt2"><code class="c keyword bold">using</code> <code class="c keyword bold">namespace</code> <code class="c plain">std;</code></div><div class="line number4 index3 alt1">&nbsp;</div><div class="line number5 index4 alt2"><code class="c color1 bold">int</code> <code class="c plain">main(){</code></div><div class="line number6 index5 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">cout &lt;&lt; </code><code class="c string">"HelloWorld."</code> <code class="c plain">&lt;&lt; endl;</code></div><div class="line number7 index6 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c keyword bold">return</code> <code class="c plain">0;</code></div><div class="line number8 index7 alt1"><code class="c plain">}</code></div></div></td></tr></tbody></table></div></div>
+		</div><!-- source -->
+		<b>実行結果</b>
+		<div id="result">
+			HelloWorld.
+		</div><!-- result -->
+		<p>実行結果からもわかるとおり、このプログラムを実行すると、"HelloWorld."という文字列が表示されます。見てみると、namespace,coutなど見慣れない記述が多いことがわかります。</p>
+		<p>すでに述べたとおり、C++言語は、あくまでもC言語を拡張したものであることから、printf()関数などを用いてコンソールに文字列を表示することが出来ます。しかし、ここではあえて、C++言語特有の方法で行ってみることにします。</p>
+		<h4>プログラムの仕組み</h4>
+		<p>では、一体、このプログラムはどのような仕組みになっているのでしょうか？ここでは、C言語との違いを中心に見てみましょう。</p>
+		<h4>ヘッダとiostream</h4>
+		<p>1行目に出てくる、<b>#include</b>は、C言語同様、ヘッダファイルと呼ばれるファイルを読み込むときに用いる宣言です。ここで読み込むファイルは、<b>iostream</b>というファイルです。これは、ヘッダファイルですが、C++の場合のものであり、C言語の時のように<b>".h"</b>は、必要ありません。そのため、C言語のヘッダファイルと一線を画すため、単に<b>ヘッダ</b>と呼ばれます。</p>
+		<p>C言語では、ヘッダファイルを呼び込むことにより、様々な関数を利用できるようになりましたが、C++の場合は、ヘッダを読み込むことにより、クラスを利用できるようになるといった違いがあります。(詳細は後述)</p>
+		<h4>名前空間</h4>
+		<p>3行目の<b>using namespace std;</b>の部分ですが、<b>using namespace</b>は、指定された名前の<b>名前空間</b>を使うことを意味しています。詳細は後述しますが、名前空間とは、C言語には存在せず、C++言語から用いられるようになった重要な概念です。</p>
+		<p>次に出てくる、<b>cout</b>は、ここで定義されているものです。したがって、利用するためには、「標準名前空間を利用する」という宣言としてこの一文が必要になるわけです。</p>
+		<h4>cout</h4>
+		<p>続いて、プログラムの中身に移ります。C++言語では、printf()関数と同じような働きをするものとして、<b>cout</b>が用意されています。</p>
+		<p><b>cout</b>は、<u>C言語で用いた関数のようなものではありません。</u>見た目は似ていますが、実は<b>オブジェクト</b>と呼ばれるもので、特に標準入出力の出力をつかさどるものなのです。</p>
+		<p>C++言語の入出力ストリームでは、<b>&gt;&gt;</b>および、<b>&lt;&lt;</b>を用いることにより、ストリームと呼ばれる対象に対するデータのやりとりを行います。ここでは、<b>cout</b>を通じて、巣津力ストリームに、文字列"HelloWorld."を送り出しているわけです。</p>
+		<p>最後の<b>endl</b>は改行を表します。C言語で用いた<b>¥n</b>も利用可能ですが、C++で、coutを用いる場合は、こちらが一般的です。</p>
+		<h3>標準名前空間</h3>
+		<h4>名前空間とは</h4>
+		<p>ではここで、<b>名前空間</b>とは何か、という概念について説明しましょう。C++言語とC言語の大きな違いのひとつは、C++言語が、あらかじめ大規模開発を意識して作られている言語だという点があります。</p>
+		<p>大規模開発とは、大勢の人間がひとつのソフト・アプリケーションを開発することで、その場合問題になってくるのが名前の重複です。その場合、ひとつの単語が変数名などとして用いられると、ほかの開発者はそれを利用できなくなり、大変不便です。</p>
+		<p>そこで、名前空間という概念を用意し、名前空間が違えば、同じ名前を用いてもよい、というルールを作ったわけです。たとえば、ゲームの開発現場で、二人のプログラマーがたまたま<b>power</b>変数を使用していたとします。</p>
+		<p>このとき、プログラマーAが、この変数をプレイヤーの力として、プログラマーBがモンスターの力としてこの変数を用いていたならば、プレイヤー、モンスターのそれぞれの名前空間をあらかじめ別々に用意しておけば、こういった問題は発生しません。<b>(図1-1)</b></p>
+		<table>
+			<caption><b>図1-1.名前空間の概念①</b></caption>
+			<tbody><tr>
+				<td><img src="img/fig1-1.png" alt="C++言語で用いられる名前空間（ネームスペース:namespace）のイメージ①" title="ネームスペースのイメージ"></td>
+			</tr>
+		</tbody></table>
+		<p>また、当然ながら同一の名前空間には、同じ名前の存在は許されません。<b>(図1-2)</b></p>
+		<table>
+			<tbody><tr>
+				</tr></tbody><caption><b>図1-2.名前空間の概念②</b></caption>
+				<tbody><tr><td><img src="img/fig1-2.png" alt="C++言語で用いられる名前空間（ネームスペース:namespace）のイメージ②" title="ネームスペースのイメージ"></td>
+			</tr>
+		</tbody></table>
+		<h4>名前空間の利用</h4>
+		<p>名前空間には、ユーザーが独自に定義するものと、もともとC++言語に備わっているものがあります。後者のものの、<b>標準名前空間</b>と呼び、<b>std</b>と表記します。なお、名前空間を用いる場合は、以下のように行います。</p>
+		<b>名前空間の利用①</b>
+		<div id="source">		
+		using&nbsp;namespace&nbsp;(名前空間名);
+		</div><!-- source -->
+		<p>そのため、<b>list1-1</b>の3行目で、C++の標準名前空間が利用されていることがわかります。<u>coutなどは、この標準名前空間で利用可能</u>なのです。また、次のような使い方も可能です。</p>
+		<b>名前空間の利用②</b>
+		<div id="source">		
+		(名前空間名)::(変数名・クラス名など）
+		</div><!-- source -->
+		<p>この方法を用いると、<b>using&nbsp;</b>を使う必要がありません。なお、この方法を用いて<b>list1-1</b>を書き換えると、以下のようになります。</p>
+		<b>list1-2：main.cpp</b>
+		<div id="source">
+<div><div id="highlighter_272827" class="syntaxhighlighter  c"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="c preprocessor">#include &lt;iostream&gt;</code></div><div class="line number2 index1 alt1">&nbsp;</div><div class="line number3 index2 alt2"><code class="c color1 bold">int</code> <code class="c plain">main(){</code></div><div class="line number4 index3 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">std::cout &lt;&lt; </code><code class="c string">"HelloWorld."</code> <code class="c plain">&lt;&lt; std::endl;</code></div><div class="line number5 index4 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c keyword bold">return</code> <code class="c plain">0;</code></div><div class="line number6 index5 alt1"><code class="c plain">}</code></div></div></td></tr></tbody></table></div></div>
+		</div><!-- source -->
+		<p>動作結果は同じなので省略します。<b>cout</b>、<b>endl</b>共に標準名前空間に含まれるので、先頭に<b>std</b>がつきます。</p>		
+		<h3>コンソールからの入力</h3>
+		<h4>サンプルプログラム</h4>
+		<p>続いて、コンソールから数値を入力し表示するという簡単なサンプルを紹介しましょう。まずは、以下のプログラムを実行してください。</p>
+		<b>list1-3：main.cpp</b>
+		<div id="source">
+<div><div id="highlighter_531854" class="syntaxhighlighter  c"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="c preprocessor">#include &lt;iostream&gt;</code></div><div class="line number2 index1 alt1">&nbsp;</div><div class="line number3 index2 alt2"><code class="c keyword bold">using</code> <code class="c keyword bold">namespace</code> <code class="c plain">std;</code></div><div class="line number4 index3 alt1">&nbsp;</div><div class="line number5 index4 alt2"><code class="c color1 bold">int</code> <code class="c plain">main(){</code></div><div class="line number6 index5 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c color1 bold">int</code> <code class="c plain">a;</code></div><div class="line number7 index6 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">cin &gt;&gt; a;</code></div><div class="line number8 index7 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">cout &lt;&lt; </code><code class="c string">"a="</code> <code class="c plain">&lt;&lt; a &lt;&lt; endl;</code></div><div class="line number9 index8 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c keyword bold">return</code> <code class="c plain">0;</code></div><div class="line number10 index9 alt1"><code class="c plain">}</code></div></div></td></tr></tbody></table></div></div>
+		</div><!-- source -->
+		<b>実行結果</b>
+		<div id="result">
+			5&nbsp;&nbsp;&nbsp;<font color="red">←キーボードから入力</font><br>
+			a=5<br>
+		</div><!-- result -->
+		<h4>cin</h4>
+		<p>実行結果からわかるとおり、キーボードから入力した数値をそのまま出力しています。ここで出てくる、<b>cin</b>も、標準名前空間に含まれるものの一つです。C言語であれば、scanf()関数に相当する処理です。</p>
+		<p>7行目で、キーボードから数値の入力を受け付けています。値は整数型変数aに代入され、8行目で表示されています。<b>cout</b>では、連続していくつものものを表示する場合、間を<b>&lt;&lt;</b>ではさみます。そのため8行目では、"a="、変数aの値、改行(endl)の順で出力されるわけです。</p>
+		<p>このことからわかるとおり、C++においては、C言語のprintf()のように、<b>%d</b>や<b>¥n</b>といった記述はほとんど必要ありません。利用することは皆無ではありませんが、C言語に比べればはるかに少なくなっています。</p>
+		<h4>ストリームの概念</h4>
+		<p>最後に、ストリームの概念について説明して終わることにしましょう。ここまで読むと、<b>cout</b>や、<b>cin</b>は、単純に、C言語のprintf()関数や、scanf()関数の代わりと思われるかも知れませんが、実は違います。</p>
+		<p>これらは、<b>ストリーム</b>と呼ばれるものに対し、データ（数値や文字列など）を送り込んだり、逆に受け取ったりするものなのです。ストリームとは、英語で渓流などを表す言葉で、「流れ」という意味で用いられています。</p>
+		<p>つまり、<b>cin</b>や、<b>cout</b>は、その”流れ”からデータを受け取ったり、送り込んだりするわけです<b>(図1-3)</b>。不等号の向きは、その流れの向きを表すわけです。そして、そのストリームの行き着く先は、今回のサンプルのようなコンソールだったり、ファイルシステムだったりするわけです。これにより、ファイルへの読み書きと、コンソールからの入力・出力の処理がほとんど同じような記述で行うことが出来るのです。</p>
+		<table>
+			<caption><b>図1-3.ストリームの概念</b></caption>
+			<tbody><tr>
+				<td><img src="img/fig1-3.png" alt="C++言語でもC言語でも用いられるストリームのイメージ" title="ストリームのイメージ"></td>
+			</tr>
+		</tbody></table>
+		<p>コンソールの概念自体は、C言語にも存在し、似たようなことも出来ますが、C++の場合は、よりその方法が洗練されているのです。</p>
+<h3>stringと文字列</h3>
+		<h4>string</h4>
+		<p>C++言語では、文字列の操作を行う<b>string</b>という<b>クラス</b>が存在します。クラスとは何かという説明は後ほど出てくるので、ここでは省略します。ただ、これを<b>cin</b>および<b>cout</b>と合わせて使うと大変便利で、char型の配列を用いて文字列の操作を行っていたC言語に比べれば、大変楽なので、まずはそのことについて解説します。</p>
+		<h4>サンプルプログラム</h4>
+		<p><b>string</b>というクラスを用いて作った簡単なサンプルをまずは実行してみてください。</p>
+		<b>list1-4：簡単な文字列の操作(main.cpp)</b>
+		<div id="source">
+<div><div id="highlighter_490472" class="syntaxhighlighter  c"><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="c preprocessor">#include &lt;iostream&gt;</code></div><div class="line number2 index1 alt1"><code class="c preprocessor">#include &lt;string&gt;</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="c keyword bold">using</code> <code class="c keyword bold">namespace</code> <code class="c plain">std;</code></div><div class="line number5 index4 alt2">&nbsp;</div><div class="line number6 index5 alt1"><code class="c color1 bold">int</code> <code class="c plain">main(){</code></div><div class="line number7 index6 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">string s,t;</code></div><div class="line number8 index7 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">t =</code><code class="c string">"入力された文字は、"</code><code class="c plain">;</code></div><div class="line number9 index8 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">cout &lt;&lt; </code><code class="c string">"文字列を入力："</code><code class="c plain">;</code></div><div class="line number10 index9 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">cin &gt;&gt; s;</code></div><div class="line number11 index10 alt2"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c plain">cout &lt;&lt; t+s &lt;&lt; </code><code class="c string">"です。"</code> <code class="c plain">&lt;&lt; endl;</code></div><div class="line number12 index11 alt1"><code class="c spaces">&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="c keyword bold">return</code> <code class="c plain">0;</code></div><div class="line number13 index12 alt2"><code class="c plain">}</code></div></div></td></tr></tbody></table></div></div>
+		</div>
+		<b>実行結果</b>
+		<div id="result">
+			文字列を入力：Hello&nbsp;&nbsp;&nbsp;<font color="red">←キーボードから入力</font><br>
+			入力された文字は、Helloです。<br>
+		</div><!-- result -->
+		<p>実行すると「文字列を入力：」と出力され、入力待ち状態になります。ここで、任意の文字列を入力し、Enterを押すと、「入力された文字列は○○です。」と出ます。見てわかるとおり、C言語で同様のプログラムを作るときよりも、数段簡単ですし、cin、coutの記述方法は、intのときとまったく変わりません。これが、C++のストリームを利用する際の魅力のひとつです。</p>
+		<h4>stringと演算子</h4>
+		<p>また、文字列を扱うには、まず2行目のように、ヘッダファイル<b>string</b>をインクルードする必要があります。これは、<u>C言語のヘッダファイルであるstring.hとは違う</u>ので、注意が必要です。値への代入は、9行目、10行目のように、<b>=（イコール）</b>演算子を用いて行うことができます。</p>
+		<p>また、13行目のように、<b>+(プラス）</b>演算子を用いて、文字列同士をつなげることが可能です。このように、C言語とは違い、文字列の操作が簡単にできることがC++言語の特徴です。stringでは、以下の表2-1のように演算子を用いて文字列を操作することが可能です。</p>
+		<div id="tab">
+		<table>
+			<caption>表2-1：stringで用いられる主な演算子</caption>
+			<tbody><tr align="center" bgcolor="#BBEEFF">
+				<th>演算子</th>
+				<th>意味</th>
+			</tr>
+			<tr>
+				<td align="center">+</td>
+				<td>文字列同士の足し算</td>
+			</tr>
+			<tr>
+				<td align="center">+=</td>
+				<td>文字列同士の足し算（代入演算）</td>
+			</tr>
+			<tr>
+				<td align="center">==</td>
+				<td>比較演算(内容が同等)</td>
+			</tr>
+			<tr>
+				<td align="center">!=</td>
+				<td>比較演算(内容が異なる)</td>
+			</tr>
+			<tr>
+				<td align="center">&gt;</td>
+				<td rowspan="2">比較演算(文字列の大きさ)</td>
+			</tr>
+			<tr>
+				<td align="center">&lt;</td>
+			</tr>
+		</tbody></table>
+		</div><!-- tab -->
+		<p>この表を見てもわかるとおり、文字列も、数値などと直感的に近い操作が出来るのが、C++言語の大きな特徴のひとつです。</p>
+		<br>
+		<p><b>練習問題&nbsp;:&nbsp;<a href="problem1.html">問題1.</a></b></p>
+		<br>
+		<div id="link">
+			<table align="center">
+				<tbody><tr>
+					<td width="121"><a href="day0.html"><img src="style_files/img/back.png" alt="戻る" title="戻る"></a></td><td width="121"><a href="index.html"><img src="style_files/img/top.png" alt="トップへ戻る" title="トップへ戻る"></a></td><td width="121"><a href="day2.html"><img src="style_files/img/next.png" alt="次へ" title="次へ"></a></td>
+				</tr>
+			</tbody></table>
+		</div><!-- link -->
+<!--		<div align="center">
+			<iframe frameborder="0" allowtransparency="true" height="90" width="728" marginheight="0" scrolling="no" src="http://ad.jp.ap.valuecommerce.com/servlet/htmlbanner?sid=2759512&pid=883470655" marginwidth="0"><script language="javascript" src="http://ad.jp.ap.valuecommerce.com/servlet/jsbanner?sid=2759512&pid=883470655"></script><noscript><a href="http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=2759512&pid=883470655" target="_blank" ><img src="http://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=2759512&pid=883470655" height="90" width="728" border="0"></a></noscript></iframe>
+		</div>-->
+	</div><!-- main -->
+	<div id="right">
+		<div align="center">
+			<a href="index.html"><img src="./style_files/img/logo.png" alt="一週間でわかるC++言語" title="一週間でわかるC++言語"></a><br>
+                        <table style="margin-bottom: 10px;">
+                            <tbody><tr>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="http://www.facebook.com/sharer.php?u=http://cpp-lang.sevendays-study.com/"><img src="./style_files/img/facebook.gif"></a></td>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="http://twitter.com/share?url=http://cpp-lang.sevendays-study.com/&amp;text=一週間で身につくC＋＋言語の基本～おさえておきたいプログラミングの基本#programmer_study" target="_blank"><img src="./style_files/img/twitter.gif"></a></td>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="https://plus.google.com/share?url={http://cpp-lang.sevendays-study.com/}" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img src="./style_files/img/google_plus.gif"></a></td>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="http://b.hatena.ne.jp/entry/http://cpp-lang.sevendays-study.com/" class="hatena-bookmark-button" data-hatena-bookmark-title="一週間で身につくC＋＋言語の基本" data-hatena-bookmark-layout="simple" title="このエントリーをはてなブックマークに追加" data-hatena-bookmark-initialized="1"><img src="./style_files/img/hatebu.gif"></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></td>
+                            </tr>
+                        </tbody></table>
+			<a href="/lang/c">C言語</a>&nbsp;|&nbsp;<a href="index.html">C++言語</a>&nbsp;|&nbsp;<a href="/lang/java">Java</a>&nbsp;|&nbsp;<a href="/lang/c#">C#</a>
+		</div>
+		<h4>プログラミング</h4>
+		<ul>
+			<li><a href="/lang/c/">一週間でわかるC言語</a></li>
+			<li><a href="/lang/c++">一週間でわかるC++言語</a></li>
+			<li><a href="/lang/java">一週間でわかるJava言語</a></li>
+			<li><a href="/lang/c#">一週間でわかるC#言語</a></li>
+			<li><a href="/lang/algorithm/">一週間でわかるアルゴリズム</a></li>
+		</ul>
+		<hr>
+		<h4>web関連</h4>
+		<ul>
+			<li><a href="/lang/mysql/">一週間でわかるMySQL</a></li>
+		</ul>
+		<hr>
+ 
+		<h4>開発環境（IDE）</h4>
+		<ul>
+			<li><a href="development1.html">VisualStudio2015</a></li>
+			<li><a href="development2.html">Eclipse</a></li>
+		</ul>
+		<hr>
+		<h4>参考資料</h4>
+		<ul>
+			<li><a href="appendix1.html">参考になるC++言語の本</a></li>
+		</ul>
+		<hr>
+		<h4>リンク</h4>
+		<ul>
+			<li><a href="link.html">相互リンク</a></li>
+			<!--<li><a href="http://sevendays-study.com/programmer_howtobe/">プログラマのなり方</a></li>-->
+            <li><a href="/lang/computer-literacy/">コンピュータリテラシ</a></li>
+		</ul>
+		<hr>
+                    <h4>プライバシーポリシー</h4>
+		<ul>
+			<li><a href="/lang/privacypolicy.html">プライバシーポリシー</a></li>
+		</ul>
+                <hr>
+		<!--<div align="center">
+			<h4>参考書籍</h4>
+			<a href="http://progbooks.shift-system.jp/"><img src="style_files/img/logo_book.png" alt="プログラマーの本棚" title="一プログラマーの本棚"></a><br/>
+			<a href="http://progbooks.shift-system.jp/">プログラマーの本棚</a>
+		</div>
+		<hr>-->
+<!--		<table>
+			<tr width="100%">
+				<td align="right" style="padding-left:12px;">
+					<iframe frameborder="0" allowtransparency="true" height="600" width="120" marginheight="0" scrolling="no" src="http://ad.jp.ap.valuecommerce.com/servlet/htmlbanner?sid=2759512&pid=882965229" marginwidth="0"><script language="javascript" src="http://ad.jp.ap.valuecommerce.com/servlet/jsbanner?sid=2759512&pid=882965229"></script><noscript><a href="http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=2759512&pid=882965229" target="_blank" ><img src="http://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=2759512&pid=882965229" height="600" width="120" border="0"></a></noscript></iframe>
+				</td>
+			</tr>
+		</table>-->
+	</div><!-- right-->
+	<div id="footer">
+		Copyright © <a href="http://shift-system.jp/">shift-system.jp</a> All Rights Reserved.
+	</div><!-- footer -->
+ 
+ 
+ 
+ 
+</div></body></html>
