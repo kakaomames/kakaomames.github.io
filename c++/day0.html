@@ -1,0 +1,282 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>一週間で身につくC++言語の基本|0日目：C++言語とは</title>
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="keywords" content="C言語,C++言語,cpp,オブジェクト指向,iostream" lang="ja" xml:lang="ja">
+<meta name="description" content="C++言語のプログラミングについて学ぶ前に、言語の概要に着いて説明します。C++言語は、C言語をベースにして、オブジェクト指向という考え方を導入した拡張を施しています。ここでは、オブジェクト指向の概念と、C++言語がどういう言語かということについて説明していきます。" lang="ja" xml:lang="ja">
+<meta http-equiv="content-style-type" content="text/css">
+<meta http-equiv="content-script-type" content="text/javascript">
+<meta http-equiv="content-language" content="ja">
+<link rel="stylesheet" type="text/css" href="./style_files/style.css">
+<link rel="shortcut icon" type="image/ico" href="./style_files/img/favicon.ico">
+	<!-- google analytics -->
+	<script type="text/javascript" async="" src="https://www.googletagmanager.com/gtag/js?id=G-149EFET2SP&amp;cx=c&amp;_slc=1"></script><script async="" src="//www.google-analytics.com/analytics.js"></script><script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ 
+	  ga('create', 'UA-48887342-2', 'sevendays-study.com');
+	  ga('send', 'pageview');
+	</script>
+</head>
+<body>
+<div id="out">
+	<div id="header">
+		
+                <div style="width: 500px;display: inline-block;">
+                    <h1><a href="index.html">一週間で身につくC++言語の基本</a></h1>
+                    <h2>0日目：C++言語とは</h2>
+                </div>
+                <div style="float:right;text-align: center;display: inline-block;">
+                    <a href="http://shift-system.jp/"><img src="../img/logo.png"><br>シフトシステム株式会社</a>
+                </div>
+<!--		<div align="right" style="float:right;">
+			<table>
+		<tr>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="http://www.facebook.com/sharer.php?u=http://cpp-lang.sevendays-study.com/"><img src="./style_files/img/facebook.gif"></a></td>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="http://twitter.com/share?url=http://cpp-lang.sevendays-study.com/&text=一週間で身につくC＋＋言語の基本～おさえておきたいプログラミングの基本#programmer_study" target="_blank"><img src="./style_files/img/twitter.gif"></a></td>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="https://plus.google.com/share?url={http://cpp-lang.sevendays-study.com/}" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img src="./style_files/img/google_plus.gif"></a></td>
+			<td style="padding-right:8px;paddig-left:8px;"><a href="http://b.hatena.ne.jp/entry/http://cpp-lang.sevendays-study.com/" class="hatena-bookmark-button" data-hatena-bookmark-title="一週間で身につくC＋＋言語の基本" data-hatena-bookmark-layout="simple" title="このエントリーをはてなブックマークに追加"><img src="./style_files/img/hatebu.gif"></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></td>
+		</tr>
+	</table>		</div>-->
+	</div><!-- header -->
+ 
+	<div id="main">
+		<div id="menu">
+			<table width="100%">
+				<tbody><tr>
+					<td>
+						<ul>
+							<li><a href="index.html">トップページ</a> &gt;</li>
+							<li><a href="day0.html">0日目：C++言語とは</a></li>
+						</ul>
+					</td>
+					<td>
+						<a href="day0.html">0日目</a> | <a href="day1.html">1日目</a> | <a href="day2.html">2日目</a> | <a href="day3.html">3日目</a> | <a href="day4.html">4日目</a> | <a href="day5.html">5日目</a> | <a href="day6.html">6日目</a> | <a href="day7.html">7日目</a>
+					</td>
+				</tr>
+			</tbody></table>
+		</div><!-- menu -->
+		<!-- udem-banner -->
+		<div id="udemy-banner">
+			<a href="https://www.udemy.com/course/cc-lubmn/?referralCode=2908165580C9767F5A55"><img src="img/udemy.png"></a>
+		</div>
+		<!-- udemy banner -->
+		<h3>C言語の上位セットとしてのC++言語</h3>
+		<p>1972年にC言語が開発されると、瞬く間に各方面で利用されるデファクトスタンダードの言語となりました。しかし、それにつれ、この言語の問題と限界が露呈するようになりました。</p>
+		<p>そのひとつは、C言語は、大規模な開発には、必ずしも向かないということです。時代の変化とともにコンピュータの性能が向上すると、多数のプログラマが参加する大規模開発が主流になってきました。しかし、C言語はそういったプログラミングを行ううえでは、必ずしも効率的な言語とはいえませんでした。そこで、C言語にオブジェクト指向的な拡張を施したC++(シー・プラス・プラス）言語が開発され、利用されるようになったのです。</p>
+<!--		<table width="100%">
+			<tr align="center">
+				<td>
+					<script type="text/javascript">
+					amazon_ad_tag = "s03ef-22"; amazon_ad_width = "728"; amazon_ad_height = "90"; amazon_ad_logo = "hide";//</script>
+					<script type="text/javascript" src="http://ir-jp.amazon-adsystem.com/s/ads.js"></script>
+				</td>
+			</tr>
+		</table> table -->
+		<h3>オブジェクト指向</h3>
+		<p>C++言語について詳しく説明する前に、オブジェクト指向とは何かということについて詳しく説明していきましょう。</p>
+		<p>オブジェクト指向の「オブジェクト」とは、英語で「もの」とか「物体」などを表す言葉で、データを現実世界のものに置き換える考え方です。</p>
+		<p>たとえば、オブジェクト指向プログラミング言語で、テレビを操作するプログラムを作成したと仮定します。そのとき、オブジェクト指向では、テレビを象徴する「テレビ」というオブジェクトを用意します。また、「テレビ」には、「スイッチを入れる」、「チャンネルを変える」などといった動作が伴います。これら動作のことを「メソッド」と言います。</p>
+		<p>オブジェクト指向では、これら「オブジェクト」とその動作である「メソッド」の組み合わせと、その相互作用でプログラムを記述します。</p>
+		<p>このような考え方が、現在のプログラミング言語の考え方の主流なのです。現在、主なオブジェクト指向言語には、以下のようなものがあります。</p>
+		<div id="tab">
+		<table style="width:100%">
+			<caption>表0-1：主要なオブジェクト指向言語一覧</caption>
+			<tbody><tr align="center" bgcolor="#BBEEFF">
+				<th>言語名</th>
+				<th>特徴</th>
+			</tr>
+			<tr>
+				<th>C++</th>
+				<td>C言語を更に拡張した言語。オブジェクト指向といった考え方に対応。</td>
+			</tr>
+			<tr>
+				<th><a href="/lang/java">Java</a></th>
+				<td>C/C++をベースにして、SunMicrosystemsによって開発された、Androidなどで用いられている言語。</td>
+			</tr>
+				<tr>
+				<th><a href="/lang/c#">C#</a></th>
+				<td>Microsoft社がJavaなどをベースに独自に開発した言語。</td>
+			</tr>
+			<tr>
+				<th>Objective-C</th>
+				<td>Apple社がC言語を独自に拡張した言語。iPhoneやiPadのアプリ開発に用いられる。</td>
+			</tr>
+			<tr>
+				<th>Swift</th>
+				<td>Apple社によって開発されたObjective-Cの後継言語。iPhoneやiPadのアプリ開発に用いられる。</td>
+			</tr>
+			<tr>
+				<th>Perl</th>
+				<td>スクリプト言語として、CGIなどに多用される。バージョン5よりオブジェクト指向になった。</td>
+			</tr>
+			<tr>
+				<th>JavaScript</th>
+				<td>HP作成に用いられるスクリプト言語。jQueryなどに応用される。</td>
+			</tr>
+			<tr>
+				<th>Python</th>
+				<td>Web開発などによく用いられる言語。拡張性に定評がある。</td>
+			</tr>
+			<tr>
+				<th>Ruby</th>
+				<td>この中では、唯一日本人によって作成された言語。Pythonと共通点が多い。</td>
+			</tr>
+			<tr>
+				<th>PHP</th>
+				<td>ウェブ開発に特化した言語。サーバーサイド側の処理を記述する。</td>
+			</tr>
+		</tbody></table>
+		</div><!-- tab -->
+		<br>
+		<p>現在使用されている主要なプログラミング言語は、ほとんどがオブジェクト指向言語です。したがって、C++でオブジェクト指向プログラミングを学べば、広い範囲に応用可能なのです。</p>
+		<h3>C++言語の特徴</h3>
+		<p>ここでは、C++言語の特徴について説明します。一般に。C++言語には、以下の長所・短所があるといわれています。簡単にまとめると、以下のようになります。</p>
+		<b>C++言語の長所</b>
+		<ul>
+			<li>C言語と互換性があり、ソースコードを再利用できる。</li>
+			<li>他のオブジェクト指向言語と違い独自のフレームワーク必要とせず、ネイティブコードを得られる。</li>
+			<li>C言語よりもセキュリティの面が優れている。</li>
+		</ul>
+		<p>これに対し、デメリットとしては以下のようなものがあげられます。</p>
+		<b>C++言語の短所</b>
+		<ul>
+			<li>他の言語に比べ、言語使用が複雑。</li>
+			<li>標準で利用できるライブラリが少ない。</li>
+			<li>メモリ管理機能（GC機能）が存在しない。</li>
+		</ul>
+		<p>といった点が挙げられます。</p>
+		<h3>オブジェクト指向</h3>
+		<h4>オブジェクト指向の考え方</h4>
+		<p>では、次にC++言語の特徴である、<b>オブジェクト指向</b>について、詳しく説明しましょう。オブジェクト指向とは、<u>あらゆるものを、すべて「モノ」として表現するという考え方</u>のことを言います。オブジェクト指向の、<b>オブジェクト（Object）</b>とは、英語で「モノ」を表す言葉です。</p>
+		<p>例えば、自動車を運転する際には、自動車内部の仕組みを理解する必要はありません。ただ運転方法だけを知っていれば、それだけで自動車を使うことができます。</p>
+		<p>つまり、「自動車」というオブジェクトは、動作させる仕組みがすでに内部に組み込まれていることから、それを利用するためには、仕組みを知る必要は一切なく、ただアクセルを踏む、ハンドルを切るなどといったような適切な操作をすればよいことになります。(図0-1参照)</p>	
+		<b>図0-1.オブジェクト指向の考え方</b>
+		<table>
+			<tbody><tr>
+				<td><img src="img/fig0-1.png" alt="オブジェクト指向の考え方：車を例に" title="オブジェクト指向のイメージ"></td>
+			</tr>
+		</tbody></table>
+		<p>オブジェクトには、操作にあたる、<b>メソッド</b>と呼ばれる部分と、<b>属性（ぞくせい）</b>があります。自動車の例で言えば、「発進する」「停止する」などがそのメソッドで、データは、スピード、走行距離、といったところでしょう。(表0-2参照)</p>
+		<div id="tab">
+		<table>
+			<caption>表0-2：自動車オブジェクトのメソッドと属性</caption>
+			<tbody><tr>
+				<th rowspan="3" align="center" bgcolor="#BBEEFF">属性</th>
+				<td width="200px">スピード</td>
+			</tr>
+			<tr>
+				<td>走行距離</td>
+			</tr>
+			<tr>
+				<td>排気量</td>
+			</tr>
+			<tr>
+				<th rowspan="3" align="center" bgcolor="#BBEEFF">メソッド</th>
+				<td>発信する</td>
+			</tr>
+			<tr>
+				<td>停止する</td>
+			</tr>
+			<tr>
+				<td>曲がる</td>
+			</tr>
+		</tbody></table>
+		</div><!-- tab -->
+		<h4>クラスとオブジェクト</h4>
+		<p>以上で、だいたいオブジェクト指向の考え方が理解できたかと思います。そこで、ここではさらに、<b>クラス</b>という概念について説明します。前述の、自動車という例を用いて説明すると、通常、世の中には、自動車がたくさん存在します。</p>
+		<p><b>オブジェクト</b>は、こういった、<u>個々の物体をさす場合に用いられる概念</u>で、このほかに、<b>インスタンス</b>という呼び名もあります。</p>
+		<p>ただ、こういった自動車も、もとはひとつの設計図を元に大量生産されているはずなのです。この、設計図にあたるものを、<b>クラス</b>と言います。つまり、クラスがなければ、オブジェクトもありえないのです。以上が、基本的なオブジェクト指向の考え方です。オブジェクト指向には、このほかに様々な概念がありますが、今後適宜紹介していきます。（図0-2.参照）</p>
+		<b>図0-2.クラスとオブジェクト</b>
+		<table>
+			<tbody><tr>
+				<td><img src="img/fig0-2.png" alt="クラスとオブジェクト" title="クラスとオブジェクト"></td>
+			</tr>
+		</tbody></table>
+		<br>
+		<div id="link">
+			<table align="center">
+				<tbody><tr>
+					<td width="121"><img src="style_files/img/back_stop.png" alt="戻る" title="戻る"></td><td width="121"><a href="index.html"><img src="style_files/img/top.png" alt="トップへ戻る" title="トップへ戻る"></a></td><td width="121"><a href="day1.html"><img src="style_files/img/next.png" alt="次へ" title="次へ"></a></td>
+				</tr>
+			</tbody></table>
+		</div><!-- link -->
+<!--		<div align="center">
+			<iframe frameborder="0" allowtransparency="true" height="90" width="728" marginheight="0" scrolling="no" src="http://ad.jp.ap.valuecommerce.com/servlet/htmlbanner?sid=2759512&pid=883470655" marginwidth="0"><script language="javascript" src="http://ad.jp.ap.valuecommerce.com/servlet/jsbanner?sid=2759512&pid=883470655"></script><noscript><a href="http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=2759512&pid=883470655" target="_blank" ><img src="http://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=2759512&pid=883470655" height="90" width="728" border="0"></a></noscript></iframe>
+		</div>-->
+	</div><!-- main -->
+	<div id="right">
+		<div align="center">
+			<a href="index.html"><img src="./style_files/img/logo.png" alt="一週間でわかるC++言語" title="一週間でわかるC++言語"></a><br>
+                        <table style="margin-bottom: 10px;">
+                            <tbody><tr>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="http://www.facebook.com/sharer.php?u=http://cpp-lang.sevendays-study.com/"><img src="./style_files/img/facebook.gif"></a></td>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="http://twitter.com/share?url=http://cpp-lang.sevendays-study.com/&amp;text=一週間で身につくC＋＋言語の基本～おさえておきたいプログラミングの基本#programmer_study" target="_blank"><img src="./style_files/img/twitter.gif"></a></td>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="https://plus.google.com/share?url={http://cpp-lang.sevendays-study.com/}" onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img src="./style_files/img/google_plus.gif"></a></td>
+                                    <td style="padding-right:8px;paddig-left:8px;"><a href="http://b.hatena.ne.jp/entry/http://cpp-lang.sevendays-study.com/" class="hatena-bookmark-button" data-hatena-bookmark-title="一週間で身につくC＋＋言語の基本" data-hatena-bookmark-layout="simple" title="このエントリーをはてなブックマークに追加" data-hatena-bookmark-initialized="1"><img src="./style_files/img/hatebu.gif"></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script></td>
+                            </tr>
+                        </tbody></table>
+			<a href="http://c-lang.sevendays-study.com/">C言語</a>&nbsp;|&nbsp;<a href="index.html">C++言語</a>&nbsp;|&nbsp;<a href="http://java.sevendays-study.com/">Java</a>&nbsp;|&nbsp;<a href="http://csharp.sevendays-study.com/">C#</a>
+		</div>
+		<h4>プログラミング</h4>
+		<ul>
+			<li><a href="http://c-lang.sevendays-study.com/">一週間でわかるC言語</a></li>
+			<li><a href="http://cpp-lang.sevendays-study.com/">一週間でわかるC++言語</a></li>
+			<li><a href="http://java.sevendays-study.com/">一週間でわかるJava言語</a></li>
+			<li><a href="http://csharp.sevendays-study.com/">一週間でわかるC#言語</a></li>
+			<li><a href="http://sevendays-study.com/algorithm/">一週間でわかるアルゴリズム</a></li>
+		</ul>
+		<hr>
+		<h4>web関連</h4>
+		<ul>
+			<li><a href="http://web.sevendays-study.com/mysql/">一週間でわかるMySQL</a></li>
+		</ul>
+		<hr>
+ 
+		<h4>開発環境（IDE）</h4>
+		<ul>
+			<li><a href="development1.html">VisualStudio2015</a></li>
+			<li><a href="development2.html">Eclipse</a></li>
+		</ul>
+		<hr>
+		<h4>参考資料</h4>
+		<ul>
+			<li><a href="appendix1.html">参考になるC++言語の本</a></li>
+		</ul>
+		<hr>
+		<h4>リンク</h4>
+		<ul>
+			<li><a href="link.html">相互リンク</a></li>
+			<!--<li><a href="http://sevendays-study.com/programmer_howtobe/">プログラマのなり方</a></li>-->
+            <li><a href="http://sevendays-study.com/computer-literacy/">コンピュータリテラシ</a></li>
+		</ul>
+		<hr>
+                    <h4>プライバシーポリシー</h4>
+		<ul>
+			<li><a href="http://sevendays-study.com/privacypolicy.html">プライバシーポリシー</a></li>
+		</ul>
+                <hr>
+		<!--<div align="center">
+			<h4>参考書籍</h4>
+			<a href="http://progbooks.shift-system.jp/"><img src="style_files/img/logo_book.png" alt="プログラマーの本棚" title="一プログラマーの本棚"></a><br/>
+			<a href="http://progbooks.shift-system.jp/">プログラマーの本棚</a>
+		</div>
+		<hr>-->
+<!--		<table>
+			<tr width="100%">
+				<td align="right" style="padding-left:12px;">
+					<iframe frameborder="0" allowtransparency="true" height="600" width="120" marginheight="0" scrolling="no" src="http://ad.jp.ap.valuecommerce.com/servlet/htmlbanner?sid=2759512&pid=882965229" marginwidth="0"><script language="javascript" src="http://ad.jp.ap.valuecommerce.com/servlet/jsbanner?sid=2759512&pid=882965229"></script><noscript><a href="http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=2759512&pid=882965229" target="_blank" ><img src="http://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=2759512&pid=882965229" height="600" width="120" border="0"></a></noscript></iframe>
+				</td>
+			</tr>
+		</table>-->
+	</div><!-- right-->
+ 
+	<div id="footer">
+		Copyright © <a href="http://shift-system.jp/">shift-system.jp</a> All Rights Reserved.
+	</div><!-- footer -->
+</div><!-- out -->
+ 
+ 
+</body></html>
