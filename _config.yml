@@ -1,0 +1,5 @@
+# _config.yml
+plugins:
+  # 他のプラグインがあればそのまま
+  # ...
+  - jekyll-redirect-from # これを追加
