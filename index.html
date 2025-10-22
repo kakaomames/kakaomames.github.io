@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カカオマメのサイドバディ - Googleログイン</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #google-login-btn {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        #google-login-btn:hover {
+            background-color: #357ae8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>サイドバディアプリへようこそ！</h1>
+        <p>Googleアカウントでログインしてみましょう。</p>
+        
+        <button id="google-login-btn">
+            Googleでログイン
+        </button>
+    </div>
+    
+    <script>
+        // ★★★ 以下の情報を、必ずあなたの環境に合わせて変更してください！ ★★★
+        
+        // 1. Google Cloud Consoleで取得したクライアントID (Vercelの G_CI と同じ値)
+        const CLIENT_ID = '844740267850-v6jekibmbdgdcm0fjnq60m0289okic4d.apps.googleusercontent.com'; // 例: 844740267850-v6jeklbm...
+        
+        // 2. VercelのコールバックURL（Vercelの G_REDIRECT_URI と同じ値）
+        // 例: https://[あなたのプロジェクト名].vercel.app/api/callback
+        const REDIRECT_URI = 'https://xeroxapp037.vercel.app/login/google'; 
+        
+        // 3. 必要な権限 (YouTubeの読み取りと、基本的なプロファイル/メール情報)
+        const SCOPE = 'https://www.googleapis.com/auth/youtube.readonly profile email'; 
+        
+        // Googleの認証エンドポイント
+        const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+        // パラメータを構築
+        const params = new URLSearchParams({
+            client_id: CLIENT_ID,
+            redirect_uri: REDIRECT_URI,
+            response_type: 'code',      // 認証コードを要求
+            scope: SCOPE,
+            access_type: 'offline',     // リフレッシュトークンが必要な場合に設定
+            prompt: 'consent'           // ユーザーに許可を求め、リフレッシュトークンを確実に取得
+        });
+
+        // ボタンにクリックイベントを設定
+        document.getElementById('google-login-btn').addEventListener('click', () => {
+            if (CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE' || REDIRECT_URI === 'YOUR_VERCEL_REDIRECT_URI_HERE') {
+                alert('エラー: CLIENT_ID または REDIRECT_URI が設定されていません。コードを修正してください！');
+                return;
+            }
+            
+            // ユーザーをGoogle認証画面へリダイレクト
+            window.location.href = `${AUTH_URL}?${params.toString()}`;
+        });
+    </script>
+</body>
+</html>
