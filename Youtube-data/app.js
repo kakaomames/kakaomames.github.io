@@ -61,7 +61,7 @@ function displayChannelInfo(info) {
         <ul>
             <li>チャンネル登録者数: ${subscribers} 人</li>
             <li>総再生回数: ${views} 回</li>
-            <li>チャンネルURL: <a href="https://youtube.com/channel/${info.id}" target="_blank">${info.customUrl || info.id}</a></li>
+            <li>チャンネルURL: <a href="channel/${info.id}" target="_blank">${info.customUrl || info.id}</a></li>
         </ul>
     `;
     // リフレッシュトークンは重要なので、localStorageなどに保存することを検討
