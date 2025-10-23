@@ -24,7 +24,7 @@ function getUrlParams() {
  */
 async function fetchYouTubeData(token) {
     // あなたのVercelドメインに合わせてURLを修正してください
-    const VERCEL_API_URL = 'https://xeroxapp037.vercel.app/api/youtube_channel';
+    const VERCEL_API_URL = 'https://xeroxapp037.vercel.app/api/youtube/cannel/mine';
     const apiCallUrl = `${VERCEL_API_URL}?access_token=${token}`;
 
     try {
