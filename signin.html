@@ -1,0 +1,73 @@
+<form id="register-form">
+    <h2>新規プレイヤー登録</h2>
+    <div id="register-message" style="color: red; margin-bottom: 15px;"></div>
+    
+    <label for="username">プレイヤー名:</label><br>
+    <input type="text" id="username" name="username" required><br><br>
+    
+    <label for="password">パスワード:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
+    
+    <button type="submit">登録</button>
+    
+    <p>
+        <a href="/login">既にアカウントをお持ちの方はこちら</a>
+    </p>
+</form>
+
+<script>
+    // 📣 Vercelの登録エンドポイントURL
+    const REGISTER_URL = "https://minecraft-flask-app-gold.vercel.app/register";
+    const form = document.getElementById('register-form');
+    const messageDiv = document.getElementById('register-message');
+
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // ページ遷移を防ぐ (重要!)
+            messageDiv.textContent = ''; // メッセージをリセット
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // フォームデータを x-www-form-urlencoded 形式で準備
+            const formData = new URLSearchParams();
+            formData.append('username', username);
+            formData.append('password', password);
+
+            try {
+                const response = await fetch(REGISTER_URL, {
+                    method: 'POST',
+                    headers: {
+                        // Flask側がrequest.formで受け取れるように設定
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    // 登録にはセッションは不要だが、ログイン処理を見据えてcredentialsを含めても良い
+                    // credentials: 'include', 
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.message + ' 自動的にログインページへ移動します...';
+                    
+                    // 成功したらVercel側のログインページへ移動
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 2000); 
+
+                } else {
+                    // 失敗
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = '登録失敗: ' + (data.message || '予期せぬエラー');
+                }
+
+            } catch (error) {
+                console.error("ネットワークエラー:", error);
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = 'ネットワークエラーにより登録できませんでした。';
+            }
+        });
+    }
+</script>
