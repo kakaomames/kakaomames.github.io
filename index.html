@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホーム - マイクラ動画サイト</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 簡易的な動画グリッドのレイアウト (style.cssで定義することを推奨) */
+        .video-grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 24px;
+        }
+        .video-card {
+            background-color: #0f0f0f;
+            color: #f1f1f1;
+            border-radius: 8px;
+            overflow: hidden;
+            text-decoration: none;
+            display: block;
+        }
+        .thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .video-card-details {
+            padding: 12px;
+        }
+        .video-card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            margin: 0 0 4px 0;
+            max-height: 3.2em; /* 2行表示の切り捨て */
+            overflow: hidden;
+        }
+        .video-card-channel, .video-card-views {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="youtube-body" style="background-color: #0f0f0f; font-family: 'Roboto', sans-serif;">
+    <header id="header-bar" style="position: fixed; top: 0; left: 0; width: 100%; background-color: #202020; z-index: 100;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 24px;">
+            <a href="index.html" style="color: white; font-size: 1.5rem; text-decoration: none;">マイクラスタイル</a>
+
+            <form id="search-form" action="search.html" method="GET" style="display: flex;">
+                <input type="text" name="q" placeholder="検索" style="padding: 8px 16px; border-radius: 40px 0 0 40px; border: 1px solid #333; background: #121212; color: #f1f1f1; width: 400px;">
+                <button type="submit" style="padding: 8px 16px; border-radius: 0 40px 40px 0; border: 1px solid #333; background: #303030; color: #f1f1f1;">🔎</button>
+            </form>
+
+            <div id="auth-status-container">
+                <a id="login-link" href="login.html" style="padding: 8px 16px; background-color: #3f3f3f; color: #fff; text-decoration: none; border-radius: 2px;">
+                    ログイン / 登録
+                </a>
+                </div>
+        </div>
+    </header>
+
+    <div id="main-content-wrapper" style="display: flex; padding-top: 60px;">
+        <aside id="sidebar" style="width: 72px; background-color: #0f0f0f; height: 100vh; position: fixed; top: 60px; left: 0; padding-top: 10px;">
+            <a href="index.html" style="display: block; text-align: center; padding: 10px 0; color: white;">🏠<br>ホーム</a>
+            <a href="#" style="display: block; text-align: center; padding: 10px 0; color: white;">🔥<br>急上昇</a>
+        </aside>
+
+        <main id="video-feed-container" style="margin-left: 72px; flex-grow: 1;">
+            <div id="video-grid" class="video-grid-layout">
+                <p id="loading-message" style="grid-column: 1 / -1; color: #aaa;">動画を読み込み中...</p>
+                </div>
+        </main>
+    </div>
+
+    <script src="auth_status.js"></script>
+    <script>
+        // Vercel APIのベースURL
+        const BASE_API_URL = "https://minecraft-flask-app-gold.vercel.app/API/yt";
+        
+        /**
+         * 動画カードのHTMLを生成するヘルパー関数
+         */
+        function createVideoCard(video) {
+            // channel_url が /channel/index.html?c=CHANNEL_ID の形式を想定
+            const channelLink = video.channel_id ? `channel/index.html?c=${video.channel_id}` : '#';
+            
+            return `
+                <a href="watch.html?v=${video.video_id}" class="video-card">
+                    <img src="${video.thumbnail_url}" alt="${video.title}" class="thumbnail">
+                    <div class="video-card-details">
+                        <h3 class="video-card-title">${video.title}</h3>
+                        <p class="video-card-channel">
+                            <a href="${channelLink}" style="color: inherit; text-decoration: none;">${video.channel_name}</a>
+                        </p>
+                        <p class="video-card-views">${video.views}回視聴 • ${video.published_at}</p>
+                    </div>
+                </a>
+            `;
+        }
+
+        /**
+         * Vercel APIからホーム画面の動画リストを取得し、HTMLを更新する
+         */
+        async function loadHomePageVideos() {
+            const API_URL = `${BASE_API_URL}/videos/home`;
+            const videoGrid = document.getElementById('video-grid');
+            const loadingMessage = document.getElementById('loading-message');
+            
+            loadingMessage.style.display = 'block';
+            videoGrid.innerHTML = ''; // グリッドをクリア
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("動画リストの取得に失敗");
+                
+                const data = await response.json();
+                
+                loadingMessage.style.display = 'none';
+
+                if (data.videos && data.videos.length > 0) {
+                    data.videos.forEach(video => {
+                        videoGrid.innerHTML += createVideoCard(video);
+                    });
+                } else {
+                    videoGrid.innerHTML = '<p style="grid-column: 1 / -1; color: #aaa;">表示する動画がありません。</p>';
+                }
+
+            } catch (error) {
+                console.error("ホーム動画の取得に失敗しました:", error);
+                loadingMessage.textContent = '動画の読み込み中にエラーが発生しました。';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadHomePageVideos);
+        // 💡 ログイン状態の確認（auth_status.jsで実装）もDOMContentLoaded後に実行されます
+    </script>
+</body>
+</html>
