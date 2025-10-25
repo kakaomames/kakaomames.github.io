@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="playlist-page-title">再生リストを読み込み中...</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* 簡易的なレイアウトとYouTube風スタイル */
+        .playlist-video-card {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #282828; /* YouTube風の背景色 */
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .playlist-video-card:hover {
+            background-color: #383838;
+        }
+        .playlist-thumbnail {
+            width: 160px;
+            height: 90px;
+            object-fit: cover;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+        .playlist-detail-title {
+            font-weight: 500;
+            color: #f1f1f1;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body class="youtube-body">
+    <header id="header-bar">
+        </header>
+    
+    <div id="main-content-wrapper" style="display: flex; padding-top: 60px;">
+        <aside id="sidebar"></aside>
+
+        <main id="playlist-page-container" style="flex-grow: 1; display: flex; max-width: 1400px; margin: 0 auto;">
+            
+            <div id="playlist-main-column" style="width: 65%; padding: 20px;">
+                <div id="main-video-player" style="margin-bottom: 20px;">
+                    <iframe id="playlist-iframe" 
+                            width="100%" 
+                            height="500px" 
+                            frameborder="0" 
+                            allow="autoplay; encrypted-media" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+                
+                <div id="playlist-metadata">
+                    <h1 id="playlist-title" style="margin-top: 0;"></h1>
+                    <p id="playlist-channel"></p>
+                    <p id="playlist-description"></p>
+                    <p id="playlist-stats"></p>
+                </div>
+            </div>
+
+            <div id="playlist-video-list-column" style="width: 35%; padding: 20px; background-color: #0f0f0f;">
+                <h2>再生リストの動画</h2>
+                <div id="playlist-video-list">
+                    <p id="loading-message">再生リストの動画を読み込み中...</p>
+                    </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="auth_status.js"></script>
+    <script>
+        // Vercel APIのベースURL
+        const BASE_API_URL = "https://minecraft-flask-app-gold.vercel.app/API/yt";
+
+        function getPlaylistId() {
+            const params = new URLSearchParams(window.location.search);
+            // URLパラメータ 'list' からリストIDを取得
+            return params.get('list');
+        }
+        
+        // 最初の動画のIDを保持する変数
+        let firstVideoId = null;
+
+        /**
+         * Vercel APIから再生リストのデータと動画リストを取得し、HTMLを更新する
+         */
+        async function loadPlaylistData() {
+            const playlistId = getPlaylistId();
+            const loadingMessage = document.getElementById('loading-message');
+            const videoListElement = document.getElementById('playlist-video-list');
+            
+            loadingMessage.style.display = 'block';
+            videoListElement.innerHTML = '';
+
+            if (!playlistId) {
+                loadingMessage.textContent = "エラー: 再生リストIDが指定されていません。";
+                return;
+            }
+
+            // 1. 再生リストAPIの呼び出し (/API/yt/playlist?list=...)
+            try {
+                const listResponse = await fetch(`${BASE_API_URL}/playlist?list=${playlistId}`);
+                if (!listResponse.ok) throw new Error("再生リストデータの取得に失敗");
+                const data = await listResponse.json();
+                
+                loadingMessage.style.display = 'none';
+                
+                // メタデータの更新
+                document.getElementById('playlist-page-title').textContent = data.title + " - 再生リスト";
+                document.getElementById('playlist-title').textContent = data.title;
+                document.getElementById('playlist-channel').textContent = data.channel_name || 'チャンネル不明';
+                document.getElementById('playlist-description').textContent = data.description || '概要欄はありません。';
+                document.getElementById('playlist-stats').textContent = `動画数: ${data.video_count || 0}`;
+
+
+                if (data.videos && data.videos.length > 0) {
+                    firstVideoId = data.videos[0].video_id; // 最初の動画IDを保持
+
+                    data.videos.forEach((video, index) => {
+                        // 動画カードのHTMLを生成
+                        const videoCardHtml = `
+                            <div class="playlist-video-card">
+                                <span style="margin-right: 8px; color: #aaa;">${index + 1}</span>
+                                <a href="watch.html?v=${video.video_id}" style="text-decoration: none;">
+                                    <img src="${video.thumbnail_url}" alt="${video.title}" class="playlist-thumbnail">
+                                </a>
+                                <div class="playlist-card-details">
+                                    <h4 class="playlist-detail-title">${video.title}</h4>
+                                    <p style="color: #aaa; font-size: 13px;">${video.channel_name || ''}</p>
+                                </div>
+                            </div>
+                        `;
+                        videoListElement.innerHTML += videoCardHtml;
+                    });
+                    
+                    // 最初の動画を再生プレイヤーにロード
+                    if (firstVideoId) {
+                        loadIframeUrl(firstVideoId);
+                    }
+
+                } else {
+                    videoListElement.innerHTML = '<p>この再生リストには動画がありません。</p>';
+                }
+            } catch (error) {
+                console.error("再生リストデータの読み込みエラー:", error);
+                loadingMessage.style.display = 'block';
+                loadingMessage.textContent = '再生リストの読み込み中にエラーが発生しました。';
+            }
+        }
+        
+        /**
+         * 動画IDに基づいてiframeのsrc URLを取得し、プレイヤーを設定する
+         */
+        async function loadIframeUrl(videoId) {
+            const iframeElement = document.getElementById('playlist-iframe');
+            if (!videoId || !iframeElement) return;
+
+            try {
+                // iframe URLを取得
+                const iframeResponse = await fetch(`${BASE_API_URL}/iframe/${videoId}`);
+                const iframeData = await iframeResponse.json();
+                
+                if (iframeData.iframe_url) {
+                    iframeElement.src = iframeData.iframe_url;
+                    // iframeの高さ調整（CSSで対応することを推奨）
+                    iframeElement.style.height = (iframeElement.clientWidth * 9 / 16) + 'px'; 
+                } else {
+                    iframeElement.src = ''; 
+                    console.error("iframe URLがJSON応答に含まれていません。");
+                }
+            } catch (error) {
+                console.error("iframe URLの取得に失敗しました:", error);
+                iframeElement.src = ''; 
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPlaylistData);
+    </script>
+</body>
+</html>
