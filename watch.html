@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="video-page-title">動画を読み込み中...</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body class="youtube-body">
+    <header id="header-bar"></header>
+
+    <div id="watch-page-container">
+        <div id="video-main-column">
+            <div id="player-container">
+                <iframe id="video-iframe" 
+                        width="100%" 
+                        height="auto" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+
+            <div id="video-info">
+                <h1 id="video-title"></h1>
+                <div id="channel-and-actions">
+                    <img id="channel-icon" alt="チャンネルアイコン">
+                    <div id="channel-metadata">
+                        <p id="channel-name"></p>
+                        <p id="subscriber-count"></p>
+                    </div>
+                    <button id="subscribe-button">チャンネル登録</button>
+                </div>
+                <div id="video-description"></div>
+            </div>
+
+            <div id="comments-section">
+                </div>
+        </div>
+
+        <div id="related-videos-column">
+            </div>
+    </div>
+
+    <script src="auth_status.js"></script>
+    <script>
+        // Vercel APIのエンドポイント
+        const BASE_API_URL = "https://minecraft-flask-app-gold.vercel.app/API/yt";
+
+        function getVideoId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('v');
+        }
+
+        async function loadVideoData(videoId) {
+            if (!videoId) {
+                console.error("動画IDが見つかりません。");
+                return;
+            }
+
+            // 1. メタデータ（タイトル、チャンネル情報など）の取得
+            try {
+                const metaResponse = await fetch(`${BASE_API_URL}/video?v=${videoId}`);
+                const metaData = await metaResponse.json();
+                
+                // メタデータの更新
+                document.getElementById('video-page-title').textContent = metaData.title;
+                document.getElementById('video-title').textContent = metaData.title;
+                document.getElementById('channel-name').textContent = metaData.channel_name;
+                // 他の要素も同様に更新...
+            } catch (error) {
+                console.error("動画メタデータの取得に失敗しました:", error);
+            }
+
+            // 2. 🌟 修正点: iframe の src URL の取得
+            try {
+                const iframeResponse = await fetch(`${BASE_API_URL}/iframe/${videoId}`);
+                const iframeData = await iframeResponse.json();
+                
+                // 💡 iframe_url プロパティに URL が含まれていると仮定
+                if (iframeData.iframe_url) {
+                    const iframeElement = document.getElementById('video-iframe');
+                    iframeElement.src = iframeData.iframe_url;
+                    // アスペクト比を16:9にするための高さを設定（CSSで処理するのが理想的ですが、JSで簡易的に）
+                    iframeElement.style.height = (iframeElement.clientWidth * 9 / 16) + 'px'; 
+                    console.log("iframe URLを設定しました:", iframeData.iframe_url);
+                } else {
+                    console.error("iframe URLがJSON応答に含まれていません。");
+                }
+            } catch (error) {
+                console.error("iframe URLの取得に失敗しました:", error);
+                // エラーメッセージを表示する処理などを追加
+            }
+        }
+        
+        loadVideoData(getVideoId());
+    </script>
+</body>
+</html>
