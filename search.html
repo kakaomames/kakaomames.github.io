@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="search-page-title">検索結果 - マイクラ動画サイト</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body class="youtube-body">
+    <header id="header-bar">
+        <div id="common-header">
+            <form id="search-form" action="search.html" method="GET" style="display: inline-flex;">
+                <input type="text" id="search-input" name="q" placeholder="検索" style="padding: 8px; border-radius: 20px 0 0 20px;">
+                <button type="submit" style="padding: 8px; border-radius: 0 20px 20px 0;">🔎</button>
+            </form>
+        </div>
+    </header>
+    
+    <div id="main-content-wrapper" style="display: flex; padding-top: 60px;">
+        <aside id="sidebar"></aside>
+
+        <main id="search-results-container" style="flex-grow: 1; padding: 20px; margin-left: 72px;">
+            <h1 id="search-query-display"></h1>
+            
+            <div id="search-result-list" style="margin-top: 20px;">
+                <p id="loading-message">検索結果を読み込み中...</p>
+                </div>
+            
+            <p id="no-results-message" style="display: none; color: #aaa;">該当する検索結果は見つかりませんでした。</p>
+        </main>
+    </div>
+
+    <script src="auth_status.js"></script>
+    <script>
+        // Vercel APIのベースURL
+        const BASE_API_URL = "https://minecraft-flask-app-gold.vercel.app/API/yt";
+
+        function getSearchQuery() {
+            const params = new URLSearchParams(window.location.search);
+            // URLパラメータ 'q' から検索クエリを取得
+            return params.get('q');
+        }
+
+        /**
+         * Vercel APIから検索結果を取得し、HTMLを更新する
+         */
+        async function loadSearchResults() {
+            const query = getSearchQuery();
+            const loadingMessage = document.getElementById('loading-message');
+            const resultList = document.getElementById('search-result-list');
+            const noResultsMessage = document.getElementById('no-results-message');
+            
+            resultList.innerHTML = '';
+            loadingMessage.style.display = 'block';
+            noResultsMessage.style.display = 'none';
+
+            if (!query) {
+                loadingMessage.textContent = "検索クエリを入力してください。";
+                document.getElementById('search-query-display').textContent = "検索を入力";
+                return;
+            }
+
+            document.getElementById('search-query-display').textContent = `「${query}」の検索結果`;
+            document.getElementById('search-page-title').textContent = `「${query}」 - 検索結果`;
+            document.getElementById('search-input').value = query; // 検索バーにもクエリを反映
+
+            // 検索APIの呼び出し (/API/yt/search?q=...)
+            try {
+                const searchResponse = await fetch(`${BASE_API_URL}/search?q=${encodeURIComponent(query)}`);
+                if (!searchResponse.ok) throw new Error("検索結果の取得に失敗");
+                const data = await searchResponse.json();
+                
+                loadingMessage.style.display = 'none';
+
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(video => {
+                        // 垂直検索結果用の動画カードHTMLを生成
+                        const videoCardHtml = `
+                            <div class="search-result-card" style="display: flex; margin-bottom: 16px;">
+                                <a href="watch.html?v=${video.video_id}" style="flex-shrink: 0;">
+                                    <img src="${video.thumbnail_url}" alt="${video.title}" style="width: 360px; height: 202px; object-fit: cover; border-radius: 8px;">
+                                </a>
+                                <div class="search-card-details" style="margin-left: 16px;">
+                                    <h3 class="search-card-title">
+                                        <a href="watch.html?v=${video.video_id}" style="color: #f1f1f1; text-decoration: none;">${video.title}</a>
+                                    </h3>
+                                    <p class="search-card-metadata" style="color: #aaa; font-size: 14px;">
+                                        ${video.channel_name} • ${video.views}回視聴 • ${video.published_at}
+                                    </p>
+                                    <p class="search-card-description" style="color: #aaa; font-size: 14px; margin-top: 8px;">
+                                        ${video.description_snippet || ''}
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                        resultList.innerHTML += videoCardHtml;
+                    });
+                } else {
+                    noResultsMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("検索結果の読み込みエラー:", error);
+                loadingMessage.style.display = 'block';
+                loadingMessage.textContent = '検索結果の読み込み中にエラーが発生しました。';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadSearchResults);
+    </script>
+</body>
+</html>
