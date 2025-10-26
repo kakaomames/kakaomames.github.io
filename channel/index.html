@@ -3,147 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="channel-page-title">チャンネルを読み込み中...</title>
-    <link rel="stylesheet" href="../style.css"> 
+    <title>YouTubeチャンネル動画リスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        h1 { color: #cc0000; text-align: center; }
+        #channel-info { margin-bottom: 20px; padding: 10px; background-color: #e0f7fa; border-left: 5px solid #00bcd4; }
+        #videos-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .video-item { border: 1px solid #ddd; border-radius: 4px; overflow: hidden; transition: transform 0.2s; background: #fff; }
+        .video-item:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        .video-item img { width: 100%; height: auto; display: block; }
+        .video-details { padding: 15px; }
+        .video-details h3 { margin: 0 0 10px 0; font-size: 1.1em; height: 3.3em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .video-details p { margin: 5px 0; font-size: 0.9em; color: #555; }
+        .video-details a { text-decoration: none; color: #cc0000; font-weight: bold; }
+        #error-message { color: red; text-align: center; margin-top: 20px; font-weight: bold; }
+    </style>
 </head>
-<body class="youtube-body">
-    <header id="header-bar">
-        </header>
-    
-    <div id="channel-page-wrapper">
-        <div id="channel-header">
-            <div id="channel-banner-container" style="height: 200px; background-color: #333; overflow: hidden;">
-                <img id="channel-banner" alt="チャンネルバナー" style="width: 100%; height: 100%; object-fit: cover;">
-            </div>
+<body>
 
-            <div id="channel-details">
-                <img id="channel-profile-img" alt="プロフィール画像" style="width: 80px; height: 80px; border-radius: 50%;">
-                <div id="channel-metadata">
-                    <h1 id="channel-name"></h1>
-                    <p id="subscriber-count"></p>
-                </div>
-                <button id="channel-subscribe-button" class="youtube-button subscribe-button">チャンネル登録</button>
-            </div>
-        </div>
-
-        <nav id="channel-tabs">
-            <a href="#videos" class="active" data-tab="videos">動画</a>
-            <a href="#playlists" data-tab="playlists">再生リスト</a>
-            <a href="#about" data-tab="about">概要</a>
-        </nav>
-        
-        <main id="channel-content">
-            <div id="videos-tab" class="channel-tab-content active">
-                <h2>アップロード動画</h2>
-                <div id="channel-video-list" class="video-grid-layout">
-                    <p id="loading-videos">動画を読み込み中...</p>
-                    </div>
-            </div>
-            
-            <div id="playlists-tab" class="channel-tab-content" style="display: none;">
-                <p>再生リストは未実装です。</p>
-            </div>
-
-            <div id="about-tab" class="channel-tab-content" style="display: none;">
-                <h3>チャンネル概要</h3>
-                <p id="channel-description"></p>
-                <p id="channel-join-date"></p>
-            </div>
-        </main>
+<div class="container">
+    <h1>チャンネル動画リスト</h1>
+    <div id="channel-info">
+        チャンネルID: <span id="channel-id-display">読み込み中...</span>
     </div>
 
-    <script src="../auth_status.js"></script>
-    <script>
-        // Vercel APIのベースURL
-        const BASE_API_URL = "https://xeroxapp040.vercel.app/API/yt";
+    <div id="error-message"></div>
+    <div id="videos-list">
+        </div>
+</div>
 
-        function getChannelId() {
-            const params = new URLSearchParams(window.location.search);
-            // URLパラメータ 'c' からチャンネルIDを取得
-            return params.get('c');
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const channelId = urlParams.get('c'); // URLパラメータからチャンネルIDを取得
+
+        const channelIdDisplay = document.getElementById('channel-id-display');
+        const videosList = document.getElementById('videos-list');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        if (!channelId) {
+            channelIdDisplay.textContent = 'チャンネルIDがありません (URLに ?c=ID を追加してください)';
+            return;
         }
 
-        /**
-         * Vercel APIからチャンネルの基本データと動画リストを読み込み、HTMLを更新する
-         */
-        async function loadChannelData() {
-            const channelId = getChannelId();
-            if (!channelId) {
-                document.getElementById('channel-name').textContent = "エラー: チャンネルIDが指定されていません。";
-                return;
-            }
+        channelIdDisplay.textContent = channelId;
+        videosList.innerHTML = '動画リストを読み込み中...';
+        errorMessageDiv.textContent = ''; // エラーメッセージをクリア
 
-            // 1. チャンネルメタデータの取得 (/API/yt/channel?c=...)
-            try {
-                const metaResponse = await fetch(`${BASE_API_URL}/channel?c=${channelId}`);
-                if (!metaResponse.ok) throw new Error("チャンネルメタデータの取得に失敗");
-                const metaData = await metaResponse.json();
-                
-                // データの更新
-                document.getElementById('channel-page-title').textContent = metaData.channel_name + " - マイクラ動画サイト";
-                document.getElementById('channel-name').textContent = metaData.channel_name;
-                document.getElementById('subscriber-count').textContent = metaData.subscriber_count;
-                document.getElementById('channel-profile-img').src = metaData.profile_image_url;
-                document.getElementById('channel-banner').src = metaData.banner_image_url || '';
-                document.getElementById('channel-description').textContent = metaData.description || '概要欄はありません。';
-                document.getElementById('channel-join-date').textContent = "登録日: " + (metaData.join_date || '不明');
+        // 🚨 修正: 確実に /API/yt/channel/videos にアクセスし、JSON構造に対応させる
+        fetch(`/API/yt/channel/videos?c=${encodeURIComponent(channelId)}`)
+            .then(response => {
+                // HTTPステータスコードが4xxや5xxの場合もJSONをパースするためにresponse.json()を返す
+                return response.json().then(data => ({
+                    status: response.status,
+                    body: data
+                }));
+            })
+            .then(result => {
+                videosList.innerHTML = ''; // ローディングメッセージをクリア
 
-            } catch (error) {
-                console.error("チャンネルメタデータの取得エラー:", error);
-                document.getElementById('channel-name').textContent = "チャンネルデータの読み込みに失敗しました。";
-            }
-            
-            // 2. チャンネル動画リストの取得 (/API/yt/channel/videos?c=...)
-            try {
-                const videosResponse = await fetch(`${BASE_API_URL}/channel/videos?c=${channelId}`);
-                if (!videosResponse.ok) throw new Error("チャンネル動画リストの取得に失敗");
-                const videosData = await videosResponse.json();
-                
-                const videoListElement = document.getElementById('channel-video-list');
-                videoListElement.innerHTML = ''; // "読み込み中"メッセージをクリア
-
-                if (videosData.videos && videosData.videos.length > 0) {
-                    videosData.videos.forEach(video => {
-                        // 動画カードのHTMLを生成 (index.html, search.htmlなどと共通化することを推奨)
-                        const videoCardHtml = `
-                            <div class="video-card">
-                                <a href="../watch.html?v=${video.video_id}">
-                                    <img src="${video.thumbnail_url}" alt="${video.title}" class="thumbnail">
-                                </a>
-                                <div class="video-card-details">
-                                    <h3 class="video-card-title"><a href="../watch.html?v=${video.video_id}">${video.title}</a></h3>
-                                    <p class="video-card-views">${video.views}回視聴</p>
-                                    <p class="video-card-published">${video.published_at}</p>
-                                </div>
-                            </div>
-                        `;
-                        videoListElement.innerHTML += videoCardHtml;
-                    });
-                } else {
-                    videoListElement.innerHTML = '<p>このチャンネルには動画がありません。</p>';
+                if (result.status !== 200 || result.body.error) {
+                    // エラーメッセージを表示
+                    const errorMsg = result.body.error || `動画リストの取得に失敗しました (HTTP Status: ${result.status})`;
+                    errorMessageDiv.textContent = `エラー: ${errorMsg}`;
+                    return;
                 }
-            } catch (error) {
-                console.error("チャンネル動画リストの取得エラー:", error);
-                document.getElementById('channel-video-list').innerHTML = '<p>動画リストの読み込み中にエラーが発生しました。</p>';
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', loadChannelData);
-        
-        // タブ切り替えロジック
-        document.getElementById('channel-tabs').addEventListener('click', (e) => {
-            const tabElement = e.target.closest('a');
-            if (!tabElement || !tabElement.dataset.tab) return;
-            
-            // タブのアクティブ状態を切り替え
-            document.querySelectorAll('#channel-tabs a').forEach(a => a.classList.remove('active'));
-            tabElement.classList.add('active');
 
-            // コンテンツの表示を切り替え
-            document.querySelectorAll('.channel-tab-content').forEach(content => content.style.display = 'none');
-            document.getElementById(tabElement.dataset.tab + '-tab').style.display = 'block';
-        });
+                const videos = result.body.videos;
 
-    </script>
+                if (videos.length === 0) {
+                    videosList.innerHTML = '<p>このチャンネルには動画がありません。</p>';
+                    return;
+                }
+
+                videos.forEach(video => {
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'video-item';
+                    
+                    // サムネイルURLが存在しない場合はダミー画像を使用
+                    const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'dummy' 
+                                         ? video.thumbnail_url 
+                                         : 'https://via.placeholder.com/320x180?text=No+Thumbnail';
+                    
+                    // 動画へのリンクURLを構築
+                    const videoUrl = `watch?v=${video.video_id}`;
+
+                    videoItem.innerHTML = `
+                        <a href="${videoUrl}" target="_blank">
+                            <img src="${thumbnailUrl}" alt="${video.title}">
+                        </a>
+                        <div class="video-details">
+                            <h3><a href="${videoUrl}" target="_blank">${video.title}</a></h3>
+                            <p><strong>視聴回数:</strong> ${video.views}</p>
+                            <p><strong>公開日:</strong> ${video.published_at}</p>
+                        </div>
+                    `;
+                    videosList.appendChild(videoItem);
+                });
+            })
+            .catch(error => {
+                videosList.innerHTML = '';
+                errorMessageDiv.textContent = `ネットワークエラー: ${error.message}`;
+                console.error('Fetch error:', error);
+            });
+    });
+</script>
+
 </body>
 </html>
