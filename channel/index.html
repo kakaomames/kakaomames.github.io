@@ -5,21 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTubeチャンネル動画リスト</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
-        .container { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        h1 { color: #cc0000; text-align: center; }
-        #channel-info { margin-bottom: 20px; padding: 10px; background-color: #e0f7fa; border-left: 5px solid #00bcd4; }
-        #videos-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .video-item { border: 1px solid #ddd; border-radius: 4px; overflow: hidden; transition: transform 0.2s; background: #fff; }
-        .video-item:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
-        .video-item img { width: 100%; height: auto; display: block; }
-        .video-details { padding: 15px; }
-        .video-details h3 { margin: 0 0 10px 0; font-size: 1.1em; height: 3.3em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .video-details p { margin: 5px 0; font-size: 0.9em; color: #555; }
-        .video-details a { text-decoration: none; color: #cc0000; font-weight: bold; }
-        #error-message { color: red; text-align: center; margin-top: 20px; font-weight: bold; }
+        /* 🚨 YouTube風CSSの適用 */
+        body { 
+            font-family: 'Roboto', Arial, sans-serif; /* YouTubeで使われるフォントに近いものを指定 */
+            margin: 0; 
+            padding: 20px;
+            background-color: #0f0f0f; /* ダークテーマの背景色 */
+            color: #ffffff; /* 文字色を白に */
+        }
+        .container { 
+            max-width: 1200px; /* 少し幅を広く */
+            margin: auto; 
+            background: #0f0f0f; /* 背景を維持 */
+            padding: 0; 
+        }
+        h1 { 
+            color: #ffffff; 
+            text-align: left; /* 左寄せ */
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        #channel-info { 
+            margin-bottom: 30px; 
+            padding: 10px 15px; 
+            background-color: #272727; /* 濃いグレーの背景 */
+            border-radius: 4px;
+            color: #ccc;
+        }
+        #channel-id-display {
+            color: #ffffff;
+            font-weight: bold;
+        }
+        /* 動画グリッド */
+        #videos-list { 
+            display: grid; 
+            /* PCでは4列、タブレットでは2列、スマホでは1列に自動調整 */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px; 
+        }
+        /* 動画カード */
+        .video-item { 
+            border-radius: 8px; /* 角を丸く */
+            overflow: hidden; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            background: #0f0f0f; /* 背景色なし */
+            cursor: pointer;
+        }
+        .video-item:hover { 
+            transform: none; /* ホバーで動かさない */
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); /* ホバー時に赤いシャドウ */
+        }
+        .video-item a {
+            text-decoration: none;
+            color: inherit;
+        }
+        /* サムネイルと画像 */
+        .video-item img { 
+            width: 100%; 
+            aspect-ratio: 16 / 9; /* 16:9の比率を維持 */
+            object-fit: cover;
+            border-radius: 4px;
+            display: block; 
+        }
+        /* 詳細エリア */
+        .video-details { 
+            padding: 12px 0 0 0; /* 上だけパディング */
+        }
+        .video-details h3 { 
+            margin: 0; 
+            font-size: 0.95em; 
+            font-weight: 500;
+            line-height: 1.4;
+            height: 2.8em; /* 2行分を確保 */
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            color: #ffffff;
+        }
+        /* メタデータ（視聴回数、公開日） */
+        .video-details p { 
+            margin: 4px 0; 
+            font-size: 0.8em; 
+            color: #aaaaaa; /* YouTubeの薄いグレー */
+            line-height: 1.3;
+        }
+        .video-details .channel-name {
+            font-weight: 500;
+            color: #aaa;
+        }
+        /* エラーメッセージ */
+        #error-message { 
+            color: #ff0000; /* YouTubeの赤 */
+            text-align: center; 
+            margin-top: 20px; 
+            font-weight: bold; 
+        }
     </style>
-    <style src="/style">
 </head>
 <body>
 
