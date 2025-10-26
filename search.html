@@ -3,109 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="search-page-title">検索結果 - マイクラ動画サイト</title>
-    <link rel="stylesheet" href="style.css"> 
-</head>
-<body class="youtube-body">
-    <header id="header-bar">
-        <div id="common-header">
-            <form id="search-form" action="search.html" method="GET" style="display: inline-flex;">
-                <input type="text" id="search-input" name="q" placeholder="検索" style="padding: 8px; border-radius: 20px 0 0 20px;">
-                <button type="submit" style="padding: 8px; border-radius: 0 20px 20px 0;">🔎</button>
-            </form>
-        </div>
-    </header>
-    
-    <div id="main-content-wrapper" style="display: flex; padding-top: 60px;">
-        <aside id="sidebar"></aside>
-
-        <main id="search-results-container" style="flex-grow: 1; padding: 20px; margin-left: 72px;">
-            <h1 id="search-query-display"></h1>
-            
-            <div id="search-result-list" style="margin-top: 20px;">
-                <p id="loading-message">検索結果を読み込み中...</p>
-                </div>
-            
-            <p id="no-results-message" style="display: none; color: #aaa;">該当する検索結果は見つかりませんでした。</p>
-        </main>
-    </div>
-
-    <script src="auth_status.js"></script>
-    <script>
-        // Vercel APIのベースURL
-        const BASE_API_URL = "https://xeroxapp040.vercel.app/API/yt";
-
-        function getSearchQuery() {
-            const params = new URLSearchParams(window.location.search);
-            // URLパラメータ 'q' から検索クエリを取得
-            return params.get('q');
+    <title>YouTube動画＆チャンネル検索</title>
+    <style>
+        /* YouTube風CSS */
+        body { 
+            font-family: 'Roboto', Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px;
+            background-color: #0f0f0f; 
+            color: #ffffff; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: auto; 
+            background: #0f0f0f; 
+            padding: 0; 
+        }
+        h1 { 
+            color: #ffffff; 
+            text-align: left; 
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        #search-box {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #121212;
+            color: #ffffff;
+            font-size: 1em;
+        }
+        #search-button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        #search-button:hover {
+            background-color: #cc0000;
         }
 
-        /**
-         * Vercel APIから検索結果を取得し、HTMLを更新する
-         */
-        async function loadSearchResults() {
-            const query = getSearchQuery();
-            const loadingMessage = document.getElementById('loading-message');
-            const resultList = document.getElementById('search-result-list');
-            const noResultsMessage = document.getElementById('no-results-message');
+        /* 検索結果セクションのスタイル */
+        .result-section {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .result-section h2 {
+            color: #ffffff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-left: 4px solid #ff0000;
+            padding-left: 10px;
+        }
+
+        /* 動画グリッド */
+        #videos-list { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px; 
+        }
+        .video-item { 
+            border-radius: 8px; 
+            overflow: hidden; 
+            transition: box-shadow 0.2s; 
+            background: #0f0f0f; 
+            cursor: pointer;
+        }
+        .video-item:hover { 
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); 
+        }
+        .video-item a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .video-item img { 
+            width: 100%; 
+            aspect-ratio: 16 / 9; 
+            object-fit: cover;
+            border-radius: 4px;
+            display: block; 
+        }
+        .video-details { 
+            padding: 12px 0 0 0; 
+        }
+        .video-details h3 { 
+            margin: 0; 
+            font-size: 0.95em; 
+            font-weight: 500;
+            line-height: 1.4;
+            height: 2.8em; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            color: #ffffff;
+        }
+        .video-details p { 
+            margin: 4px 0; 
+            font-size: 0.8em; 
+            color: #aaaaaa; 
+            line-height: 1.3;
+        }
+
+        /* チャンネルリスト（縦型リストとして表示）*/
+        #channels-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .channel-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background-color: #1a1a1a;
+            transition: background-color 0.2s;
+        }
+        .channel-item:hover {
+            background-color: #272727;
+        }
+        .channel-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%; /* 丸いサムネイル */
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .channel-info h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #ffffff;
+        }
+        .channel-info p {
+            margin: 2px 0 0 0;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        #error-message { 
+            color: #ff0000; 
+            text-align: center; 
+            margin-top: 20px; 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>YouTube動画＆チャンネル検索</h1>
+    
+    <div id="search-box">
+        <input type="text" id="search-input" placeholder="検索キーワードを入力してください">
+        <button id="search-button">検索 🔍</button>
+    </div>
+
+    <div id="error-message"></div>
+    
+    <div class="result-section" id="channels-section">
+        <h2>チャンネル検索結果</h2>
+        <div id="channels-list">
+            </div>
+    </div>
+
+    <div class="result-section" id="videos-section">
+        <h2>動画検索結果</h2>
+        <div id="videos-list">
+            </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const channelsList = document.getElementById('channels-list');
+        const videosList = document.getElementById('videos-list');
+        const errorMessageDiv = document.getElementById('error-message');
+
+        // 共通のHTML描画関数
+        const renderList = (element, content) => {
+            element.innerHTML = content;
+        };
+
+        // 動画リストを描画する関数
+        const renderVideos = (videos) => {
+            if (videos.length === 0) {
+                return '<p style="color: #ccc;">動画は見つかりませんでした。</p>';
+            }
             
-            resultList.innerHTML = '';
-            loadingMessage.style.display = 'block';
-            noResultsMessage.style.display = 'none';
+            return videos.map(video => {
+                const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'dummy' 
+                                     ? video.thumbnail_url 
+                                     : 'https://via.placeholder.com/320x180?text=No+Thumbnail';
+                const videoUrl = `/watch?v=${video.video_id}`;
+                const channelLink = video.channel_id 
+                    ? `<a href="/channel/index.html?c=${video.channel_id}" class="channel-name">${video.channel_name}</a>`
+                    : `<span class="channel-name">${video.channel_name}</span>`;
+                
+                return `
+                    <div class="video-item">
+                        <a href="${videoUrl}" target="_blank">
+                            <img src="${thumbnailUrl}" alt="${video.title}">
+                            <div class="video-details">
+                                <h3>${video.title}</h3>
+                                <p>${channelLink}</p>
+                                <p>${video.views} • ${video.published_at}</p>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // チャンネルリストを描画する関数
+        const renderChannels = (channels) => {
+            if (channels.length === 0) {
+                return '<p style="color: #ccc;">チャンネルは見つかりませんでした。</p>';
+            }
+
+            return channels.map(channel => {
+                const thumbnailUrl = channel.thumbnail_url && channel.thumbnail_url.startsWith('//')
+                    ? 'https:' + channel.thumbnail_url // プロトコル相対URLを修正
+                    : channel.thumbnail_url || 'https://via.placeholder.com/60x60?text=C';
+                
+                const channelPageUrl = `/channel/index.html?c=${channel.channel_id}`;
+                
+                return `
+                    <div class="channel-item">
+                        <a href="${channelPageUrl}" target="_blank" style="display:flex; align-items:center; width:100%;">
+                            <img src="${thumbnailUrl}" alt="${channel.channel_name}">
+                            <div class="channel-info">
+                                <h3>${channel.channel_name}</h3>
+                                <p>${channel.subscribers} | チャンネルへ</p>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        const performSearch = async () => {
+            const query = searchInput.value.trim();
 
             if (!query) {
-                loadingMessage.textContent = "検索クエリを入力してください。";
-                document.getElementById('search-query-display').textContent = "検索を入力";
+                errorMessageDiv.textContent = '検索キーワードを入力してください。';
+                renderList(channelsList, '');
+                renderList(videosList, '');
                 return;
             }
 
-            document.getElementById('search-query-display').textContent = `「${query}」の検索結果`;
-            document.getElementById('search-page-title').textContent = `「${query}」 - 検索結果`;
-            document.getElementById('search-input').value = query; // 検索バーにもクエリを反映
+            errorMessageDiv.textContent = '';
+            renderList(channelsList, '<p style="color: #ccc;">チャンネルを検索中...</p>');
+            renderList(videosList, '<p style="color: #ccc;">動画を検索中...</p>');
 
-            // 検索APIの呼び出し (/API/yt/search?q=...)
-            try {
-                const searchResponse = await fetch(`${BASE_API_URL}/search?q=${encodeURIComponent(query)}`);
-                if (!searchResponse.ok) throw new Error("検索結果の取得に失敗");
-                const data = await searchResponse.json();
-                
-                loadingMessage.style.display = 'none';
+            const fetchApi = async (path, listElement, renderFunc) => {
+                try {
+                    const response = await fetch(`https://xeroxapp039.vercel.app/API/yt/${path}?q=${encodeURIComponent(query)}`);
+                    const result = await response.json();
+                    
+                    if (response.status !== 200 || result.error) {
+                        const errorMsg = result.error || `APIエラー (Status: ${response.status})`;
+                        renderList(listElement, `<p style="color: #ff0000;">取得エラー: ${errorMsg}</p>`);
+                        return [];
+                    }
 
-                if (data.results && data.results.length > 0) {
-                    data.results.forEach(video => {
-                        // 垂直検索結果用の動画カードHTMLを生成
-                        const videoCardHtml = `
-                            <div class="search-result-card" style="display: flex; margin-bottom: 16px;">
-                                <a href="watch.html?v=${video.video_id}" style="flex-shrink: 0;">
-                                    <img src="${video.thumbnail_url}" alt="${video.title}" style="width: 360px; height: 202px; object-fit: cover; border-radius: 8px;">
-                                </a>
-                                <div class="search-card-details" style="margin-left: 16px;">
-                                    <h3 class="search-card-title">
-                                        <a href="watch.html?v=${video.video_id}" style="color: #f1f1f1; text-decoration: none;">${video.title}</a>
-                                    </h3>
-                                    <p class="search-card-metadata" style="color: #aaa; font-size: 14px;">
-                                        ${video.channel_name} • ${video.views}回視聴 • ${video.published_at}
-                                    </p>
-                                    <p class="search-card-description" style="color: #aaa; font-size: 14px; margin-top: 8px;">
-                                        ${video.description_snippet || ''}
-                                    </p>
-                                </div>
-                            </div>
-                        `;
-                        resultList.innerHTML += videoCardHtml;
-                    });
-                } else {
-                    noResultsMessage.style.display = 'block';
+                    // 'channels' または 'videos' のキーをチェックして描画
+                    const data = result.channels || result.videos || [];
+                    renderList(listElement, renderFunc(data));
+                    return data;
+
+                } catch (error) {
+                    renderList(listElement, `<p style="color: #ff0000;">ネットワークエラー: ${error.message}</p>`);
+                    console.error('Fetch error:', path, error);
+                    return [];
                 }
-            } catch (error) {
-                console.error("検索結果の読み込みエラー:", error);
-                loadingMessage.style.display = 'block';
-                loadingMessage.textContent = '検索結果の読み込み中にエラーが発生しました。';
+            };
+
+            // 🚨 2つのAPIを同時に実行 (Promise.all)
+            await Promise.all([
+                fetchApi('search/channels', channelsList, renderChannels), // チャンネル検索
+                fetchApi('search', videosList, renderVideos)     // 動画検索
+            ]);
+        };
+
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
             }
-        }
-        
-        document.addEventListener('DOMContentLoaded', loadSearchResults);
-    </script>
+        });
+    });
+</script>
+
 </body>
 </html>
