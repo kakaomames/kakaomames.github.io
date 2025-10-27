@@ -209,8 +209,9 @@
             return videos.map(video => {
                 const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'dummy' 
                                      ? video.thumbnail_url 
-                                     : 'http://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg';
-                const imgUrl = 'http://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg';
+                                     : 'http://img.youtube.com/vi//maxresdefault.jpg';
+                
+                const imgUrl = `http://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`;
                 const videoUrl = `/watch?v=${video.video_id}`;
                 const channelLink = video.channel_id 
                     ? `<a href="/channel/index.html?c=${video.channel_id}" class="channel-name">${video.channel_name}</a>`
@@ -242,7 +243,7 @@
                     ? 'https:' + channel.thumbnail_url // プロトコル相対URLを修正
                     : channel.thumbnail_url || 'https://via.placeholder.com/60x60?text=C';
                 
-                const channelPageUrl = `/channel/index.html?c=${channel.channel_id}`;
+                const channelPageUrl = `/channel/?c=${channel.channel_id}`;
                 
                 return `
                     <div class="channel-item">
