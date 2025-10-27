@@ -87,7 +87,7 @@
          */
         function createVideoCard(video) {
             // channel_url が /channel/index.html?c=CHANNEL_ID の形式を想定
-            const channelLink = video.channel_id ? `channel/index.html?c=${video.channel_id}` : '#';
+            const channelLink = video.channel_id ? `channel/?c=${video.channel_id}` : '#';
             
             return `
                 <a href="watch.html?v=${video.video_id}" class="video-card">
@@ -107,7 +107,7 @@
          * Vercel APIからホーム画面の動画リストを取得し、HTMLを更新する
          */
         async function loadHomePageVideos() {
-            const API_URL = `${BASE_API_URL}/videos/home`;
+            const API_URL = `${BASE_API_URL}/videos/home?type=data`;
             const videoGrid = document.getElementById('video-grid');
             const loadingMessage = document.getElementById('loading-message');
             
