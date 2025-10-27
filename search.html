@@ -209,7 +209,7 @@
             return videos.map(video => {
                 const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'dummy' 
                                      ? video.thumbnail_url 
-                                     : 'https://via.placeholder.com/320x180?text=No+Thumbnail';
+                                     : 'http://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg';
                 const videoUrl = `/watch?v=${video.video_id}`;
                 const channelLink = video.channel_id 
                     ? `<a href="/channel/index.html?c=${video.channel_id}" class="channel-name">${video.channel_name}</a>`
