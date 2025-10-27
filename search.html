@@ -210,6 +210,7 @@
                 const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'dummy' 
                                      ? video.thumbnail_url 
                                      : 'http://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg';
+                const imgUrl = 'http://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg';
                 const videoUrl = `/watch?v=${video.video_id}`;
                 const channelLink = video.channel_id 
                     ? `<a href="/channel/index.html?c=${video.channel_id}" class="channel-name">${video.channel_name}</a>`
@@ -218,7 +219,7 @@
                 return `
                     <div class="video-item">
                         <a href="${videoUrl}" target="_blank">
-                            <img src="${thumbnailUrl}" alt="${video.title}">
+                            <img src="${imgUrl}" alt="${video.title}">
                             <div class="video-details">
                                 <h3>${video.title}</h3>
                                 <p>${channelLink}</p>
