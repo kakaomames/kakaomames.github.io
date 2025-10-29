@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="title">動画を読み込み中...</title>
     <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* ロゴ (yt-logo) の固定表示とスタイル設定 */
+.yt-logo {
+    /* 画面左上に固定 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    /* 他のコンテンツより手前に表示 */
+    z-index: 1000; 
+    
+    /* ロゴのサイズ調整 (幅と高さ) */
+    width: 95px; /* ロゴ全体を少し小さく */
+    height: 48px; /* ヘッダーバーの高さに合わせる */
+    
+    /* 背景とパディング */
+    background-color: white; /* ヘッダーバーの背景色（仮定） */
+    padding: 0 16px;
+    
+    /* ロゴの中身（SVG）の調整 */
+    display: flex; /* flexboxで中身を中央寄せにする */
+    align-items: center; /* 垂直方向の中央寄せ */
+    justify-content: flex-start; /* 水平方向の左寄せ */
+}
+
+/* ロゴアイコンのSVGコンテナ (必要に応じて) */
+.yt-logo svg {
+    height: 20px; /* SVGの高さを固定 */
+    width: auto; /* 幅は自動調整 */
+}
+
+/* その他のヘッダー要素との干渉を防ぐため、ボディに上余白を設定 */
+.youtube-body {
+    padding-top: 48px; /* 固定ヘッダーの高さ分、コンテンツ全体を下にずらす */
+}
+    </style>
 </head>
 <body class="youtube-body">
     <a class="yt-logo" id="logo" aria-label="" href="/home" title="YouTube ホーム">
