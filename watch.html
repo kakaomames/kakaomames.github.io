@@ -6,6 +6,24 @@
     <title id="title">動画を読み込み中...</title>
     <link rel="stylesheet" href="style.css"> 
     <style>
+        /* style.css に追加 */
+
+/* 説明文の初期状態（折りたたみ状態）を設定 */
+.collapsed-description {
+    /* 表示する行数を制限するために max-height を設定 */
+    max-height: 60px; /* 例: 約3〜4行分の高さ */
+    overflow: hidden; /* 高さを超えた内容は非表示 */
+    white-space: pre-wrap; /* preタグの改行を保持しつつ、行の折り返しを許可 */
+    text-overflow: ellipsis;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* 説明文が展開された状態 */
+.expanded-description {
+    max-height: none; /* 高さを無制限にする */
+    overflow: visible;
+}
         /* ロゴ (yt-logo) の固定表示とスタイル設定 */
 .yt-logo {
     /* 画面左上に固定 */
@@ -120,9 +138,10 @@
                     <button id="subscribe-button">チャンネル登録</button>
                 </div>
                 
-                <div id="video-description-container">
-                    <pre id="video-description">説明文を読み込み中...</pre>
-                </div>
+                <div id="description-container">
+        <pre id="video-description" class="collapsed-description">説明文を読み込み中...</pre>
+        <button id="toggle-description" style="display:none;">もっと見る</button>
+    </div>
             </div>
 
             <div id="comments-section">
@@ -182,7 +201,6 @@
             
             // 💡 メタデータの反映
             
-            // 基本情報
             // ページタイトル（<title>タグのID）
             const pageTitleElement = document.getElementById('video-page-title');
             if (pageTitleElement) {
@@ -212,11 +230,45 @@
                 iconElement.alt = `${metaData.channel_name}のプロフィール画像`;
             }
             
-            // 説明文 (ID: video-description を参照)
+            // 説明文 (ID: video-description を参照) とトグルボタンの処理
             const descriptionElement = document.getElementById('video-description');
+            const toggleButton = document.getElementById('toggle-description');
+
             if (descriptionElement) {
-                descriptionElement.textContent = metaData.description || '説明文がありません。';
+                const descriptionText = metaData.description || '説明文がありません。';
+                descriptionElement.textContent = descriptionText;
+                
+                // 💡 【折りたたみ/展開のロジック】
+                // 説明文が長いか、改行が含まれる場合にトグル機能を有効にする
+                if (descriptionText.length > 100 || descriptionText.includes('\n')) { 
+                    toggleButton.style.display = 'green'; // ボタンを表示
+                    
+                    const toggleDescription = () => {
+                        // クラスを切り替える
+                        if (descriptionElement.classList.contains('collapsed-description')) {
+                            descriptionElement.classList.remove('collapsed-description');
+                            descriptionElement.classList.add('expanded-description');
+                            toggleButton.textContent = '一部を表示';
+                        } else {
+                            descriptionElement.classList.remove('expanded-description');
+                            descriptionElement.classList.add('collapsed-description');
+                            toggleButton.textContent = 'もっと見る';
+                        }
+                    };
+                    
+                    // ボタンにイベントリスナーを設定
+                    toggleButton.onclick = toggleDescription;
+                    
+                    // 初期状態を折りたたみに設定 (CSSクラスを適用)
+                    descriptionElement.classList.add('collapsed-description');
+
+                } else {
+                    // 説明文が短い場合はトグルボタンを非表示にし、折りたたみCSSを適用しない
+                    toggleButton.style.display = 'none';
+                    descriptionElement.classList.remove('collapsed-description');
+                }
             }
+
 
             // コメント情報
             const commentCountElement = document.getElementById('comment-count');
@@ -233,12 +285,11 @@
             }
 
         } catch (error) {
-            // エラー時のメッセージも 'video-title' に表示するよう修正
             console.error("動画メタデータの取得に失敗しました:", error);
             document.getElementById('video-title').textContent = '動画情報の読み込み中にエラーが発生しました。';
         }
 
-        // 2. iframe の src URL の取得 (変更なし)
+        // 2. iframe の src URL の取得
         try {
             const iframeResponse = await fetch(`${BASE_API_URL}/iframe/${videoId}`);
             if (!iframeResponse.ok) throw new Error("iframe URL APIからの応答が不正です。");
