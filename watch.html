@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="video-page-title">動画を読み込み中...</title>
+    <title id="title">動画を読み込み中...</title>
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body class="youtube-body">
-    <a class="yt-simple-endpoint style-scope ytd-topbar-logo-renderer" id="logo" aria-label="" href="/home" title="YouTube ホーム">
+    <a class="yt-logo" id="logo" aria-label="" href="/home" title="YouTube ホーム">
   <div class="style-scope ytd-topbar-logo-renderer">
     <ytd-logo class="style-scope ytd-topbar-logo-renderer">
         <yt-icon id="logo-icon" class="style-scope ytd-logo">
@@ -65,16 +65,16 @@
             </div>
 
             <div id="video-info">
-                <h1 id="video-title"></h1>
+                <h1 id="title">不明</h1>              <h3>視聴回数 : </h3><h3 id="views">不明</h3>         <h3>公開日 : </h3><h3 id="published_at"></h3><br>
                 <div id="channel-and-actions">
                     <img id="channel-icon" alt="チャンネルアイコン">
-                    <div id="channel-metadata">
+                    <div id="description">
                         <p id="channel-name"></p>
                         <p id="subscriber-count"></p>
                     </div>
                     <button id="subscribe-button">チャンネル登録</button>
                 </div>
-                <div id="video-description"></div>
+                <div id="description"></div>
             </div>
 
             <div id="comments-section">
@@ -133,15 +133,20 @@
             
             // 基本情報
             document.getElementById('video-page-title').textContent = metaData.title || '動画再生';
-            document.getElementById('video-title').textContent = metaData.title || 'タイトル不明';
+            document.getElementById('title').textContent = metaData.title || 'タイトル不明';
             document.getElementById('views-and-date').textContent = `${metaData.views || '?'} • ${metaData.published_at || '公開日不明'}`;
+            document.getElementById('views').textContent = metaData.views || '視聴回数不明';
+            document.getElementById('published_at').textContent = metaData.published_at || '公開日不明';
+            document.getElementById('description').textContent = metaData.description || '概要欄不明';
 
+            
             // チャンネル情報
             document.getElementById('channel-name').textContent = metaData.channel_name || 'チャンネル名不明';
+            document.getElementById('channel_id').textContent = metaData.channel_id || 'チャンネル🆔不明';
             
             const channelLinkElement = document.getElementById('channel-link');
             if (channelLinkElement && metaData.channel_id) {
-                 channelLinkElement.href = `channel/?c=${metaData.channel_id}`;
+                 channelLinkElement.href = `/channel/?c=${metaData.channel_id}`;
             }
 
             // チャンネルアイコン
