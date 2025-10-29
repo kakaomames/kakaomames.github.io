@@ -17,8 +17,8 @@
     z-index: 1000; 
     
     /* ロゴのサイズ調整 (幅と高さ) */
-    width: 95px; /* ロゴ全体を少し小さく */
-    height: 48px; /* ヘッダーバーの高さに合わせる */
+    width: 200px; /* ロゴ全体を少し小さく */
+    height: 50px; /* ヘッダーバーの高さに合わせる */
     
     /* 背景とパディング */
     background-color: white; /* ヘッダーバーの背景色（仮定） */
@@ -32,7 +32,7 @@
 
 /* ロゴアイコンのSVGコンテナ (必要に応じて) */
 .yt-logo svg {
-    height: 20px; /* SVGの高さを固定 */
+    height: auto; /* SVGの高さを固定 */
     width: auto; /* 幅は自動調整 */
 }
 
@@ -180,20 +180,25 @@
             
             const metaData = await metaResponse.json();
             
-            // 💡 メタデータの更新 (JSON形式に合わせた項目をすべて反映)
+            // 💡 メタデータの反映
             
             // 基本情報
-            document.getElementById('video-page-title').textContent = metaData.title || '動画再生';
-            document.getElementById('title').textContent = metaData.title || 'タイトル不明';
-            document.getElementById('views-and-date').textContent = `${metaData.views || '?'} • ${metaData.published_at || '公開日不明'}`;
-            document.getElementById('views').textContent = metaData.views || '視聴回数不明';
-            document.getElementById('published_at').textContent = metaData.published_at || '公開日不明';
-            document.getElementById('description').textContent = metaData.description || '概要欄不明';
-
+            // ページタイトル（<title>タグのID）
+            const pageTitleElement = document.getElementById('video-page-title');
+            if (pageTitleElement) {
+                pageTitleElement.textContent = metaData.title || '動画再生';
+            }
             
+            // 動画タイトル（<h1>タグのID）
+            document.getElementById('video-title').textContent = metaData.title || 'タイトル不明'; 
+            
+            // 視聴回数
+            document.getElementById('views').textContent = metaData.views || '視聴回数不明';
+            // 公開日
+            document.getElementById('published_at').textContent = metaData.published_at || '公開日不明';
+
             // チャンネル情報
             document.getElementById('channel-name').textContent = metaData.channel_name || 'チャンネル名不明';
-            document.getElementById('channel_id').textContent = metaData.channel_id || 'チャンネル🆔不明';
             
             const channelLinkElement = document.getElementById('channel-link');
             if (channelLinkElement && metaData.channel_id) {
@@ -207,8 +212,11 @@
                 iconElement.alt = `${metaData.channel_name}のプロフィール画像`;
             }
             
-            // 説明文
-            document.getElementById('video-description').textContent = metaData.description || '説明文がありません。';
+            // 説明文 (ID: video-description を参照)
+            const descriptionElement = document.getElementById('video-description');
+            if (descriptionElement) {
+                descriptionElement.textContent = metaData.description || '説明文がありません。';
+            }
 
             // コメント情報
             const commentCountElement = document.getElementById('comment-count');
@@ -225,11 +233,12 @@
             }
 
         } catch (error) {
+            // エラー時のメッセージも 'video-title' に表示するよう修正
             console.error("動画メタデータの取得に失敗しました:", error);
             document.getElementById('video-title').textContent = '動画情報の読み込み中にエラーが発生しました。';
         }
 
-        // 2. iframe の src URL の取得
+        // 2. iframe の src URL の取得 (変更なし)
         try {
             const iframeResponse = await fetch(`${BASE_API_URL}/iframe/${videoId}`);
             if (!iframeResponse.ok) throw new Error("iframe URL APIからの応答が不正です。");
@@ -241,7 +250,7 @@
                 iframeElement.src = iframeData.iframe_url;
                 
                 // アスペクト比の設定 (CSSで処理されていない場合)
-                iframeElement.style.height = (iframeElement.clientWidth * 9 / 16) + 'px'; 
+                iframeElement.style.height = (iframeElement.clientWidth * 9 / 16) + 'px'; 
             } else {
                 console.error("iframe URLがJSON応答に含まれていません。");
             }
@@ -253,7 +262,6 @@
     // ページロード時に実行
     document.addEventListener('DOMContentLoaded', () => {
         loadVideoData(getVideoId());
-        // 💡 ログイン状態の確認（auth_status.jsで実装）もDOMContentLoaded後に実行されます
     });
 </script>
 </body>
