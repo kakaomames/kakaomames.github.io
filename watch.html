@@ -60,7 +60,7 @@
 
             // 1. メタデータ（タイトル、チャンネル情報など）の取得
             try {
-                const metaResponse = await fetch(`${BASE_API_URL}/video?v=${videoId}`);
+                const metaResponse = await fetch(`${BASE_API_URL}/video?v=${videoId}&type=data`);
                 const metaData = await metaResponse.json();
                 
                 // メタデータの更新
