@@ -136,7 +136,7 @@
         errorMessageDiv.textContent = ''; // エラーメッセージをクリア
 
         // 🚨 修正: 確実に /API/yt/channel/videos にアクセスし、JSON構造に対応させる
-        fetch(`https://xeroxapp039.vercel.app/API/yt/channel/videos?c=${encodeURIComponent(channelId)}`)
+        fetch(`https://xeroxapp039.vercel.app/API/yt/channel/videos?c=${encodeURIComponent(channelId)}&type=data`)
             .then(response => {
                 // HTTPステータスコードが4xxや5xxの場合もJSONをパースするためにresponse.json()を返す
                 return response.json().then(data => ({
