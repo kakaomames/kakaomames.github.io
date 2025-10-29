@@ -109,34 +109,35 @@
 <div class="container">
     <h1>チャンネル動画リスト</h1>
     <div id="channel-info">
-        チャンネルID: <span id="channel-id-display">読み込み中...</span>
+        チャンネルID/カスタムURL: <span id="channel-id-display">読み込み中...</span>
     </div>
 
     <div id="error-message"></div>
     <div id="videos-list">
-        </div>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
-        const channelId = urlParams.get('c'); // URLパラメータからチャンネルIDを取得
+        const channelIdentifier = urlParams.get('c'); // URLパラメータからチャンネルID/カスタムURLを取得
 
         const channelIdDisplay = document.getElementById('channel-id-display');
         const videosList = document.getElementById('videos-list');
         const errorMessageDiv = document.getElementById('error-message');
 
-        if (!channelId) {
-            channelIdDisplay.textContent = 'チャンネルIDがありません (URLに ?c=ID を追加してください)';
+        if (!channelIdentifier) {
+            channelIdDisplay.textContent = 'チャンネルIDまたはカスタムURLがありません (URLに ?c=ID または ?c=@User を追加してください)';
             return;
         }
 
-        channelIdDisplay.textContent = channelId;
+        // 💡 修正点 2: 表示を channelIdentifier に更新
+        channelIdDisplay.textContent = channelIdentifier;
         videosList.innerHTML = '動画リストを読み込み中...';
         errorMessageDiv.textContent = ''; // エラーメッセージをクリア
 
-        // 🚨 修正: 確実に /API/yt/channel/videos にアクセスし、JSON構造に対応させる
-        fetch(`https://xeroxapp039.vercel.app/API/yt/channel/videos?c=${encodeURIComponent(channelId)}&type=data`)
+        // 💡 修正点 1: &type=data パラメータを削除して、整形されたJSONを取得する
+        fetch(`https://xeroxapp039.vercel.app/API/yt/channel/videos?c=${encodeURIComponent(channelIdentifier)}`)
             .then(response => {
                 // HTTPステータスコードが4xxや5xxの場合もJSONをパースするためにresponse.json()を返す
                 return response.json().then(data => ({
@@ -147,16 +148,28 @@
             .then(result => {
                 videosList.innerHTML = ''; // ローディングメッセージをクリア
 
+                // 💡 修正点 3: result.body.identifier と result.body.error をチェック
                 if (result.status !== 200 || result.body.error) {
                     // エラーメッセージを表示
                     const errorMsg = result.body.error || `動画リストの取得に失敗しました (HTTP Status: ${result.status})`;
                     errorMessageDiv.textContent = `エラー: ${errorMsg}`;
+                    
+                    // エラーの場合でも、 identifier キーが存在すれば表示を上書き
+                    if (result.body.identifier) {
+                        channelIdDisplay.textContent = result.body.identifier;
+                    }
+
                     return;
                 }
 
+                // 💡 修正点 3: identifier がある場合、表示を上書き（念のため）
+                if (result.body.identifier) {
+                    channelIdDisplay.textContent = result.body.identifier;
+                }
+                
                 const videos = result.body.videos;
 
-                if (videos.length === 0) {
+                if (!videos || videos.length === 0) {
                     videosList.innerHTML = '<p>このチャンネルには動画がありません。</p>';
                     return;
                 }
@@ -166,29 +179,29 @@
                     videoItem.className = 'video-item';
                     
                     // サムネイルURLが存在しない場合はダミー画像を使用
-                    const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'dummy' 
-                                         ? video.thumbnail_url 
-                                         : 'https://via.placeholder.com/320x180?text=No+Thumbnail';
+                    // APIが返す thumbnail_url のチェック
+                    const thumbnailUrl = video.thumbnail_url && video.thumbnail_url !== 'N/A' 
+                                            ? video.thumbnail_url 
+                                            : 'https://via.placeholder.com/320x180?text=No+Thumbnail';
                     
-                    // 動画へのリンクURLを構築
+                    // 動画へのリンクURLを構築 (YouTubeの相対パス)
                     const videoUrl = `/watch?v=${video.video_id}`;
 
                     videoItem.innerHTML = `
-                        <a href="${videoUrl}" target="">
+                        <a href="${videoUrl}" target="_blank">
                             <img src="${thumbnailUrl}" alt="${video.title}">
                         </a>
                         <div class="video-details">
                             <h3><a href="${videoUrl}" target="_blank">${video.title}</a></h3>
                             <p><strong>視聴回数:</strong> ${video.views}</p>
-                            <p><strong>公開日:</strong> ${video.published_at}</p>
-                        </div>
+                            </div>
                     `;
                     videosList.appendChild(videoItem);
                 });
             })
             .catch(error => {
                 videosList.innerHTML = '';
-                errorMessageDiv.textContent = `ネットワークエラー: ${error.message}`;
+                errorMessageDiv.textContent = `ネットワークエラー: ${error.message}。APIのエンドポイントを確認してください。`;
                 console.error('Fetch error:', error);
             });
     });
