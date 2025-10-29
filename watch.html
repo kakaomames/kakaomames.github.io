@@ -7,9 +7,13 @@
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body class="youtube-body">
-    <a class="yt-simple-endpoint style-scope ytd-topbar-logo-renderer" id="logo" aria-label="" href="/" title="YouTube ホーム">
+    <a class="yt-simple-endpoint style-scope ytd-topbar-logo-renderer" id="logo" aria-label="" href="/home" title="YouTube ホーム">
   <div class="style-scope ytd-topbar-logo-renderer">
-    <ytd-logo class="style-scope ytd-topbar-logo-renderer"><!--css-build:shady--><!--css_build_scope:ytd-logo--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js--><yt-icon id="logo-icon" class="style-scope ytd-logo"><!--css-build:shady--><!--css_build_scope:yt-icon--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js,video.youtube.src.web.polymer.shared.core.yt_icon.yt.icon.css.js--><span class="yt-icon-shape style-scope yt-icon ytSpecIconShapeHost"><div style="width: 100%; height: 100%; display: block; fill: currentcolor;"><svg xmlns="http://www.w3.org/2000/svg" id="yt-ringo2-svg_yt9" width="93" height="20" viewBox="0 0 93 20" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
+    <ytd-logo class="style-scope ytd-topbar-logo-renderer">
+        <yt-icon id="logo-icon" class="style-scope ytd-logo">
+            <span class="yt-icon-shape style-scope yt-icon ytSpecIconShapeHost">
+                <div style="width: 100%; height: 100%; display: block; fill: currentcolor;">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="yt-ringo2-svg_yt9" width="93" height="20" viewBox="0 0 93 20" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
   <g>
     <path d="M14.4848 20C14.4848 20 23.5695 20 25.8229 19.4C27.0917 19.06 28.0459 18.08 28.3808 16.87C29 14.65 29 9.98 29 9.98C29 9.98 29 5.34 28.3808 3.14C28.0459 1.9 27.0917 0.94 25.8229 0.61C23.5695 0 14.4848 0 14.4848 0C14.4848 0 5.42037 0 3.17711 0.61C1.9286 0.94 0.954148 1.9 0.59888 3.14C0 5.34 0 9.98 0 9.98C0 9.98 0 14.65 0.59888 16.87C0.954148 18.08 1.9286 19.06 3.17711 19.4C5.42037 20 14.4848 20 14.4848 20Z" fill="#FF0033"></path>
     <path d="M19 10L11.5 5.75V14.25L19 10Z" fill="white"></path>
@@ -82,57 +86,119 @@
     </div>
 
     <script src="auth_status.js"></script>
-    <script>
-        // Vercel APIのエンドポイント
-        const BASE_API_URL = "https://xeroxapp040.vercel.app/API/yt";
+<script>
+    // Vercel APIのエンドポイント
+    const BASE_API_URL = "https://xeroxapp040.vercel.app/API/yt";
 
-        function getVideoId() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('v');
+    /**
+     * URLのクエリパラメータから動画ID (v=...) を取得する
+     */
+    function getVideoId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('v');
+    }
+
+    /**
+     * コメントHTMLを生成するヘルパー関数
+     */
+    function createCommentHtml(comment) {
+        return `
+            <div class="comment-item">
+                <p class="comment-author"><strong>${comment.author}</strong></p>
+                <p class="comment-text">${comment.text}</p>
+            </div>
+        `;
+    }
+
+    /**
+     * 動画IDを元にAPIからデータを取得し、ページに反映する
+     */
+    async function loadVideoData(videoId) {
+        if (!videoId) {
+            console.error("動画IDが見つかりません。");
+            document.getElementById('video-title').textContent = '動画IDがありません。';
+            return;
         }
 
-        async function loadVideoData(videoId) {
-            if (!videoId) {
-                console.error("動画IDが見つかりません。");
-                return;
-            }
-
-            // 1. メタデータ（タイトル、チャンネル情報など）の取得
-            try {
-                const metaResponse = await fetch(`${BASE_API_URL}/video?v=${videoId}&type=data`);
-                const metaData = await metaResponse.json();
-                
-                // メタデータの更新
-                document.getElementById('video-page-title').textContent = metaData.title;
-                document.getElementById('video-title').textContent = metaData.title;
-                document.getElementById('channel-name').textContent = metaData.channel_name;
-                // 他の要素も同様に更新...
-            } catch (error) {
-                console.error("動画メタデータの取得に失敗しました:", error);
-            }
-
-            // 2. 🌟 修正点: iframe の src URL の取得
-            try {
-                const iframeResponse = await fetch(`${BASE_API_URL}/iframe/${videoId}`);
-                const iframeData = await iframeResponse.json();
-                
-                // 💡 iframe_url プロパティに URL が含まれていると仮定
-                if (iframeData.iframe_url) {
-                    const iframeElement = document.getElementById('video-iframe');
-                    iframeElement.src = iframeData.iframe_url;
-                    // アスペクト比を16:9にするための高さを設定（CSSで処理するのが理想的ですが、JSで簡易的に）
-                    iframeElement.style.height = (iframeElement.clientWidth * 9 / 16) + 'px'; 
-                    console.log("iframe URLを設定しました:", iframeData.iframe_url);
-                } else {
-                    console.error("iframe URLがJSON応答に含まれていません。");
-                }
-            } catch (error) {
-                console.error("iframe URLの取得に失敗しました:", error);
-                // エラーメッセージを表示する処理などを追加
-            }
-        }
+        const API_URL = `${BASE_API_URL}/video?v=${videoId}`;
         
+        // 1. メタデータ（タイトル、チャンネル情報など）の取得
+        try {
+            const metaResponse = await fetch(API_URL);
+            if (!metaResponse.ok) throw new Error("動画メタデータAPIからの応答が不正です。");
+            
+            const metaData = await metaResponse.json();
+            
+            // 💡 メタデータの更新 (JSON形式に合わせた項目をすべて反映)
+            
+            // 基本情報
+            document.getElementById('video-page-title').textContent = metaData.title || '動画再生';
+            document.getElementById('video-title').textContent = metaData.title || 'タイトル不明';
+            document.getElementById('views-and-date').textContent = `${metaData.views || '?'} • ${metaData.published_at || '公開日不明'}`;
+
+            // チャンネル情報
+            document.getElementById('channel-name').textContent = metaData.channel_name || 'チャンネル名不明';
+            
+            const channelLinkElement = document.getElementById('channel-link');
+            if (channelLinkElement && metaData.channel_id) {
+                 channelLinkElement.href = `channel/?c=${metaData.channel_id}`;
+            }
+
+            // チャンネルアイコン
+            const iconElement = document.getElementById('channel-icon');
+            if (iconElement && metaData.profile_image_url) {
+                iconElement.src = metaData.profile_image_url;
+                iconElement.alt = `${metaData.channel_name}のプロフィール画像`;
+            }
+            
+            // 説明文
+            document.getElementById('video-description').textContent = metaData.description || '説明文がありません。';
+
+            // コメント情報
+            const commentCountElement = document.getElementById('comment-count');
+            if (commentCountElement) {
+                commentCountElement.textContent = `コメント ${metaData.comment_count || 0} 件`;
+            }
+            
+            const commentsContainer = document.getElementById('comments-list');
+            if (commentsContainer && Array.isArray(metaData.comments)) {
+                commentsContainer.innerHTML = ''; // コメントリストをクリア
+                metaData.comments.forEach(comment => {
+                    commentsContainer.innerHTML += createCommentHtml(comment);
+                });
+            }
+
+        } catch (error) {
+            console.error("動画メタデータの取得に失敗しました:", error);
+            document.getElementById('video-title').textContent = '動画情報の読み込み中にエラーが発生しました。';
+        }
+
+        // 2. iframe の src URL の取得
+        try {
+            const iframeResponse = await fetch(`${BASE_API_URL}/iframe/${videoId}`);
+            if (!iframeResponse.ok) throw new Error("iframe URL APIからの応答が不正です。");
+            
+            const iframeData = await iframeResponse.json();
+            
+            if (iframeData.iframe_url) {
+                const iframeElement = document.getElementById('video-iframe');
+                iframeElement.src = iframeData.iframe_url;
+                
+                // アスペクト比の設定 (CSSで処理されていない場合)
+                iframeElement.style.height = (iframeElement.clientWidth * 9 / 16) + 'px'; 
+            } else {
+                console.error("iframe URLがJSON応答に含まれていません。");
+            }
+        } catch (error) {
+            console.error("iframe URLの取得に失敗しました:", error);
+        }
+    }
+    
+    // ページロード時に実行
+    document.addEventListener('DOMContentLoaded', () => {
         loadVideoData(getVideoId());
-    </script>
+        // 💡 ログイン状態の確認（auth_status.jsで実装）もDOMContentLoaded後に実行されます
+    });
+</script>
 </body>
 </html>
