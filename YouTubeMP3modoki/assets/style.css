@@ -1,0 +1,153 @@
+
+body {
+    background: linear-gradient(to bottom right,  rgba(27, 177, 222, 0.9) 0%, rgba(161, 246, 215, 0.9) 80%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', 'YakuHanJPs', 'Twemoji', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif !important;
+
+}
+
+/* Safari は Twemoji COLR をうまく描画できない？ので当面無効にする */
+@supports (-webkit-touch-callout: none) {
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', 'YakuHanJPs', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    }
+}
+
+ul, ol {
+    padding-inline-start: 30px;
+}
+
+@media (min-width: 576px) {
+    body .pl-sm-5, body .px-sm-5 {
+        padding-left: 3rem !important;
+    }
+    body .pr-sm-5, body .px-sm-5 {
+        padding-right: 3rem !important;
+    }
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.alert .container {
+    font-size: 15px;
+}
+
+#navigation {
+    box-shadow: 2px 0px 4px #A3A3A3;
+}
+
+label {
+    user-select: none;
+}
+
+.navbar .navbar-nav .nav-link {
+    transition: background-color .15s cubic-bezier(.4,0,.6,1);
+    border-radius: 4px;
+}
+.navbar .navbar-nav .nav-link:focus, .navbar .navbar-nav .nav-link:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+@media screen and (max-width: 500px) {
+    .navbar .navbar-nav .nav-link {
+        padding: 5px 8px;
+        margin-top: 7px;
+    }
+}
+
+i {
+    width: 17px;
+    margin-right: 10px;
+}
+
+h3 {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    color: #272727;
+    font-size: 24px;
+    border-bottom: solid 3px #272727;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 7px;
+    position: relative;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+h3:before {
+    content: '';
+    width: 85%;
+    height: 3.1px;
+    background-color: #4ECDC4;
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+}
+
+p, li {
+    line-height: 170%;
+}
+
+.px-2-3 {
+    padding-left: .75rem!important;
+    padding-right: .75rem!important;
+}
+
+@media (min-width: 576px) {
+    div.px-sm-2-3 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+.msmall {
+    font-size: 14.5px;
+}
+
+.no-wrap {
+    white-space: nowrap;
+}
+
+#logo {
+    height: 26px;
+}
+
+@media (min-width: 350px) {
+    #logo {
+        height: 31px;
+    }
+}
+
+@media (min-width: 768px) {
+    #logo {
+        height: 30px;
+    }
+}
+
+@media (min-width: 992px) {
+    #logo {
+        height: 38px;
+    }
+}
+
+@media (min-width: 768px) {
+    .navbar-expand-md .navbar-nav .nav-link {
+        padding-right: .5rem;
+        padding-left: .5rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .navbar-expand-md .navbar-nav .nav-link {
+        padding-right: 1.2rem;
+        padding-left: 1.2rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .form-range {
+        width: 35%;
+    }
+}
