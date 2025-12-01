@@ -1,0 +1,195 @@
+/*
+ * LoiLoNote風のクリーンで教育的なデザインを模倣したスタイルシート
+ * フィルター回避のため、過度なアニメーションやリッチな装飾は避ける
+ */
+
+/* === 1. 基本設定 === */
+body {
+    /* フォントは視認性の高いシステムフォントを優先 */
+    font-family: "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+    background-color: #f8f9fa; /* 明るい背景色 */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* リンクは控えめな青 */
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* === 2. ヘッダーとナビゲーション === */
+.header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 40px; /* パディングを増やしてゆったりと */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.site-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0088cc; /* 教育的なテーマカラーの青 */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.user-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    font-size: 14px;
+    color: #555;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.primary-btn {
+    background-color: #4CAF50; /* 落ち着いた緑 */
+    color: white !important;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-decoration: none !important;
+}
+
+.primary-btn:hover {
+    background-color: #45a049;
+    text-decoration: none !important;
+}
+
+/* === 3. メインコンテンツとレイアウト === */
+.content-wrapper {
+    display: flex;
+    max-width: 1300px; /* 最大幅を少し広げて情報量を増やす */
+    margin: 20px auto 40px auto;
+    gap: 30px;
+}
+
+.sidebar {
+    width: 280px; /* サイドバーを少し広げて資料感を出す */
+    padding: 25px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08); /* 影を付けて資料感を強調 */
+    height: fit-content; /* コンテンツに合わせて高さを調整 */
+}
+
+.main-document {
+    flex-grow: 1;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.08);
+}
+
+/* サイドバー内のリスト */
+.sidebar h2 {
+    color: #0088cc;
+    font-size: 18px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-list li {
+    margin-bottom: 10px;
+}
+
+.nav-list a {
+    display: block;
+    padding: 5px 0;
+    color: #333;
+    font-size: 15px;
+}
+
+.nav-list a:hover {
+    color: #0088cc;
+}
+
+/* === 4. ドキュメント要素 === */
+.document-title {
+    font-size: 32px;
+    color: #333;
+    border-bottom: 3px solid #0088cc;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.doc-section {
+    margin-bottom: 50px;
+    padding-top: 10px; /* 内部リンクの飛び先調整用 */
+}
+
+.section-title {
+    font-size: 24px;
+    color: #1a1a1a;
+    border-left: 5px solid #0088cc;
+    padding-left: 10px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.introduction {
+    font-size: 16px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f0f8ff; /* 導入文を少し目立たせる */
+    border-left: 5px solid #0056b3;
+}
+
+.doc-list {
+    list-style: disc;
+    margin-left: 25px;
+    padding-left: 0;
+}
+
+/* === 5. 画像と図解（フィルター対策） === */
+figure {
+    margin: 30px 0;
+    padding: 10px;
+    background-color: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+figure img {
+    /* HTMLで指定したスタイルを維持しつつ、レスポンシブにする */
+    display: block;
+    margin: 0 auto;
+}
+
+figcaption {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.9em !important;
+    color: #666 !important;
+}
+
+/* === 6. フッター === */
+.footer {
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding: 20px 0;
+    margin-top: 30px;
+    color: #888;
+    font-size: 12px;
+}
