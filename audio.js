@@ -6,7 +6,7 @@ function print(value) {
 
 const BGM_PATH = '/bgm_emotive.mp3';
 print(`BGM_PATH: ${BGM_PATH}`);
-const LOOP_DURATION = 120; // ループ間隔 (秒)
+const LOOP_DURATION = 119; // ループ間隔 (秒)
 print(`LOOP_DURATION: ${LOOP_DURATION}`);
 
 let audio; // Audioオブジェクトを保持するための変数
