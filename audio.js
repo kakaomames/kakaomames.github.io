@@ -1,29 +1,61 @@
-// audio.js
+// audio.js (クエリパラメータ対応版)
 // 値の決定時に出力する関数 (ユーザーの指示に従って作成)
 function print(value) {
     console.log(value);
 }
 
-const BGM_PATH = '/bgm_emotive.mp3';
+// ----------------------------------------------------
+// ★★★ BGMパスの動的決定 ★★★
+// ----------------------------------------------------
+const urlParams = new URLSearchParams(window.location.search);
+print(`window.location.search: ${window.location.search}`);
+
+// スクリプトタグのURLではなく、ページ全体のURLからパラメータを読み取っています。
+// ※スクリプトタグ自身のURLを取得するには、DOMを走査する複雑な処理が必要になるため、
+//   ページURLのパラメータを使用することを想定します。
+
+let bgmFileName = urlParams.get('name');
+
+// audio.jsに直接クエリパラメータを付けた場合、以下の処理でファイル名を正確に取得します。
+// （より確実な方法として、読み込まれたスクリプトタグ自身を特定します）
+const currentScript = document.currentScript;
+print(`currentScript: ${currentScript}`);
+
+if (currentScript) {
+    const scriptUrlParams = new URLSearchParams(currentScript.src.split('?')[1]);
+    bgmFileName = scriptUrlParams.get('name');
+    print(`Script URL Param 'name': ${bgmFileName}`);
+}
+
+// ファイル名が取得できたら、パスを決定
+let BGM_PATH = bgmFileName ? `/${bgmFileName}.mp3` : '/bgm_default.mp3'; // デフォルトファイルを用意
+if (bgmFileName && bgmFileName.endsWith('.mp3')) {
+    BGM_PATH = `/${bgmFileName}`; // 拡張子が既に付いていたらそのまま使用
+}
+
 print(`BGM_PATH: ${BGM_PATH}`);
-const LOOP_DURATION = 119; // ループ間隔 (秒)
+// ----------------------------------------------------
+// ★★★ BGMパスの動的決定 ここまで ★★★
+// ----------------------------------------------------
+
+
+const LOOP_DURATION = 120; // ループ間隔 (秒)
 print(`LOOP_DURATION: ${LOOP_DURATION}`);
 
-let audio; // Audioオブジェクトを保持するための変数
-let isPlaying = false; // 現在再生中かどうかの状態を保持
-const BUTTON_ID = 'kakakakakakakakaka_bgm_toggle_btn'; // 広告と干渉しないユニークID
+let audio; 
+let isPlaying = false; 
+const BUTTON_ID = 'kakakakakakakakaka_bgm_toggle_btn';
 
 /**
  * BGMの再生を開始し、120秒ごとにループさせる
  */
 function startBGM() {
     if (!audio) {
-        audio = new Audio(BGM_PATH);
+        audio = new Audio(BGM_PATH); // ★ BGM_PATH が動的に決定される
         print(`audio: ${audio}`);
 
         // 再生時間の監視を設定
         audio.addEventListener('timeupdate', function() {
-            // 現在の再生時間が120秒を超えたら、0秒に戻して再開
             if (audio.currentTime >= LOOP_DURATION) {
                 audio.currentTime = 0;
                 audio.play();
@@ -31,24 +63,20 @@ function startBGM() {
             }
         });
         
-        // BGMが最後まで再生されたとき (120秒制限で基本的に到達しないが、安全策として)
         audio.addEventListener('ended', function() {
             audio.currentTime = 0;
             audio.play();
         });
     }
 
-    // BGMの再生を実行
     audio.play()
         .then(() => {
             isPlaying = true;
             updateButtonLabel(true);
-            console.log("BGM再生開始 (120秒間隔ループ)");
+            console.log(`BGM再生開始: ${BGM_PATH}`);
         })
         .catch(error => {
-            // ブラウザの制限などで再生がブロックされた場合
             console.error("BGMの再生に失敗しました:", error);
-            console.error("💡 ヒント: ユーザー操作がないため再生がブロックされました。ボタンをクリックしてください。");
             isPlaying = false;
             updateButtonLabel(false);
         });
@@ -56,7 +84,6 @@ function startBGM() {
 
 /**
  * 再生状態に基づいてボタンのラベルを更新する
- * @param {boolean} playing - 現在再生中かどうか
  */
 function updateButtonLabel(playing) {
     const btn = document.getElementById(BUTTON_ID);
@@ -71,7 +98,6 @@ function updateButtonLabel(playing) {
  */
 function toggleBGM() {
     if (!audio) {
-        // audioオブジェクトがまだ作成されていなければ、ここで作成して再生開始
         startBGM();
         return;
     }
@@ -81,7 +107,6 @@ function toggleBGM() {
         isPlaying = false;
         console.log("BGM一時停止。");
     } else {
-        // pause()で止まっているだけなので、play()で再開
         audio.play()
             .then(() => {
                 isPlaying = true;
@@ -99,21 +124,19 @@ function toggleBGM() {
  * 制御ボタンの作成とCSSの挿入
  */
 function createControlButton() {
-    // 1. CSSの挿入 (干渉を避けるため、独自のIDセレクタを使用)
     const style = document.createElement('style');
     print(`style: ${style}`);
     
-    // ユニークIDセレクタを使って他のCSSとの干渉を避ける
     const cssText = `
         #${BUTTON_ID} {
             position: fixed;
-            bottom: 20px; /* 画面下部に固定 */
+            bottom: 20px; 
             left: 50%;
             transform: translateX(-50%);
-            z-index: 9999998; /* 広告よりは下、他のページ要素よりは上に配置 */
+            z-index: 9999998; 
             
             padding: 10px 20px;
-            background-color: #4CAF50; /* 緑色のボタン */
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -131,16 +154,13 @@ function createControlButton() {
     print(`style.textContent (first 50 chars): ${style.textContent.substring(0, 50)}...`);
     document.head.appendChild(style);
 
-    // 2. ボタン要素の作成
     const button = document.createElement('button');
     button.id = BUTTON_ID;
-    button.textContent = 'BGM 再生 ▶️'; // 初期ラベル
+    button.textContent = 'BGM 再生 ▶️';
     print(`Button created with ID: ${button.id}`);
     
-    // 3. クリックイベントリスナーを設定
     button.addEventListener('click', toggleBGM);
 
-    // 4. bodyに挿入
     document.body.appendChild(button);
     console.log("BGM制御ボタンを画面下部に配置しました。");
 }
