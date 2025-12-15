@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="アトラス, JSON, UV座標, 変換, Spine, スプライトシート, ツール, カカオマメ">
+    <meta name="description" content="Spineアトラスファイル（.atlas）を解析し、ピクセル座標とUV座標を含むJSON形式に変換するツールです。">
+    <meta property="og:title" content="アトラス to JSON 変換 🛠️">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="YOUR_SITE_URL/converter.html">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <meta name="author" content="カカオマメ / Gemini programming隊">
+    <title>アトラス to JSON 変換 🛠️</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+            display: block;
+            margin-top: 5px;
+        }
+        .json-output {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            background-color: #6c757d;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        h2 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>アトラス to JSON 変換フォーム 📂</h2>
+        <p>Spineから出力された `.atlas` ファイルをアップロードしてください。</p>
+
+        <div>
+            <label for="atlasFile">**必須** アトラスメタデータ (.atlas):</label>
+            <input type="file" id="atlasFile" accept=".atlas" />
+        </div>
+        <div>
+            <label for="atlasImage">アトラス画像 (.png/.jpg) - *情報として参照されます*:</label>
+            <input type="file" id="atlasImage" accept="image/*" />
+        </div>
+        <div>
+            <label for="skelFile">スケルトンデータ (.skel/.json) - *現在は無視されます*:</label>
+            <input type="file" id="skelFile" accept=".skel,.json" />
+        </div>
+
+        <button onclick="generateJson()">JSON生成 ⚙️</button>
+
+        <div class="json-output">
+            <h3>生成されたJSONデータ 👇 (UV座標含む)</h3>
+            <textarea id="jsonOutput" readonly>ここに生成されたJSONが表示されます...</textarea>
+            <button onclick="copyJson()">クリップボードにコピー 📋</button>
+        </div>
+        
+        <button id="backButton" class="back-button">初期画面に戻る 🔙</button>
+    </div>
+
+    <script>
+        document.addEventListener('click', function(event) {
+            // ページ遷移ロジック
+            if (event.target && event.target.id === 'backButton') {
+                const targetUrl = 'アトラス.html';
+                console.log(`targetUrl:${targetUrl}`);
+                window.location.href = targetUrl;
+            }
+        });
+
+        /**
+         * Spine .atlas ファイルを解析し、JSONオブジェクトを生成する
+         * (UV座標の計算を含む)
+         */
+        function parseAtlas(atlasContent) {
+            const lines = atlasContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            const result = {
+                atlas_name: "",
+                image_size: { width: 0, height: 0 },
+                format: "Spine Atlas",
+                sprites: []
+            };
+            
+            let currentPage = null;
+            let currentRegion = null;
+            
+            let imageWidth = 0;
+            let imageHeight = 0;
+
+            // 1. 画像全体のサイズ(W, H)を取得
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (i === 0) {
+                    currentPage = line;
+                    result.atlas_name = currentPage;
+                    console.log(`currentPage:${currentPage}`);
+                } else if (line.startsWith('size:')) {
+                    const value = line.substring(5).trim();
+                    const [w, h] = value.split(',').map(Number);
+                    imageWidth = w;
+                    imageHeight = h;
+                    result.image_size = { width: imageWidth, height: imageHeight };
+                    console.log(`result.image_size:{ width: ${imageWidth}, height: ${imageHeight} }`);
+                    break;
+                }
+            }
+            
+            if (imageWidth === 0 || imageHeight === 0) {
+                console.log("Error: Image size not found in .atlas file.");
+                result.error = "画像サイズ情報が見つからなかったため、UV座標の計算ができませんでした。";
+                return result;
+            }
+
+            // 2. 各スプライトの情報を解析し、UV座標を計算
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (line.trim() !== "" && !line.includes(':') && line.trim() !== currentPage) {
+                    // スプライト名行
+                    if (currentRegion) {
+                        result.sprites.push(currentRegion);
+                        console.log(`currentRegion.name:${currentRegion.name} (Pushed)`);
+                    }
+                    
+                    const spriteName = line;
+                    currentRegion = {
+                        name: spriteName,
+                        frame: {},
+                        uv_frame: {}, 
+                        uv_size: {},
+                        rotated: false,
+                        offset: { x: 0, y: 0 },
+                        original_size: { w: 0, h: 0 }
+                    };
+                    console.log(`currentRegion.name:${currentRegion.name}`);
+                    
+                    let x, y, w, h;
+
+                    // 次の4行を読み込む
+                    for (let j = 1; j <= 4; j++) {
+                        if (i + j >= lines.length) break;
+
+                        const nextLine = lines[i + j];
+                        const [key, value] = nextLine.split(':').map(s => s.trim());
+                        const parts = value.split(',').map(s => s.trim());
+
+                        if (key === 'rotate') {
+                            currentRegion.rotated = (value === 'true');
+                            console.log(`currentRegion.rotated:${currentRegion.rotated}`);
+                        } else if (key === 'xy') {
+                            x = Number(parts[0]);
+                            y = Number(parts[1]);
+                            currentRegion.frame.x = x;
+                            currentRegion.frame.y = y;
+                            console.log(`currentRegion.frame.x:${x}`);
+                            console.log(`currentRegion.frame.y:${y}`);
+                        } else if (key === 'size') {
+                            w = Number(parts[0]);
+                            h = Number(parts[1]);
+                            currentRegion.frame.w = w;
+                            currentRegion.frame.h = h;
+                            console.log(`currentRegion.frame.w:${w}`);
+                            console.log(`currentRegion.frame.h:${h}`);
+                        } else if (key === 'orig') {
+                            currentRegion.original_size.w = Number(parts[0]);
+                            currentRegion.original_size.h = Number(parts[1]);
+                            console.log(`currentRegion.original_size.w:${currentRegion.original_size.w}`);
+                            console.log(`currentRegion.original_size.h:${currentRegion.original_size.h}`);
+                        } else if (key === 'offset') {
+                            currentRegion.offset.x = Number(parts[0]);
+                            currentRegion.offset.y = Number(parts[1]);
+                            console.log(`currentRegion.offset.x:${currentRegion.offset.x}`);
+                            console.log(`currentRegion.offset.y:${currentRegion.offset.y}`);
+                        }
+                    }
+                    
+                    // ★★★ UV座標の計算 ★★★
+                    if (x !== undefined && y !== undefined && w !== undefined && h !== undefined) {
+                        const u_min = x / imageWidth;
+                        const v_min = y / imageHeight;
+                        const u_max = (x + w) / imageWidth;
+                        const v_max = (y + h) / imageHeight;
+
+                        // 小数点以下6桁に丸めて出力
+                        currentRegion.uv_frame = {
+                            u_min: u_min.toFixed(6),
+                            v_min: v_min.toFixed(6),
+                            u_max: u_max.toFixed(6),
+                            v_max: v_max.toFixed(6),
+                        };
+                        currentRegion.uv_size = {
+                            u_width: (u_max - u_min).toFixed(6),
+                            v_height: (v_max - v_min).toFixed(6),
+                        };
+                        console.log(`currentRegion.uv_frame:{u_min: ${currentRegion.uv_frame.u_min}, v_min: ${currentRegion.uv_frame.v_min}, ...}`);
+                    }
+                    i += 4; // スプライト名とそれに続く4行をスキップ
+                }
+            }
+            
+            // 最後に解析したスプライトを追加
+            if (currentRegion) {
+                result.sprites.push(currentRegion);
+                console.log(`currentRegion.name:${currentRegion.name} (Last Pushed)`);
+            }
+            
+            return result;
+        }
+
+        function generateJson() {
+            const atlasFile = document.getElementById('atlasFile').files[0];
+            const outputArea = document.getElementById('jsonOutput');
+
+            // outputAreaの初期化（エラー時も明確にするため）
+            outputArea.value = "JSONを生成中です...";
+
+            if (!atlasFile) {
+                alert("アトラスメタデータ (.atlas) ファイルを選択してください！");
+                outputArea.value = "アトラスファイルが選択されていません。";
+                return;
+            }
+
+            console.log(`atlasFile:${atlasFile.name}`);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const atlasContent = e.target.result;
+                
+                const parsedData = parseAtlas(atlasContent);
+                
+                // エラーメッセージがあれば表示
+                if (parsedData.error) {
+                    outputArea.value = `エラー: ${parsedData.error}`;
+                    console.error(parsedData.error);
+                    return;
+                }
+
+                // バックスラッシュの扱いに関する隊長のご要望はJSON.stringifyでは直接制御が難しいですが、
+                // 生成されたJSONにはバックスラッシュを含む文字列がないため、そのまま出力します。
+                const jsonString = JSON.stringify(parsedData, null, 4);
+                
+                outputArea.value = jsonString;
+                console.log("JSONを生成しました:");
+                console.log(jsonString); // コード全体を出力
+            };
+
+            reader.readAsText(atlasFile);
+        }
+
+        function copyJson() {
+            const outputArea = document.getElementById('jsonOutput');
+            outputArea.select();
+            outputArea.setSelectionRange(0, 99999);
+            try {
+                navigator.clipboard.writeText(outputArea.value).then(() => {
+                    alert("JSONデータをクリップボードにコピーしました！ ✅");
+                });
+            } catch (err) {
+                document.execCommand('copy');
+                alert("JSONデータをクリップボードにコピーしました！ ✅");
+            }
+        }
+    </script>
+</body>
+</html>
