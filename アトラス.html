@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="アトラス, JSON, 変換, ツール, Spine, スプライトシート, カカオマメ">
+    <meta name="description" content="Gemini programming隊が開発した、アトラスファイル（.atlas）をJSON形式に変換する Web ツールです。">
+    <meta property="og:title" content="アトラス to JSON 変換ツール 🚀">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="YOUR_SITE_URL">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <meta name="author" content="カカオマメ / Gemini programming隊">
+    <title>アトラス to JSON 変換ツール 🚀</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f4f4f9;
+        }
+        .start-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .start-button:hover {
+            background-color: #45a049;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌟 Gemini programming隊特製 アトラス to JSON 変換サイト 🌟</h1>
+    <p>隊長、準備ができました！アトラス画像とメタデータファイルをアップロードして、JSONデータを生成します。</p>
+    <button id="startButton" class="start-button">変換スタート！</button>
+
+    <script>
+        // ボタンがクリックされたらconverter.htmlへ遷移
+        document.addEventListener('click', function(event) {
+            if (event.target && event.target.id === 'startButton') {
+                const targetUrl = '変換.html';
+                console.log(`targetUrl:${targetUrl}`); // 遷移先を出力
+                window.location.href = targetUrl;
+            }
+        });
+    </script>
+</body>
+</html>
