@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数値基準の説明書 | Gemini programming隊</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="マイクラアドオンアイテム作成の数値基準説明。耐久力と防御力の目安。">
+    <meta name="author" content="Gemini programming隊">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #e8f4f8; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+        h1 { color: #1e8449; border-bottom: 3px solid #1e8449; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 25px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f1f1f1; }
+        .back-button { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: #e74c3c; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 アドオンアイテム数値基準の説明書</h1>
+        <p>このページでは、アイテム作成フォームで入力する「耐久力」と「防御力」の一般的なMinecraftにおける基準値を示します。オリジナルのゲームバランス設計の参考にしてください。</p>
+
+        <h2>🛡️ 1. 耐久力の目安 (minecraft:max_damage)</h2>
+        <p>ツルハシ、シャベル、斧、剣、クワ、防具などに適用される値です。数値が大きいほど壊れにくいです。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>素材・アイテム</th>
+                    <th>耐久力 (目安)</th>
+                    <th>備考</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>木のツール</td><td>59</td><td>最低限の耐久値</td></tr>
+                <tr><td>石のツール</td><td>131</td><td></td></tr>
+                <tr><td>**鉄のツール**</td><td>**250**</td><td>中間的な基準値</td></tr>
+                <tr><td>金のツール</td><td>32</td><td>極端に低い</td></tr>
+                <tr><td>**ダイヤモンドのツール**</td><td>**1561**</td><td>非常に高い基準値</td></tr>
+                <tr><td>ネザライトのツール</td><td>2031</td><td>最高峰の基準値</td></tr>
+            </tbody>
+        </table>
+
+        <h2>🛡️ 2. 防御力の目安 (minecraft:armor.protection)</h2>
+        <p>防具が提供するダメージ軽減能力の総量です。全装備部位（ヘルメット、チェストプレート、レギンス、ブーツ）の合計で25が上限となります。フォームで入力するのは**その防具単体の数値**です。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>素材</th>
+                    <th>チェストプレート (目安)</th>
+                    <th>レギンス (目安)</th>
+                    <th>ヘルメット (目安)</th>
+                    <th>ブーツ (目安)</th>
+                    <th>合計</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>革</td><td>3</td><td>2</td><td>1</td><td>1</td><td>7</td></tr>
+                <tr><td>チェーン</td><td>5</td><td>4</td><td>2</td><td>1</td><td>12</td></tr>
+                <tr><td>**鉄**</td><td>**6**</td><td>**5**</td><td>**2**</td><td>**2**</td><td>**15**</td></tr>
+                <tr><td>**ダイヤモンド**</td><td>**8**</td><td>**6**</td><td>**3**</td><td>**3**</td><td>**20**</td></tr>
+                <tr><td>ネザライト</td><td>8</td><td>6</td><td>3</td><td>3</td><td>20 (追加のノックバック耐性あり)</td></tr>
+            </tbody>
+        </table>
+        
+        <p>💡 **ヒント:** 新しい防具を作成する場合、鉄(15)～ダイヤモンド(20)の間の合計値になるように調整するのが一般的です。</p>
+
+        <a href="アイテムjson.html" class="back-button">フォームに戻る 🔙</a>
+        <script>
+            // 隊員指定の画面遷移方法 (今回はaタグで代用していますが、JSで戻る機能を持たせる場合)
+            document.querySelector('.back-button').addEventListener('click', function(event) {
+                 event.preventDefault(); // aタグのデフォルト動作を停止
+                 window.location.href = 'アイテムjson.html'; 
+            });
+        </script>
+    </div>
+</body>
+</html>
