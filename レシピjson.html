@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レシピJSON作成 | Gemini programming隊</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Gemini programming隊によるマイクラアドオンレシピJSON作成サポートサイト">
+    <meta name="author" content="Gemini programming隊">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; padding: 0; background-color: #f4f4f4; margin: 0; }
+        header { background-color: #2c3e50; color: white; padding: 10px 20px; text-align: right; }
+        header a { color: #f1c40f; text-decoration: none; font-weight: bold; margin-left: 15px; }
+        header a:hover { text-decoration: underline; }
+        .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; margin-top: 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; padding: 10px 15px; background-color: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #e67e22; }
+        .message { margin-top: 20px; padding: 15px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 15px; }
+        
+        /* レシピ種類選択 */
+        .recipe-type-select { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;}
+        .recipe-type-select label { display: inline-block; margin-right: 20px; font-weight: normal; }
+
+        /* クラフトグリッドのスタイル (前回のまま) */
+        .recipe-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .grid-cell { 
+            text-align: center;
+            border: 1px dashed #ddd;
+            padding: 5px;
+        }
+        .key-input-group {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        /* フォームの切り替え時に使うスタイル */
+        .hidden-form { display: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <span>Gemini programming隊 アドオンサポート</span>
+        <a href="index.html">ホームに戻る 🏠</a>
+    </header>
+    
+    <div class="container">
+        <h1>🍳 レシピ JSON 作成ツール</h1>
+        
+        <div class="recipe-type-select">
+            <label>レシピの種類を選択:</label><br>
+            <input type="radio" id="type_crafting" name="recipe_type" value="crafting_table" checked>
+            <label for="type_crafting">定形クラフト (3x3)</label>
+            
+            <input type="radio" id="type_furnace" name="recipe_type" value="furnace">
+            <label for="type_furnace">精錬 (Furnace)</label>
+        </div>
+        
+        <form id="recipeForm">
+            <h2>1. 結果アイテム</h2>
+            <label for="result_id">結果アイテムID <span style="color: red;">*</span></label>
+            <input type="text" id="result_id" name="result_id" placeholder="例: myaddon:custom_sword" required>
+
+            <label for="result_count">結果アイテム数</label>
+            <input type="number" id="result_count" name="result_count" value="1" min="1">
+            
+            <div id="craftingForm">
+                <h2>2. クラフト配置 (3x3)</h2>
+                <div class="recipe-grid">
+                    <div class="grid-cell">左上</div><div class="grid-cell">上</div><div class="grid-cell">右上</div>
+                    <input type="text" class="grid-cell" id="g1" maxlength="1" placeholder="キー文字 (例: D)">
+                    <input type="text" class="grid-cell" id="g2" maxlength="1" placeholder="キー文字 (例: I)">
+                    <input type="text" class="grid-cell" id="g3" maxlength="1" placeholder="キー文字 (例: )">
+                    
+                    <div class="grid-cell">左</div><div class="grid-cell">中央</div><div class="grid-cell">右</div>
+                    <input type="text" class="grid-cell" id="g4" maxlength="1" placeholder="キー文字 (例: S)">
+                    <input type="text" class="grid-cell" id="g5" maxlength="1" placeholder="キー文字 (例: )">
+                    <input type="text" class="grid-cell" id="g6" maxlength="1" placeholder="キー文字 (例: )">
+                    
+                    <div class="grid-cell">左下</div><div class="grid-cell">下</div><div class="grid-cell">右下</div>
+                    <input type="text" class="grid-cell" id="g7" maxlength="1" placeholder="キー文字 (例: )">
+                    <input type="text" class="grid-cell" id="g8" maxlength="1" placeholder="キー文字 (例: )">
+                    <input type="text" class="grid-cell" id="g9" maxlength="1" placeholder="キー文字 (例: )">
+                </div>
+
+                <h2>3. キーとアイテムの対応</h2>
+                <div id="keyMappings">
+                    <div class="key-input-group">
+                        <input type="text" class="key-char" maxlength="1" placeholder="キー (例: D)">
+                        <input type="text" class="key-item-id" placeholder="アイテムID (例: minecraft:diamond)" value="">
+                    </div>
+                </div>
+                <button type="button" id="addKeyButton" style="background-color: #3498db; margin-top: 10px;">+ キーを追加</button>
+            </div>
+            
+            <div id="furnaceForm" class="hidden-form">
+                <h2>2. 精錬材料と設定</h2>
+                <label for="furnace_input_id">精錬材料アイテムID <span style="color: red;">*</span></label>
+                <input type="text" id="furnace_input_id" placeholder="例: minecraft:raw_iron" required>
+
+                <label for="furnace_experience">経験値 (数値)</label>
+                <input type="number" id="furnace_experience" value="0.1" step="0.01" min="0" placeholder="例: 0.1">
+                
+                <label for="furnace_group">グループ名 (精錬機のタブ分けに使用)</label>
+                <input type="text" id="furnace_group" placeholder="例: iron_ingots">
+            </div>
+
+            <button type="submit">JSONファイルをダウンロード 💾</button>
+        </form>
+
+        <div id="resultMessage" class="message" style="display: none;"></div>
+        <div id="jsonOutput" style="display: none;">
+            <h3>生成されたJSONプレビュー</h3>
+            <pre id="jsonContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        const MESSAGE_DIV = document.getElementById('resultMessage');
+        const JSON_CONTENT_PRE = document.getElementById('jsonContent');
+        const JSON_OUTPUT_DIV = document.getElementById('jsonOutput');
+        const KEY_MAPPINGS_DIV = document.getElementById('keyMappings');
+        const CRAFTING_FORM = document.getElementById('craftingForm');
+        const FURNACE_FORM = document.getElementById('furnaceForm');
+        const RECIPE_FORM = document.getElementById('recipeForm');
+        
+        // --- フォーム切り替えロジック ---
+        function switchRecipeForm(type) {
+            console.log(`Switching form to type: ${type}`);
+            if (type === 'crafting_table') {
+                CRAFTING_FORM.classList.remove('hidden-form');
+                FURNACE_FORM.classList.add('hidden-form');
+            } else if (type === 'furnace') {
+                CRAFTING_FORM.classList.add('hidden-form');
+                FURNACE_FORM.classList.remove('hidden-form');
+            }
+        }
+        
+        // ラジオボタンの変更イベントを監視
+        document.querySelectorAll('input[name="recipe_type"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                switchRecipeForm(e.target.value);
+            });
+        });
+
+        // 初期表示をセット
+        switchRecipeForm(document.querySelector('input[name="recipe_type"]:checked').value);
+        
+        // キー追加ボタンの処理 (クラフトテーブル用)
+        document.getElementById('addKeyButton').addEventListener('click', function() {
+            const newGroup = document.createElement('div');
+            newGroup.className = 'key-input-group';
+            newGroup.innerHTML = `
+                <input type="text" class="key-char" maxlength="1" placeholder="キー (例: A)">
+                <input type="text" class="key-item-id" placeholder="アイテムID (例: minecraft:iron_ingot)">
+            `;
+            KEY_MAPPINGS_DIV.appendChild(newGroup);
+        });
+
+        // --- フォーム送信ロジック ---
+        RECIPE_FORM.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            MESSAGE_DIV.style.display = 'none';
+            JSON_OUTPUT_DIV.style.display = 'none';
+
+            const recipeType = document.querySelector('input[name="recipe_type"]:checked').value;
+            const resultId = document.getElementById('result_id').value.trim();
+            const resultCount = parseInt(document.getElementById('result_count').value.trim());
+
+            if (!resultId) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: 結果アイテムIDは必須です。';
+                return;
+            }
+            if (isNaN(resultCount) || resultCount < 1) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: 結果アイテム数は1以上の数値で入力してください。';
+                return;
+            }
+
+            let recipeData = null;
+            let fileNameBase = resultId;
+            let error = null;
+
+            // --- 1. クラフトテーブルレシピ生成 ---
+            if (recipeType === 'crafting_table') {
+                let pattern = [];
+                const gridInputs = [
+                    document.getElementById('g1').value.trim(), document.getElementById('g2').value.trim(), document.getElementById('g3').value.trim(),
+                    document.getElementById('g4').value.trim(), document.getElementById('g5').value.trim(), document.getElementById('g6').value.trim(),
+                    document.getElementById('g7').value.trim(), document.getElementById('g8').value.trim(), document.getElementById('g9').value.trim(),
+                ];
+                
+                for (let i = 0; i < 9; i += 3) {
+                    const row = (gridInputs[i] || ' ') + (gridInputs[i+1] || ' ') + (gridInputs[i+2] || ' ');
+                    pattern.push(row.trimEnd()); // 行末の空白は省略可能
+                }
+                
+                // 行全体が空白の行を末尾から削除
+                while (pattern.length > 0 && pattern[pattern.length - 1].trim() === '') {
+                    pattern.pop();
+                }
+
+                // キーマッピングの構築
+                let keyMappings = {};
+                const keyGroups = KEY_MAPPINGS_DIV.querySelectorAll('.key-input-group');
+                let usedKeys = new Set();
+                let uniqueKeyCount = 0;
+
+                keyGroups.forEach(group => {
+                    const keyChar = group.querySelector('.key-char').value.trim();
+                    const itemId = group.querySelector('.key-item-id').value.trim();
+
+                    if (keyChar && itemId) {
+                        if (keyChar.length !== 1 || keyChar === ' ') {
+                            error = `クラフトキー文字 "${keyChar}" は1文字で、かつスペース以外である必要があります。`;
+                            return;
+                        }
+                        if (usedKeys.has(keyChar)) {
+                            error = `クラフトキー文字 "${keyChar}" が重複しています。`;
+                            return;
+                        }
+
+                        if (pattern.join('').includes(keyChar)) {
+                            keyMappings[keyChar] = { "item": itemId };
+                            usedKeys.add(keyChar);
+                            uniqueKeyCount++;
+                        }
+                    }
+                });
+                if (error) { return; } // エラー時は処理中断
+
+                if (uniqueKeyCount === 0) {
+                     error = 'クラフトレシピの有効な材料が定義されていません。';
+                     return;
+                }
+                
+                recipeData = {
+                    "format_version": "1.12", 
+                    "minecraft:recipe_shaped": {
+                        "description": { "identifier": `${resultId.split(':').pop()}_crafting_recipe` },
+                        "tags": [ "crafting_table" ],
+                        "pattern": pattern,
+                        "key": keyMappings,
+                        "result": { "item": resultId, "count": resultCount }
+                    }
+                };
+                fileNameBase = resultId.split(':').pop() + "_crafting";
+            }
+            
+            // --- 2. 精錬レシピ生成 ---
+            else if (recipeType === 'furnace') {
+                const inputId = document.getElementById('furnace_input_id').value.trim();
+                const experience = parseFloat(document.getElementById('furnace_experience').value.trim());
+                const group = document.getElementById('furnace_group').value.trim();
+
+                if (!inputId) {
+                    error = '精錬レシピには精錬材料アイテムIDが必要です。';
+                    return;
+                }
+                if (isNaN(experience) || experience < 0) {
+                    error = '経験値は0以上の数値で入力してください。';
+                    return;
+                }
+                
+                recipeData = {
+                    "format_version": "1.12", 
+                    "minecraft:recipe_furnace": {
+                        "description": { "identifier": `${resultId.split(':').pop()}_furnace_recipe` },
+                        "tags": [ "furnace" ], // tagsを"furnace"に設定
+                        "input": inputId,
+                        "output": resultId,
+                        "result": { "item": resultId, "count": resultCount },
+                        "experience": experience
+                    }
+                };
+                // オプショナルなグループを追加
+                if (group) {
+                     recipeData["minecraft:recipe_furnace"]["group"] = group;
+                }
+                // 精錬レシピのtagsには furnace, smoker, blast_furnace などが使用可能ですが、今回は furnace のみ
+                fileNameBase = resultId.split(':').pop() + "_furnace";
+            }
+
+            // --- エラー処理 ---
+            if (error) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = `❌ エラー: ${error}`;
+                return;
+            }
+            
+            // --- ダウンロード処理 ---
+            const jsonString = JSON.stringify(recipeData, null, 4);
+            console.log(`jsonString:${jsonString}`);
+
+            const fileName = fileNameBase + '.json';
+            
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = fileName;
+            a.href = url;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // メッセージとプレビューの表示
+            MESSAGE_DIV.style.display = 'block';
+            MESSAGE_DIV.className = 'message'; 
+            MESSAGE_DIV.innerHTML = `✅ レシピJSONファイル **${fileName}** のダウンロードを開始しました！`;
+            
+            JSON_CONTENT_PRE.textContent = jsonString;
+            JSON_OUTPUT_DIV.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
