@@ -38,14 +38,6 @@ function injectCSS() {
     // 干渉の度合いが低いもの（display: blockなど）のみ使用します。
     // bodyスタイルを削除または最小限にすることで干渉リスクを下げます。
     const cssText = `
-        /* ★ bodyへの影響を最小限にするため、一部スタイルを削除/調整 ★ */
-        body {
-            /* ページレイアウトに影響する display/align-items は削除し、パディングのみ残します */
-            padding: 50px; 
-            margin: 0;
-            background-color: #e3f2fd; /* 背景色はそのまま */
-            font-family: 'Verdana', sans-serif;
-        }
 
         /* ★★★ 広告コンテナのスタイル (プレフィックス適用) ★★★ */
         ${mock} {
