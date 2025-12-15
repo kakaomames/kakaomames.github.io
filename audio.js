@@ -50,15 +50,12 @@ function getQueryParams() {
 }
 
 const params = getQueryParams();
-const BGM_PATH = params.name ? `/${params.name}` : '/bgm_default.mp3'; // ファイルパス
+const BGM_PATH = params.name ? `/${params.name}` : '/bgm/another-eden/bgm_デフォルト.mp3'; // ファイルパス
 const START_TIME = params.start || 0; // 再生開始時間
 const LOOP_DURATION = params.duration || 120; // ループ終了時間/間隔
 
-print(`Parsed BGM_PATH: ${BGM_PATH}`);
-print(`Parsed START_TIME (s): ${START_TIME}`);
-print(`Parsed LOOP_DURATION (e): ${LOOP_DURATION}`);
-
-
+//ループ終了時間/間隔
+sed BGM_PATH: $ BGM_PATH: );print(HParsed START_TIME (s): $_TIME (s): ${);print(EParsed LOOP_DURATION (e): $ATION (e): ${LOO);
 // ----------------------------------------------------
 // ★★★ 2. 制御ロジック (再生開始とループ処理を修正) ★★★
 // ----------------------------------------------------
