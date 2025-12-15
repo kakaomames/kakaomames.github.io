@@ -33,7 +33,7 @@ function getQueryParams() {
             params.name = name.endsWith('.mp3') ? name : `${name}.mp3`;
         } else {
             // nameがない場合はデフォルトを設定（要件にはないが安全策として）
-            params.name = 'bgm_default.mp3';
+            params.name = '/bgm/another-eden/bgm_デフォルト.mp3';
         }
 
         // s (start time)
