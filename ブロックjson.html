@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブロックJSON作成 | Gemini programming隊</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Gemini programming隊によるマイクラアドオンブロックJSON作成サポートサイト">
+    <meta name="author" content="Gemini programming隊">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; padding: 0; background-color: #f4f4f4; margin: 0; }
+        header { background-color: #2c3e50; color: white; padding: 10px 20px; text-align: right; }
+        header a { color: #f1c40f; text-decoration: none; font-weight: bold; margin-left: 15px; }
+        header a:hover { text-decoration: underline; }
+        .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; margin-top: 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .checkbox-group { display: flex; align-items: center; margin-top: 10px; }
+        .checkbox-group input { width: auto; margin-right: 10px; }
+        button { margin-top: 20px; padding: 10px 15px; background-color: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #1e8449; }
+        .message { margin-top: 20px; padding: 15px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <header>
+        <span>Gemini programming隊 アドオンサポート</span>
+        <a href="index.html">ホームに戻る 🏠</a>
+    </header>
+    
+    <div class="container">
+        <h1>🧱 ブロック定義 JSON 作成ツール</h1>
+        <p>新しいカスタムブロックの情報を入力し、JSONファイルを生成します。</p>
+        
+        <form id="blockForm">
+            <label for="block_id">ブロックID <span style="color: red;">*</span> (例: myaddon:custom_block)</label>
+            <input type="text" id="block_id" name="block_id" required>
+
+            <label for="block_name">ブロック名 (アイテム時の表示名)</label>
+            <input type="text" id="block_name" name="block_name" placeholder="例: カスタムブロック" required>
+
+            <label for="texture_all">テクスチャ名 (すべての面に同じテクスチャの場合)</label>
+            <input type="text" id="texture_all" name="texture_all" placeholder="例: 'custom_block'">
+            
+            <hr style="margin-top: 20px;">
+            <p>※ 破壊と耐性に関する設定</p>
+
+            <label for="destroy_time">硬さ (破壊時間。数値。例: 1.5)</label>
+            <input type="text" id="destroy_time" name="destroy_time" placeholder="例: 1.5 (鉄ブロック)">
+
+            <label for="explosion_resistance">爆破耐性 (数値。例: 30)</label>
+            <input type="text" id="explosion_resistance" name="explosion_resistance" placeholder="例: 30 (石)">
+
+            <div class="checkbox-group">
+                <label for="is_flammable">燃えるか (燃焼性)</label>
+                <input type="checkbox" id="is_flammable" name="is_flammable">
+            </div>
+
+            <label for="tool_type">適正ツール (ツールがない場合はNone)</label>
+            <select id="tool_type" name="tool_type">
+                <option value="none">なし (素手で破壊可能)</option>
+                <option value="pickaxe">ツルハシ (pickaxe)</option>
+                <option value="axe">斧 (axe)</option>
+                <option value="shovel">シャベル (shovel)</option>
+                <option value="hoe">クワ (hoe)</option>
+            </select>
+
+            <button type="submit">JSONファイルをダウンロード 💾</button>
+        </form>
+
+        <div id="resultMessage" class="message" style="display: none;"></div>
+        <div id="jsonOutput" style="display: none;">
+            <h3>生成されたJSONプレビュー</h3>
+            <pre id="jsonContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        const MESSAGE_DIV = document.getElementById('resultMessage');
+        const JSON_CONTENT_PRE = document.getElementById('jsonContent');
+        const JSON_OUTPUT_DIV = document.getElementById('jsonOutput');
+        
+        document.getElementById('blockForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            MESSAGE_DIV.style.display = 'none';
+            JSON_OUTPUT_DIV.style.display = 'none';
+
+            // フォームデータの取得
+            const blockId = document.getElementById('block_id').value.trim();
+            const blockName = document.getElementById('block_name').value.trim(); // NEW
+            const textureAll = document.getElementById('texture_all').value.trim();
+            const destroyTime = document.getElementById('destroy_time').value.trim();
+            const explosionResistance = document.getElementById('explosion_resistance').value.trim();
+            const isFlammable = document.getElementById('is_flammable').checked; // NEW
+            const toolType = document.getElementById('tool_type').value; // NEW
+            
+            console.log(`blockId:${blockId}`);
+            console.log(`blockName:${blockName}`);
+            console.log(`isFlammable:${isFlammable}`);
+            console.log(`toolType:${toolType}`);
+
+            if (!blockId || !blockName) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: ブロックIDとブロック名は必須です。';
+                return;
+            }
+
+            let hasError = false;
+            
+            // JSONデータの基本構造
+            let blockData = {
+                "format_version": "1.19.0", 
+                "minecraft:block": {
+                    "description": {
+                        "identifier": blockId,
+                        // アイテム化されたブロックの名前を設定
+                        "menu_category": {
+                            "category": "nature", 
+                            "group": "itemGroup.name.fullBlock"
+                        }
+                    },
+                    "components": {
+                        // アイテム化された時の表示名を設定 (1.19以降のブロックはこうする)
+                        "minecraft:display_name": blockName, 
+                        // アイテムとして持てるようにする
+                        "minecraft:creative_category": {
+                            "category": "nature",
+                            "group": "itemGroup.name.fullBlock"
+                        },
+                        "minecraft:loot": `loot_tables/blocks/${blockId.split(':')[1]}.json`
+                    }
+                }
+            };
+            
+            let components = blockData["minecraft:block"]["components"];
+            
+            // 1. テクスチャ設定
+            if (textureAll) {
+                components["minecraft:unit_cube"] = {};
+                components["minecraft:material_instances"] = {
+                    "*": {
+                        "texture": textureAll,
+                        "render_method": "opaque"
+                    }
+                };
+            }
+            
+            // 2. 硬さ (破壊時間)
+            if (destroyTime) {
+                const dtVal = parseFloat(destroyTime);
+                if (isNaN(dtVal) || dtVal < 0) {
+                     MESSAGE_DIV.style.display = 'block';
+                     MESSAGE_DIV.className = 'message error';
+                     MESSAGE_DIV.innerHTML = '❌ エラー: 硬さ（破壊時間）は0以上の数値で入力してください。';
+                     hasError = true;
+                } else {
+                    components["minecraft:destroy_time"] = dtVal;
+                    console.log(`destroy_time:${dtVal}`);
+                }
+            }
+
+            // 3. 爆破耐性
+            if (explosionResistance && !hasError) {
+                const erVal = parseFloat(explosionResistance);
+                if (isNaN(erVal) || erVal < 0) {
+                     MESSAGE_DIV.style.display = 'block';
+                     MESSAGE_DIV.className = 'message error';
+                     MESSAGE_DIV.innerHTML = '❌ エラー: 爆破耐性は0以上の数値で入力してください。';
+                     hasError = true;
+                } else {
+                    components["minecraft:explosion_resistance"] = erVal;
+                    console.log(`explosion_resistance:${erVal}`);
+                }
+            }
+            
+            // 4. 燃焼性 (minecraft:flammable)
+            if (isFlammable && !hasError) {
+                components["minecraft:flammable"] = {
+                    "catch_chance_modifier": 5,
+                    "destroy_chance_modifier": 20
+                };
+                console.log("-> Flammable component added.");
+            }
+
+            // 5. 適正ツール (minecraft:pick_diggable, minecraft:break_by_tool)
+            if (toolType !== 'none' && !hasError) {
+                // 適正ツールが設定されている場合、このツールでのみ掘れるように設定
+                components["minecraft:break_by_tool"] = {
+                    "filter": {
+                        "test": "has_equipment",
+                        "domain": "hand",
+                        "subject": "self",
+                        "value": toolType // 例: 'pickaxe'
+                    }
+                };
+                // ツルハシ、斧、シャベルは掘れるブロックとして設定
+                if (['pickaxe', 'axe', 'shovel'].includes(toolType)) {
+                    components["minecraft:pick_diggable"] = true;
+                }
+                console.log(`-> Break by tool set to ${toolType}`);
+            } else if (toolType === 'none' && !hasError) {
+                // ツールの指定がない場合は、素手で掘れるように設定（デフォルト）
+                components["minecraft:destructible_by_hand"] = true;
+                console.log("-> Destructible by hand set.");
+            }
+            
+
+            if (hasError) return;
+            
+            // JSONファイルのダウンロード処理
+            const jsonString = JSON.stringify(blockData, null, 4);
+            console.log(`jsonString:${jsonString}`);
+
+            const parts = blockId.split(':');
+            const fileName = (parts.length > 1 ? parts[1] : blockId) + '.json';
+            
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = fileName;
+            a.href = url;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // メッセージとプレビューの表示
+            MESSAGE_DIV.style.display = 'block';
+            MESSAGE_DIV.className = 'message'; 
+            MESSAGE_DIV.innerHTML = `✅ JSONファイル **${fileName}** のダウンロードを開始しました！`;
+            
+            JSON_CONTENT_PRE.textContent = jsonString;
+            JSON_OUTPUT_DIV.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
