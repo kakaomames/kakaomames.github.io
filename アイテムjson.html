@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アイテムJSON作成 | JS単独版</title>
+    <title>アイテムJSON作成 | Gemini programming隊</title>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="robots" content="index, follow">
     <meta name="description" content="Gemini programming隊によるマイクラアドオンアイテムJSON作成サポートサイト">
@@ -34,17 +34,20 @@
     
     <div class="container">
         <h1>✨ アイテムJSON作成ツール (JS完結)</h1>
-        <p>入力後、ボタンを押すとJSONファイルがダウンロードされます。数値の基準はヘッダーの説明書リンクを確認してください。</p>
+        <p>必須項目を入力し、攻撃力、耐久力、防御力を設定してください。空白の場合はその機能がないアイテムとして扱われます。数値の基準はヘッダーの説明書リンクを確認してください。</p>
         
         <form id="itemForm">
             <label for="item_id">アイテムID <span style="color: red;">*</span> (例: myaddon:custom_sword)</label>
             <input type="text" id="item_id" name="item_id" required>
 
-            <label for="item_name">アイテム名 (表示名)</label>
+            <label for="item_name">アイテム名 (アドオン内での表示名)</label>
             <input type="text" id="item_name" name="item_name" required>
 
             <label for="texture_path">テクスチャパス <span style="color: red;">*</span> (例: 'item_icons/custom_sword')</label>
             <input type="text" id="texture_path" name="texture_path" required>
+
+            <label for="attack_damage">攻撃力 (数値。空白の場合、攻撃能力なしと判断)</label>
+            <input type="text" id="attack_damage" name="attack_damage" placeholder="例: 8 (ダイヤ剣は7)">
 
             <label for="durability">耐久力 (数値。空白の場合、ツールではない)</label>
             <input type="text" id="durability" name="durability" placeholder="例: 500 (鉄のツルハシは約250)">
@@ -73,14 +76,18 @@
             MESSAGE_DIV.style.display = 'none';
             JSON_OUTPUT_DIV.style.display = 'none';
 
+            // フォームデータの取得
             const itemId = document.getElementById('item_id').value.trim();
             const itemName = document.getElementById('item_name').value.trim();
             const texturePath = document.getElementById('texture_path').value.trim();
+            const attackDamage = document.getElementById('attack_damage').value.trim();
             const durability = document.getElementById('durability').value.trim();
             const defense = document.getElementById('defense').value.trim();
 
             console.log(`itemId:${itemId}`);
+            console.log(`attackDamage:${attackDamage}`);
             
+            // 必須項目のチェック
             if (!itemId || !itemName || !texturePath) {
                 MESSAGE_DIV.style.display = 'block';
                 MESSAGE_DIV.className = 'message error';
@@ -88,8 +95,9 @@
                 return;
             }
 
+            // JSONデータの基本構造
             let itemData = {
-                "format_version": "1.10.0",
+                "format_version": "1.12.0",
                 "minecraft:item": {
                     "description": {
                         "identifier": itemId,
@@ -103,10 +111,24 @@
             };
             
             let components = itemData["minecraft:item"]["components"];
-
             let hasError = false;
-            // 1. 耐久力チェック
-            if (durability) {
+
+            // 1. 攻撃力チェック
+            if (attackDamage) {
+                const atkVal = parseFloat(attackDamage);
+                if (isNaN(atkVal) || atkVal < 0) {
+                     MESSAGE_DIV.style.display = 'block';
+                     MESSAGE_DIV.className = 'message error';
+                     MESSAGE_DIV.innerHTML = '❌ エラー: 攻撃力は0以上の数値で入力してください。';
+                     hasError = true;
+                } else {
+                    components["minecraft:damage"] = atkVal;
+                    components["minecraft:weapon"] = {}; // 武器であることを示す
+                }
+            }
+
+            // 2. 耐久力チェック
+            if (durability && !hasError) {
                 const durVal = parseInt(durability);
                 if (isNaN(durVal) || durVal <= 0) {
                      MESSAGE_DIV.style.display = 'block';
@@ -120,7 +142,7 @@
                 }
             }
 
-            // 2. 防御力チェック
+            // 3. 防御力チェック
             if (defense && !hasError) {
                 const defVal = parseInt(defense);
                 if (isNaN(defVal) || defVal < 0) {
@@ -131,6 +153,7 @@
                 } else {
                     components["minecraft:armor"] = { "protection": defVal };
                     itemData["minecraft:item"]["description"]["category"] = "armor";
+                    // 防具で耐久力未設定ならデフォルトを設定
                     if (!durability) {
                         components["minecraft:max_damage"] = components["minecraft:max_damage"] || 100;
                     }
@@ -139,7 +162,11 @@
 
             if (hasError) return;
             
+            // 最終JSON生成 (バックスラッシュを維持するため、第2引数にnull、第3引数に4を指定)
             const jsonString = JSON.stringify(itemData, null, 4);
+            console.log(`jsonString:${jsonString}`);
+
+            // ファイル名決定
             const parts = itemId.split(':');
             const fileName = (parts.length > 1 ? parts[1] : itemId) + '.json';
             
