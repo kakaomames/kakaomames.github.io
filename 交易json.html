@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>村人取引 JSON 作成 | Gemini programming隊</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Gemini programming隊によるマイクラアドオン村人取引JSON作成サポートサイト">
+    <meta name="author" content="Gemini programming隊">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; padding: 0; background-color: #f4f4f4; margin: 0; }
+        header { background-color: #2c3e50; color: white; padding: 10px 20px; text-align: right; }
+        header a { color: #f1c40f; text-decoration: none; font-weight: bold; margin-left: 15px; }
+        header a:hover { text-decoration: underline; }
+        .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; margin-top: 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; padding: 10px 15px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #c0392b; }
+        .message { margin-top: 20px; padding: 15px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 15px; }
+        
+        .trade-group {
+            border: 2px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fffafa;
+        }
+        .trade-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .trade-controls { text-align: right; }
+        .add-trade-btn { background-color: #3498db; margin-bottom: 0; }
+        .remove-trade-btn { background-color: #f0ad4e; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <span>Gemini programming隊 アドオンサポート</span>
+        <a href="index.html">ホームに戻る 🏠</a>
+    </header>
+    
+    <div class="container">
+        <h1>🧑‍🌾 村人取引 JSON 作成ツール</h1>
+        <p>指定した職業の村人に追加するカスタム取引（トレード）を定義します。</p>
+        
+        <form id="villagerTradeForm">
+            <h2>1. 取引セットの基本設定</h2>
+            
+            <label for="profession_id">村人の職業ID <span style="color: red;">*</span></label>
+            <select id="profession_id" name="profession_id" required>
+                <option value="">--- 職業を選択してください ---</option>
+                <option value="minecraft:armorer">防具鍛冶 (Armorer)</option>
+                <option value="minecraft:butcher">肉屋 (Butcher)</option>
+                <option value="minecraft:cartographer">地図職人 (Cartographer)</option>
+                <option value="minecraft:cleric">聖職者 (Cleric)</option>
+                <option value="minecraft:farmer">農民 (Farmer)</option>
+                <option value="minecraft:fisherman">釣り人 (Fisherman)</option>
+                <option value="minecraft:fletcher">矢師 (Fletcher)</option>
+                <option value="minecraft:leatherworker">革職人 (Leatherworker)</option>
+                <option value="minecraft:librarian">司書 (Librarian)</option>
+                <option value="minecraft:shepherd">羊飼い (Shepherd)</option>
+                <option value="minecraft:toolsmith">道具鍛冶 (Toolsmith)</option>
+                <option value="minecraft:weaponsmith">武器鍛冶 (Weaponsmith)</option>
+                <option value="CUSTOM_ID_INPUT">その他/カスタム職業IDを入力</option>
+            </select>
+            
+            <input type="text" id="custom_profession_id" name="custom_profession_id" placeholder="カスタム職業IDを 'myaddon:custom_job' の形式で入力" style="margin-top: 5px; display: none;">
+
+            <label for="tier_name">取引のティア名 <span style="color: red;">*</span> (ファイル名にも使用。例: apprentice_trades)</label>
+            <input type="text" id="tier_name" name="tier_name" required>
+            
+            <label for="tier_level">取引レベル (1=見習い, 5=マスター)</label>
+            <input type="number" id="tier_level" name="tier_level" value="2" min="1" max="5">
+
+            <h2>2. 取引内容の定義 (Trade List)</h2>
+            <div id="tradesContainer">
+                </div>
+            
+            <button type="button" id="addTradeButton" class="add-trade-btn">+ 取引を追加</button>
+
+            <button type="submit">JSONファイルをダウンロード 💾</button>
+        </form>
+
+        <div id="resultMessage" class="message" style="display: none;"></div>
+        <div id="jsonOutput" style="display: none;">
+            <h3>生成されたJSONプレビュー</h3>
+            <pre id="jsonContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        const MESSAGE_DIV = document.getElementById('resultMessage');
+        const JSON_CONTENT_PRE = document.getElementById('jsonContent');
+        const JSON_OUTPUT_DIV = document.getElementById('jsonOutput');
+        const TRADES_CONTAINER = document.getElementById('tradesContainer');
+        const FORM = document.getElementById('villagerTradeForm');
+        const PROFESSION_SELECT = document.getElementById('profession_id');
+        const CUSTOM_PROFESSION_INPUT = document.getElementById('custom_profession_id');
+
+        let tradeCount = 0;
+        
+        // --- 職業ID選択肢の変更を監視 ---
+        PROFESSION_SELECT.addEventListener('change', function() {
+            if (this.value === 'CUSTOM_ID_INPUT') {
+                CUSTOM_PROFESSION_INPUT.style.display = 'block';
+                CUSTOM_PROFESSION_INPUT.required = true;
+            } else {
+                CUSTOM_PROFESSION_INPUT.style.display = 'none';
+                CUSTOM_PROFESSION_INPUT.required = false;
+            }
+        });
+
+        // --- 取引フォーム関連ロジック (変更なし) ---
+        function addTradeGroup(initial = false) {
+            tradeCount++;
+            const tradeId = `trade_${tradeCount}`;
+            
+            const group = document.createElement('div');
+            group.className = 'trade-group';
+            group.id = tradeId;
+            
+            group.innerHTML = `
+                <h3>取引 #${tradeCount}</h3>
+                <div class="trade-controls">
+                    <button type="button" class="remove-trade-btn" onclick="removeTradeGroup('${tradeId}')">取引を削除</button>
+                </div>
+                
+                <div class="trade-inputs">
+                    <div>
+                        <label>必要アイテム A ID <span style="color: red;">*</span></label>
+                        <input type="text" class="need_id_a" placeholder="例: minecraft:emerald">
+                        <label>必要アイテム A 数</label>
+                        <input type="number" class="need_count_a" value="1" min="1">
+                    </div>
+                    <div>
+                        <label>必要アイテム B ID (オプション)</label>
+                        <input type="text" class="need_id_b" placeholder="例: myaddon:custom_item">
+                        <label>必要アイテム B 数</label>
+                        <input type="number" class="need_count_b" value="1" min="1">
+                    </div>
+                    <div>
+                        <label>結果アイテム ID <span style="color: red;">*</span></label>
+                        <input type="text" class="result_id" placeholder="例: minecraft:diamond_sword">
+                        <label>結果アイテム 数</label>
+                        <input type="number" class="result_count" value="1" min="1">
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label>最大取引回数 (Max Times)</label>
+                    <input type="number" class="max_times" value="12" min="1">
+                    <label>取引で得られる経験値</label>
+                    <input type="number" class="trades_exp" value="1" min="0">
+                </div>
+            `;
+            
+            TRADES_CONTAINER.appendChild(group);
+        }
+
+        window.removeTradeGroup = function(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.remove();
+                renumberTradeHeaders();
+            }
+        };
+
+        function renumberTradeHeaders() {
+            const groups = TRADES_CONTAINER.querySelectorAll('.trade-group');
+            groups.forEach((group, index) => {
+                group.querySelector('h3').textContent = `取引 #${index + 1}`;
+            });
+        }
+
+        // 初期取引の追加
+        addTradeGroup(true);
+        document.getElementById('addTradeButton').addEventListener('click', () => addTradeGroup());
+
+
+        // --- フォーム送信ロジック ---
+        FORM.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            MESSAGE_DIV.style.display = 'none';
+            JSON_OUTPUT_DIV.style.display = 'none';
+
+            const selectedProfession = PROFESSION_SELECT.value;
+            let finalProfessionId = '';
+
+            // 最終的な職業IDの決定
+            if (selectedProfession === 'CUSTOM_ID_INPUT') {
+                finalProfessionId = CUSTOM_PROFESSION_INPUT.value.trim();
+                if (!finalProfessionId) {
+                     MESSAGE_DIV.style.display = 'block';
+                     MESSAGE_DIV.className = 'message error';
+                     MESSAGE_DIV.innerHTML = '❌ エラー: カスタム職業IDを入力してください。';
+                     return;
+                }
+            } else if (selectedProfession) {
+                finalProfessionId = selectedProfession;
+            } else {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: 村人の職業を選択してください。';
+                return;
+            }
+
+            // 以降のロジックは前回通り、finalProfessionIdを使用
+            
+            const tierName = document.getElementById('tier_name').value.trim();
+            const tierLevel = parseInt(document.getElementById('tier_level').value.trim());
+            
+            if (!tierName) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: ティア名は必須です。';
+                return;
+            }
+
+            const tradeGroups = TRADES_CONTAINER.querySelectorAll('.trade-group');
+            if (tradeGroups.length === 0) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: 最低1つの取引を定義してください。';
+                return;
+            }
+
+            let tradeList = [];
+            let hasError = false;
+
+            tradeGroups.forEach((group, index) => {
+                const needIdA = group.querySelector('.need_id_a').value.trim();
+                const needCountA = parseInt(group.querySelector('.need_count_a').value.trim());
+                const needIdB = group.querySelector('.need_id_b').value.trim();
+                const needCountB = parseInt(group.querySelector('.need_count_b').value.trim());
+                const resultId = group.querySelector('.result_id').value.trim();
+                const resultCount = parseInt(group.querySelector('.result_count').value.trim());
+                const maxTimes = parseInt(group.querySelector('.max_times').value.trim());
+                const tradesExp = parseInt(group.querySelector('.trades_exp').value.trim());
+
+                if (!needIdA || !resultId) {
+                    MESSAGE_DIV.style.display = 'block';
+                    MESSAGE_DIV.className = 'message error';
+                    MESSAGE_DIV.innerHTML = `❌ エラー: 取引 #${index + 1} の必須アイテムIDが不足しています。`;
+                    hasError = true;
+                    return;
+                }
+                
+                let trade = {
+                    "wants": [
+                        { "item": needIdA, "count": needCountA }
+                    ],
+                    "gives": [
+                        { "item": resultId, "count": resultCount }
+                    ],
+                    "max_times": maxTimes,
+                    "trades_exp": tradesExp
+                };
+
+                if (needIdB) {
+                    trade.wants.push({ "item": needIdB, "count": needCountB });
+                }
+
+                tradeList.push(trade);
+            });
+
+            if (hasError) return;
+
+            const fileNameBase = finalProfessionId.split(':').pop();
+            let villagerData = {
+                "tiers": [
+                    {
+                        "level": tierLevel,
+                        "trades": tradeList
+                    }
+                ]
+            };
+            
+            const jsonString = JSON.stringify(villagerData, null, 4);
+            const fileName = `${fileNameBase}_${tierName}.json`;
+            
+            // --- JSONファイルのダウンロード処理 ---
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = fileName;
+            a.href = url;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // メッセージとプレビューの表示
+            MESSAGE_DIV.style.display = 'block';
+            MESSAGE_DIV.className = 'message'; 
+            MESSAGE_DIV.innerHTML = `✅ 村人取引JSONファイル **${fileName}** のダウンロードを開始しました！<br>このファイルは **BP/trading/villager/${fileNameBase}/[ファイル名].json** に配置してください。`;
+            
+            JSON_CONTENT_PRE.textContent = jsonString;
+            JSON_OUTPUT_DIV.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
