@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>村人取引 JSON 作成 (マルチティア対応) | Gemini programming隊</title>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="robots" content="index, follow">
-    <meta name="description" content="Gemini programming隊によるマイクラアドオン村人取引JSON作成サポートサイト">
-    <meta name="author" content="Gemini programming隊">
-    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
-    
+    <title>村人取引 JSON 作成 (高度な機能対応) | Gemini programming隊</title>
     <style>
+        /* [中略: CSSコードはここにそのまま残す] */
         body { font-family: sans-serif; padding: 0; background-color: #f4f4f4; margin: 0; }
         header { background-color: #2c3e50; color: white; padding: 10px 20px; text-align: right; }
         header a { color: #f1c40f; text-decoration: none; font-weight: bold; margin-left: 15px; }
@@ -26,7 +21,7 @@
         pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 15px; }
         
         .tier-group {
-            border: 3px solid #3498db; /* Tiersは青で目立たせる */
+            border: 3px solid #3498db; 
             padding: 20px;
             margin-bottom: 25px;
             border-radius: 10px;
@@ -45,10 +40,24 @@
             gap: 15px;
             margin-top: 10px;
         }
+        .count-group { display: flex; gap: 5px; }
+        .count-group input { width: 50%; }
         .trade-controls { text-align: right; }
         .add-trade-btn { background-color: #1abc9c; margin-bottom: 0; margin-top: 10px; padding: 8px 12px; font-size: 14px;}
         .remove-trade-btn { background-color: #f0ad4e; margin-left: 10px; padding: 5px 10px; }
         .remove-tier-btn { background-color: #c0392b; float: right; margin-top: -5px; }
+        .advanced-options {
+            border-top: 1px dashed #ccc;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .enchant-group {
+            border: 1px solid #9b59b6;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .enchant-group label { font-size: 0.9em; font-weight: normal; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -58,8 +67,8 @@
     </header>
     
     <div class="container">
-        <h1>🧑‍🌾 村人取引 JSON 作成ツール (マルチティア対応)</h1>
-        <p>レベル1からレベル5までの取引を、ティアごとに定義できます。</p>
+        <h1>🧑‍🌾 村人取引 JSON 作成ツール (高度な機能対応)</h1>
+        <p>数量のランダム化 (`min`/`max`) とエンチャント機能をサポートしました。</p>
         
         <form id="villagerTradeForm">
             <h2>1. 取引セットの基本設定</h2>
@@ -89,7 +98,7 @@
 
             <h2>2. 取引ティア（レベル）の定義</h2>
             <div id="tiersContainer">
-                </div>
+            </div>
             
             <button type="button" id="addTierButton" class="add-trade-btn" style="background-color: #3498db;">+ 新しい取引レベル (ティア) を追加</button>
 
@@ -103,313 +112,6 @@
         </div>
     </div>
 
-    <script>
-        const MESSAGE_DIV = document.getElementById('resultMessage');
-        const JSON_CONTENT_PRE = document.getElementById('jsonContent');
-        const JSON_OUTPUT_DIV = document.getElementById('jsonOutput');
-        const TIERS_CONTAINER = document.getElementById('tiersContainer');
-        const FORM = document.getElementById('villagerTradeForm');
-        const PROFESSION_SELECT = document.getElementById('profession_id');
-        const CUSTOM_PROFESSION_INPUT = document.getElementById('custom_profession_id');
-
-        let tierCount = 0;
-        let tradeIdCounter = 0;
-
-        // --- 職業ID選択肢の変更を監視 ---
-        PROFESSION_SELECT.addEventListener('change', function() {
-            if (this.value === 'CUSTOM_ID_INPUT') {
-                CUSTOM_PROFESSION_INPUT.style.display = 'block';
-                CUSTOM_PROFESSION_INPUT.required = true;
-            } else {
-                CUSTOM_PROFESSION_INPUT.style.display = 'none';
-                CUSTOM_PROFESSION_INPUT.required = false;
-            }
-        });
-        
-        /**
-         * 新しい取引入力グループ (個別取引) を動的に追加する関数
-         */
-        function addTradeItem(tierId, initial = false) {
-            tradeIdCounter++;
-            const tradeId = `trade_item_${tradeIdCounter}`;
-            const tierGroup = document.getElementById(tierId);
-            
-            const tradeItemDiv = document.createElement('div');
-            tradeItemDiv.className = 'trade-item';
-            tradeItemDiv.id = tradeId;
-            
-            tradeItemDiv.innerHTML = `
-                <div style="font-weight: bold; color: #e74c3c;">個別取引 #${tierGroup.querySelectorAll('.trade-item').length + 1}</div>
-                <div class="trade-inputs">
-                    <div>
-                        <label>必要アイテム A ID <span style="color: red;">*</span></label>
-                        <input type="text" class="need_id_a" placeholder="例: minecraft:emerald">
-                        <label>必要アイテム A 数</label>
-                        <input type="number" class="need_count_a" value="1" min="1">
-                    </div>
-                    <div>
-                        <label>必要アイテム B ID (オプション)</label>
-                        <input type="text" class="need_id_b" placeholder="例: myaddon:custom_item">
-                        <label>必要アイテム B 数</label>
-                        <input type="number" class="need_count_b" value="1" min="1">
-                    </div>
-                    <div>
-                        <label>結果アイテム ID <span style="color: red;">*</span></label>
-                        <input type="text" class="result_id" placeholder="例: minecraft:diamond_sword">
-                        <label>結果アイテム 数</label>
-                        <input type="number" class="result_count" value="1" min="1">
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 20px; margin-top: 10px; align-items: center;">
-                    <div>
-                        <label>最大取引回数 (Max Times)</label>
-                        <input type="number" class="max_times" value="12" min="1" style="width: 100px;">
-                    </div>
-                    <div>
-                        <label>取引で得られる経験値</label>
-                        <input type="number" class="trades_exp" value="1" min="0" style="width: 100px;">
-                    </div>
-                    <button type="button" class="remove-trade-btn" onclick="removeElement('${tradeId}')" style="margin-top: 25px;">削除</button>
-                </div>
-            `;
-            
-            // 既存の要素の直前に挿入 (最後の子要素の前)
-            tierGroup.insertBefore(tradeItemDiv, tierGroup.lastElementChild);
-            renumberTradeItems(tierId);
-        }
-
-        /**
-         * 新しい取引レベル (ティア) グループを動的に追加する関数
-         */
-        function addTierGroup(initialLevel = 1) {
-            tierCount++;
-            const tierId = `tier_group_${tierCount}`;
-            
-            const group = document.createElement('div');
-            group.className = 'tier-group';
-            group.id = tierId;
-            
-            group.innerHTML = `
-                <h2>
-                    取引レベル (ティア) #${tierCount}
-                    <button type="button" class="remove-tier-btn" onclick="removeElement('${tierId}')">ティアを削除</button>
-                </h2>
-                
-                <label for="tier_level_${tierId}">**取引レベル (1=見習い, 5=マスター)** <span style="color: red;">*</span></label>
-                <input type="number" class="tier_level" id="tier_level_${tierId}" value="${initialLevel}" min="1" max="5" required>
-                
-                <hr style="margin: 15px 0;">
-
-                <div class="trades-container">
-                    </div>
-
-                <button type="button" class="add-trade-btn" onclick="addTradeItem('${tierId}')">+ このティアに個別取引を追加</button>
-            `;
-            
-            TIERS_CONTAINER.appendChild(group);
-
-            // 初期取引アイテムを追加
-            const tradesContainer = group.querySelector('.trades-container');
-            const tradeItemDiv = document.createElement('div');
-            tradesContainer.appendChild(tradeItemDiv); // ダミー要素
-
-            addTradeItem(tierId);
-            tradesContainer.removeChild(tradeItemDiv); // ダミー要素削除
-        }
-        
-        /**
-         * 任意の要素を削除し、取引番号を振り直す
-         */
-        window.removeElement = function(id) {
-            const element = document.getElementById(id);
-            if (element) {
-                const parentTierId = element.closest('.tier-group') ? element.closest('.tier-group').id : null;
-                element.remove();
-                
-                if (parentTierId) {
-                    renumberTradeItems(parentTierId);
-                }
-                
-                // 全てのティアが削除されたら、最低1つ追加する
-                if (TIERS_CONTAINER.children.length === 0) {
-                     addTierGroup(1);
-                }
-            }
-        };
-
-        /**
-         * 個別取引の番号を振り直す関数
-         */
-        function renumberTradeItems(tierId) {
-            const tierGroup = document.getElementById(tierId);
-            if (!tierGroup) return;
-
-            const tradeItems = tierGroup.querySelectorAll('.trade-item');
-            tradeItems.forEach((item, index) => {
-                item.querySelector('div[style*="font-weight"]').textContent = `個別取引 #${index + 1}`;
-            });
-        }
-
-        // 初期ロード時にティアレベル1を追加
-        addTierGroup(1);
-        document.getElementById('addTierButton').addEventListener('click', () => addTierGroup(TIERS_CONTAINER.children.length + 1));
-
-
-        // --- フォーム送信ロジック ---
-        FORM.addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            
-            MESSAGE_DIV.style.display = 'none';
-            JSON_OUTPUT_DIV.style.display = 'none';
-
-            // 1. 職業IDの決定
-            const selectedProfession = PROFESSION_SELECT.value;
-            let finalProfessionId = '';
-
-            if (selectedProfession === 'CUSTOM_ID_INPUT') {
-                finalProfessionId = CUSTOM_PROFESSION_INPUT.value.trim();
-                if (!finalProfessionId) {
-                     MESSAGE_DIV.style.display = 'block';
-                     MESSAGE_DIV.className = 'message error';
-                     MESSAGE_DIV.innerHTML = '❌ エラー: カスタム職業IDを入力してください。';
-                     return;
-                }
-            } else if (selectedProfession) {
-                finalProfessionId = selectedProfession;
-            } else {
-                MESSAGE_DIV.style.display = 'block';
-                MESSAGE_DIV.className = 'message error';
-                MESSAGE_DIV.innerHTML = '❌ エラー: 村人の職業を選択してください。';
-                return;
-            }
-
-            const tierNameBase = document.getElementById('tier_name_base').value.trim();
-            if (!tierNameBase) {
-                 MESSAGE_DIV.style.display = 'block';
-                 MESSAGE_DIV.className = 'message error';
-                 MESSAGE_DIV.innerHTML = '❌ エラー: ファイル名ベースのティア名は必須です。';
-                 return;
-            }
-            
-            let tiersList = [];
-            let hasError = false;
-
-            // 2. ティアグループの収集
-            const tierGroups = TIERS_CONTAINER.querySelectorAll('.tier-group');
-            if (tierGroups.length === 0) {
-                 MESSAGE_DIV.style.display = 'block';
-                 MESSAGE_DIV.className = 'message error';
-                 MESSAGE_DIV.innerHTML = '❌ エラー: 最低1つの取引レベル (ティア) を定義してください。';
-                 return;
-            }
-            
-            // 使用済みレベルチェック用
-            const usedLevels = new Set(); 
-
-            tierGroups.forEach((tierGroup, tierIndex) => {
-                const tierLevel = parseInt(tierGroup.querySelector('.tier_level').value.trim());
-                
-                if (isNaN(tierLevel) || tierLevel < 1 || tierLevel > 5) {
-                    MESSAGE_DIV.style.display = 'block';
-                    MESSAGE_DIV.className = 'message error';
-                    MESSAGE_DIV.innerHTML = `❌ エラー: 取引レベル #${tierIndex + 1} は1〜5の数値で入力してください。`;
-                    hasError = true;
-                    return;
-                }
-                
-                if (usedLevels.has(tierLevel)) {
-                    MESSAGE_DIV.style.display = 'block';
-                    MESSAGE_DIV.className = 'message error';
-                    MESSAGE_DIV.innerHTML = `❌ エラー: 取引レベル ${tierLevel} は既に定義されています。重複は許可されません。`;
-                    hasError = true;
-                    return;
-                }
-                usedLevels.add(tierLevel);
-
-
-                // 3. 個別取引の収集
-                const tradeItems = tierGroup.querySelectorAll('.trade-item');
-                let tradeList = [];
-                
-                if (tradeItems.length === 0) {
-                    // 取引がないティアも定義自体は可能だが、ここでは警告
-                    console.warn(`Tier ${tierLevel} has no trades defined.`);
-                }
-                
-                tradeItems.forEach((item, tradeIndex) => {
-                    const needIdA = item.querySelector('.need_id_a').value.trim();
-                    const needCountA = parseInt(item.querySelector('.need_count_a').value.trim());
-                    const needIdB = item.querySelector('.need_id_b').value.trim();
-                    const needCountB = parseInt(item.querySelector('.need_count_b').value.trim());
-                    const resultId = item.querySelector('.result_id').value.trim();
-                    const resultCount = parseInt(item.querySelector('.result_count').value.trim());
-                    const maxTimes = parseInt(item.querySelector('.max_times').value.trim());
-                    const tradesExp = parseInt(item.querySelector('.trades_exp').value.trim());
-
-                    if (!needIdA || !resultId) {
-                        MESSAGE_DIV.style.display = 'block';
-                        MESSAGE_DIV.className = 'message error';
-                        MESSAGE_DIV.innerHTML = `❌ エラー: レベル ${tierLevel} の取引 #${tradeIndex + 1} の必須アイテムIDが不足しています。`;
-                        hasError = true;
-                        return;
-                    }
-                    
-                    let trade = {
-                        "wants": [
-                            { "item": needIdA, "count": needCountA }
-                        ],
-                        "gives": [
-                            { "item": resultId, "count": resultCount }
-                        ],
-                        "max_times": maxTimes,
-                        "trades_exp": tradesExp
-                    };
-
-                    if (needIdB) {
-                        trade.wants.push({ "item": needIdB, "count": needCountB });
-                    }
-
-                    tradeList.push(trade);
-                });
-                
-                if (!hasError) {
-                     tiersList.push({ "level": tierLevel, "trades": tradeList });
-                }
-            });
-
-            if (hasError) return;
-            
-            // 4. JSON構造の構築
-            let villagerData = {
-                "tiers": tiersList
-            };
-            
-            const jsonString = JSON.stringify(villagerData, null, 4);
-            
-            // 5. ファイル名決定とダウンロード
-            const fileNameBase = finalProfessionId.split(':').pop();
-            const fileName = `${fileNameBase}_${tierNameBase}.json`;
-            
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.download = fileName;
-            a.href = url;
-            
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            // メッセージとプレビューの表示
-            MESSAGE_DIV.style.display = 'block';
-            MESSAGE_DIV.className = 'message'; 
-            MESSAGE_DIV.innerHTML = `✅ 村人取引JSONファイル **${fileName}** のダウンロードを開始しました！<br>このファイルは **BP/trading/villager/${fileNameBase}/[ファイル名].json** に配置し、村人のエンティティファイルから参照してください。`;
-            
-            JSON_CONTENT_PRE.textContent = jsonString;
-            JSON_OUTPUT_DIV.style.display = 'block';
-        });
-    </script>
+    <script src="villager_trade_logic.js"></script> 
 </body>
 </html>
