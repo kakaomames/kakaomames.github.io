@@ -1,1 +1,140 @@
+<html lang="ja"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アドオン製作・製作補助ページ - かかおプロジェクト</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="https://kakaomames.github.io/Minecraft-flask-app/static/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://kakaomames.github.io/Minecraft-flask-app/static/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://kakaomames.github.io/Minecraft-flask-app/static/favicon-16x16.png">
+<link rel="manifest" href="https://kakaomames.github.io/Minecraft-flask-app/static/site.webmanifest">
+    <link rel="stylesheet" href="https://kakaomames.github.io/Minecraft-flask-app/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>アドオン製作・製作補助のホーム</h1>
+        <nav>
+            <ul>
+                <li><a href="/アイテムjson">アイテムjsonの作成</a></li>
+                <li><a href="/ブロックjson">ブロックjsonの作成</a></li>
+                <li><a href="/ロートテーブル">ロートテーブルの作成</a></li><br>
+                <li><a href="/陽気系/">陽気系</a></li>
+                <li><a href="/ポケモン系/">ポケモン系</a></li>
+                <li><a href="/マイクラ系/">マイクラ系</a></li><br>
+                <li><a href="/UNO系/">UNO系</a></li>
+                <li><a href="/マリカ系/">マリカ系</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+              <div id="video-ad-wrapper" style="text-align: center; margin: 30px auto; max-width: 600px;">
+    
+    <a id="video-ad-link" href="http://xeroxapp032.vercel.app/home" target="_blank" style="display: block; text-decoration: none;">
 
+        <video id="ad-video" src="/My Movie 1.mov" loop playsinline style="width: 100%; height: auto; border: 1px solid #ccc; border-radius: 8px;" preload="auto">
+            
+            お使いのブラウザでは動画が再生できません。
+        </video>
+
+    </a>
+    
+    <small style="display: block; margin-top: 5px; color: #666;">[広告] カカオマメの最新プロジェクト</small>
+
+    <div id="move-to-page-link" style="margin-top: 15px; display: none;">
+        </div>
+
+</div>
+
+    </main>
+ <script>
+     // ユーザーの要望に応じて、表示するURLと遅延時間を設定
+const TARGET_URL = "http://xeroxapp032.vercel.app/home"; 
+const DELAY_TIME_MS = 1000; // 1秒遅延
+
+(() => {
+    // 要素を取得
+    const video = document.getElementById('ad-video');
+    const linkContainer = document.getElementById('move-to-page-link');
+    const linkAnchor = document.getElementById('video-ad-link');
+    
+    // --- 1. 1秒遅延の自動再生設定 ---
+    
+    // 初期状態で動画を一時停止し、1秒後に再生を開始
+    // autoplay属性が付いているため、一部ブラウザでは必要ないが、遅延再生のために使用
+    video.pause(); 
+    
+    setTimeout(() => {
+        // 音はBGMのみとのことなので、再生成功率のために muted は一旦外す
+        // ただし、環境によってはミュートでないと自動再生がブロックされる可能性がある
+        // video.muted = false; // MTCの環境で音楽再生を許可
+        
+        const playPromise = video.play();
+        
+        // play()がPromiseを返すことを利用し、再生ブロック時のエラーを回避
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log("動画再生開始");
+            }).catch(error => {
+                console.error("動画再生がブロックされました:", error);
+                // 再生がブロックされた場合でも、リンクは表示する
+                showMoveLink();
+            });
+        }
+    }, DELAY_TIME_MS);
+    
+    // --- 2. ループ後のリンク表示設定 ---
+
+    let hasLoopedOnce = false;
+    
+    // timeupdateイベントで再生時間を監視し、8秒以上再生されたことを確認
+    video.addEventListener('timeupdate', () => {
+        // 動画の長さが8秒で、一度ループに入ったかどうかをチェック
+        // 動画の現在の再生時間が8秒を超えている、または動画の長さが8秒に非常に近い場合
+        if (!hasLoopedOnce && video.currentTime >= 7.9) { 
+            hasLoopedOnce = true;
+            console.log("動画が8秒再生されました。");
+            
+            // 次のフレームで再生がループに入ったらリンクを表示
+            // 確実な表示のため、少し遅延させてリンクを表示
+            setTimeout(showMoveLink, 50); 
+        }
+    });
+
+    /**
+     * ページ移動リンクを表示する関数
+     */
+    function showMoveLink() {
+        if (linkContainer.hasChildNodes()) return; // すでに表示されていたら何もしない
+        
+        // ページに移動</a> リンクを作成
+        const link = document.createElement('a');
+        link.href = TARGET_URL;
+        link.textContent = 'ページに移動';
+        link.target = '_blank'; // "_banck" ではなく "_blank" です
+        
+        // ボタン風のスタイルを適用
+        link.style.cssText = `
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        `;
+        link.onmouseover = function() { this.style.backgroundColor = '#0056b3'; };
+        link.onmouseout = function() { this.style.backgroundColor = '#007bff'; };
+        
+        linkContainer.appendChild(link);
+        linkContainer.style.display = 'block';
+        
+        // 動画全体をクリック可能にしていたaタグのhrefを削除し、誤クリックを防ぐ
+        linkAnchor.removeAttribute('href');
+    }
+
+})();
+</script>
+    <footer>
+        <p>© 2025  かかおプロジェクト</p>
+    </footer>
+ 
+</body></html>
