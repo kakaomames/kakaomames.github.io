@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ロートテーブルの仕組みと構造 - 詳細説明 | Gemini programming隊</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #f1c40f; padding-bottom: 10px; margin-top: 0; }
+        h2 { color: #e67e22; margin-top: 25px; border-left: 5px solid #e67e22; padding-left: 10px; }
+        h3 { color: #3498db; margin-top: 15px; }
+        p { line-height: 1.6; margin-bottom: 15px; }
+        code { background-color: #eee; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
+        pre { background-color: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 0.9em; }
+        .section-box { border: 1px solid #ccc; padding: 15px; margin-top: 10px; border-radius: 5px; }
+        .key-term { font-weight: bold; color: #9b59b6; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f1c40f; color: #333; }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 ロートテーブル (Loot Table) の仕組みと構造</h1>
+        <p>ロートテーブルは、Minecraft内で「アイテムがドロップする」状況全てを制御する設計図です。ブロック破壊、エンティティ討伐、チェストの生成など、すべてのランダムなアイテム取得に関わります。</p>
+
+        <h2>1. ロートテーブルの基本構造</h2>
+        <p>ロートテーブルのJSONファイルは、基本的に複数の **Pools (プール)** から構成されます。全てのドロップは、これらのプールによって定義されます。</p>
+        <pre>{
+  "pools": [
+    { /* Pool 1 の定義 */ },
+    { /* Pool 2 の定義 */ }
+  ]
+}</pre>
+
+        <h2>2. Pool (プール) とは？</h2>
+        <p>プールは、**ドロップの試行回数 (Rolls)** と、**ドロップの候補リスト (Entries)** を定義する、ドロップの「規則」の単位です。 </p>
+
+        <h3>2.1. Rolls (試行回数)</h3>
+        <p>プール内のアイテムを、何回ドロップさせるかを決めます。これが「ロトを回す回数」にあたります。</p>
+        <div class="section-box">
+            <p><strong>例: 試行回数をランダムに設定</strong></p>
+            <pre>"rolls": { "min": 1, "max": 3 }</pre>
+            <p>→ このプール内のドロップ候補から、**1回から3回**アイテムを選び出します。</p>
+            <p>ブロック破壊時などに、「鉄インゴットが1回出るか、2回出るか」といった判定を制御します。</p>
+        </div>
+
+        <h3>2.2. Entries (エントリー)</h3>
+        <p>ロールの結果、ドロップするアイテムの具体的な候補リストです。アイテムのID、ドロップ確率、数量などを設定します。</p>
+        <div class="section-box">
+            <p><strong>主な設定項目:</strong></p>
+            <ul>
+                <li><code>name</code>: アイテムID (例: <code>minecraft:diamond</code>)</li>
+                <li><code>weight</code>: ドロップ確率の重み。この値が高いほど選ばれやすくなります。</li>
+                <li><code>functions</code>: 数量の指定やエンチャント付与など、アイテムに処理を加えるための機能（後述）。</li>
+            </ul>
+        </div>
+        
+        <h2>3. Entries 内の重要要素: Weight と Functions</h2>
+
+        <h3>3.1. Weight (重み)</h3>
+        <p>ドロップ確率を制御します。同じプール内のエントリー全ての <code>weight</code> を合算し、その合計値に対する割合でドロップ確率が決まります。</p>
+        <table>
+            <thead>
+                <tr><th>アイテム</th><th>Weight</th><th>確率 (合計10の場合)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>ダイヤモンド</td><td>1</td><td>10%</td></tr>
+                <tr><td>エメラルド</td><td>3</td><td>30%</td></tr>
+                <tr><td>石炭</td><td>6</td><td>60%</td></tr>
+            </tbody>
+        </table>
+        <p>Rollsの試行回数ごとに、この比率でアイテムが選ばれます。</p>
+
+        <h3>3.2. Functions (機能)</h3>
+        <p>ドロップしたアイテムの属性を操作します。最も重要な機能は <code>set_count</code> (数量設定) です。</p>
+        <div class="section-box">
+            <p><strong>例: 数量をランダムに設定</strong></p>
+            <pre>"functions": [
+  {
+    "function": "set_count",
+    "count": { "min": 2, "max": 5 } 
+  }
+]</pre>
+            <p>→ 選ばれたアイテムは、**2個から5個**の間でランダムな数量になります。</p>
+            <p>他に、エンチャント付与 (<code>enchant_with_levels</code>) やデータ値の設定 (<code>set_data</code>) などがあります。</p>
+        </div>
+
+        <h2>4. まとめ</h2>
+        <p>ロートテーブルは、以下の構造で動いています。</p>
+        <p><strong>ロートテーブル全体</strong> &rarr; 複数定義された <strong>Pools (規則)</strong> を実行</p>
+        <p><strong>Pool (規則)</strong> &rarr; <strong>Rolls (試行回数)</strong> だけ <strong>Entries (候補)</strong> からアイテムを選択</p>
+        <p><strong>Entry (候補)</strong> &rarr; <code>weight</code> に基づいて選ばれ、<code>functions</code> で数量や属性が決定</p>
+
+        <hr>
+        <p style="text-align: center;">これでロートテーブルの構造が理解できたでしょうか？</p>
+
+    </div>
+  <a href="ロートテーブル.html">戻る</a>
+</body>
+</html>
