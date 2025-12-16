@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manifest JSON 作成 | Gemini programming隊</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Gemini programming隊によるマニフェストJSON作成サポートサイト">
+    <meta name="author" content="Gemini programming隊">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; padding: 0; background-color: #f4f4f4; margin: 0; }
+        header { background-color: #2c3e50; color: white; padding: 10px 20px; text-align: right; }
+        header a { color: #f1c40f; text-decoration: none; font-weight: bold; margin-left: 15px; }
+        header a:hover { text-decoration: underline; }
+        .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; margin-top: 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { margin-top: 20px; padding: 10px 15px; background-color: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #27ad60; }
+        .message { margin-top: 20px; padding: 15px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; margin-top: 15px; }
+        .type-select label { display: inline-block; margin-right: 15px; font-weight: normal; }
+        .json-output-group { margin-top: 20px; border: 1px solid #ccc; padding: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <header>
+        <span>Gemini programming隊 アドオンサポート</span>
+        <a href="index.html">ホームに戻る 🏠</a>
+    </header>
+    
+    <div class="container">
+        <h1>📝 Manifest JSON 作成ツール (UUIDエラー対策版)</h1>
+        <p>UUIDは自動生成されます。BPとRPを連携させる場合は「BP + RP 連携」を選択してください。</p>
+        
+        <form id="manifestForm">
+            <h2>1. 生成モードの選択</h2>
+            <div class="type-select">
+                <input type="radio" id="mode_bp" name="pack_mode" value="bp_only" checked>
+                <label for="mode_bp">BP (ビヘイビアパック) 単独</label>
+                
+                <input type="radio" id="mode_rp" name="pack_mode" value="rp_only">
+                <label for="mode_rp">RP (リソースパック) 単独</label>
+
+                <input type="radio" id="mode_both" name="pack_mode" value="both">
+                <label for="mode_both">BP + RP 連携 (推奨)</label>
+            </div>
+            
+            <h2>2. 基本情報</h2>
+            
+            <label for="pack_name">アドオン名 <span style="color: red;">*</span> (例: My Custom Addon)</label>
+            <input type="text" id="pack_name" name="pack_name" required>
+
+            <label for="pack_description">アドオンの説明 <span style="color: red;">*</span></label>
+            <input type="text" id="pack_description" name="pack_description" required>
+
+            <label for="pack_author">製作者名 (オプション)</label>
+            <input type="text" id="pack_author" name="pack_author" placeholder="例: Gemini programming隊">
+
+            <button type="submit">Manifest JSONを生成/ダウンロード 💾</button>
+        </form>
+
+        <div id="resultMessage" class="message" style="display: none;"></div>
+        
+        <div id="jsonOutput" style="display: none;">
+            <h3>生成結果 (BPとRPの連携UUIDも確認してください)</h3>
+
+            <div id="rpOutputGroup" class="json-output-group" style="display: none;">
+                <h4>RP (リソースパック) の manifest.json</h4>
+                <pre id="rpJsonContent"></pre>
+                <p>RP Header UUID: <strong id="rpHeaderUuidDisplay"></strong></p>
+                <button type="button" onclick="downloadJson('rp')">RPファイルをダウンロード</button>
+            </div>
+            
+            <div id="bpOutputGroup" class="json-output-group" style="display: none;">
+                <h4>BP (ビヘイビアパック) の manifest.json</h4>
+                <pre id="bpJsonContent"></pre>
+                <p>BP Header UUID: <strong id="bpHeaderUuidDisplay"></strong></p>
+                <button type="button" onclick="downloadJson('bp')">BPファイルをダウンロード</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MESSAGE_DIV = document.getElementById('resultMessage');
+        const BP_JSON_CONTENT_PRE = document.getElementById('bpJsonContent');
+        const RP_JSON_CONTENT_PRE = document.getElementById('rpJsonContent');
+        const BP_OUTPUT_GROUP = document.getElementById('bpOutputGroup');
+        const RP_OUTPUT_GROUP = document.getElementById('rpOutputGroup');
+        const JSON_OUTPUT_DIV = document.getElementById('jsonOutput');
+        const RP_HEADER_UUID_DISPLAY = document.getElementById('rpHeaderUuidDisplay');
+        const BP_HEADER_UUID_DISPLAY = document.getElementById('bpHeaderUuidDisplay');
+        const PACK_MODE = document.getElementsByName('pack_mode');
+        
+        let generatedBpJson = null;
+        let generatedRpJson = null;
+
+        /**
+         * 信頼性の高い UUID v4 を生成する関数
+         */
+        function generateUUID() {
+             // 乱数を16進数に変換し、UUIDの構造に合わせて整形
+             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        /**
+         * manifest.json の基本構造を作成する関数
+         */
+        function createManifest(name, description, author, type, headerUuid, moduleUuid, dependencies = []) {
+            const fullDescription = description + (author ? ` (By ${author})` : '');
+
+            let manifestData = {
+                "format_version": 2, 
+                "header": {
+                    "name": name,
+                    "description": fullDescription,
+                    "uuid": headerUuid,
+                    "version": [1, 0, 0], 
+                    "min_engine_version": [1, 20, 50] // 最新の安定版に近いバージョン
+                },
+                "modules": [
+                    {
+                        "description": description,
+                        "type": type, // 'data' or 'resources'
+                        "uuid": moduleUuid,
+                        "version": [1, 0, 0]
+                    }
+                ]
+            };
+            
+            // 依存関係がある場合のみ追加
+            if (dependencies.length > 0) {
+                manifestData["dependencies"] = dependencies;
+            }
+            
+            return manifestData;
+        }
+
+        /**
+         * JSONをダウンロードする関数
+         */
+        window.downloadJson = function(type) {
+            let jsonString;
+            let fileName;
+            
+            if (type === 'bp' && generatedBpJson) {
+                jsonString = JSON.stringify(generatedBpJson, null, 4);
+                fileName = 'BP_manifest.json';
+            } else if (type === 'rp' && generatedRpJson) {
+                jsonString = JSON.stringify(generatedRpJson, null, 4);
+                fileName = 'RP_manifest.json';
+            } else {
+                return;
+            }
+
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = fileName;
+            a.href = url;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+        
+        
+        document.getElementById('manifestForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            MESSAGE_DIV.style.display = 'none';
+            JSON_OUTPUT_DIV.style.display = 'none';
+            BP_OUTPUT_GROUP.style.display = 'none';
+            RP_OUTPUT_GROUP.style.display = 'none';
+
+            // フォームデータの取得
+            const mode = document.querySelector('input[name="pack_mode"]:checked').value;
+            const packName = document.getElementById('pack_name').value.trim();
+            const packDescription = document.getElementById('pack_description').value.trim();
+            const packAuthor = document.getElementById('pack_author').value.trim();
+            
+            if (!packName || !packDescription) {
+                MESSAGE_DIV.style.display = 'block';
+                MESSAGE_DIV.className = 'message error';
+                MESSAGE_DIV.innerHTML = '❌ エラー: アドオン名と説明は必須です。';
+                return;
+            }
+            
+            generatedBpJson = null;
+            generatedRpJson = null;
+            
+            // --- BP + RP 連携モード ---
+            if (mode === 'both') {
+                // 4つのユニークなUUIDを生成
+                const rpHeaderUuid = generateUUID();
+                const rpModuleUuid = generateUUID();
+                const bpHeaderUuid = generateUUID();
+                const bpModuleUuid = generateUUID();
+                
+                // 1. RP (リソースパック) の生成
+                generatedRpJson = createManifest(
+                    packName + " Resources", 
+                    packDescription, 
+                    packAuthor, 
+                    'resources', // type: resources
+                    rpHeaderUuid, // RP Header UUID
+                    rpModuleUuid // RP Module UUID
+                );
+                
+                // 2. BP (ビヘイビアパック) の生成 (依存関係を設定)
+                const dependencies = [{
+                    "uuid": rpHeaderUuid, // BPの依存関係にはRPのHeader UUIDを指定
+                    "version": [1, 0, 0]
+                }];
+                
+                generatedBpJson = createManifest(
+                    packName + " Behaviors", 
+                    packDescription, 
+                    packAuthor, 
+                    'data', // type: data
+                    bpHeaderUuid, // BP Header UUID (RPとは異なる)
+                    bpModuleUuid, // BP Module UUID (RPとは異なる)
+                    dependencies
+                );
+                
+                // 結果の表示
+                RP_JSON_CONTENT_PRE.textContent = JSON.stringify(generatedRpJson, null, 4);
+                BP_JSON_CONTENT_PRE.textContent = JSON.stringify(generatedBpJson, null, 4);
+                RP_HEADER_UUID_DISPLAY.textContent = rpHeaderUuid;
+                BP_HEADER_UUID_DISPLAY.textContent = bpHeaderUuid;
+
+                RP_OUTPUT_GROUP.style.display = 'block';
+                BP_OUTPUT_GROUP.style.display = 'block';
+                MESSAGE_DIV.innerHTML = `✅ BPとRPのJSONファイルを生成しました！ダウンロードしてそれぞれのフォルダに配置してください。`;
+
+            } 
+            // --- BP 単独モード ---
+            else if (mode === 'bp_only') {
+                 const bpHeaderUuid = generateUUID();
+                 const bpModuleUuid = generateUUID();
+
+                 generatedBpJson = createManifest(
+                    packName + " Behaviors", 
+                    packDescription, 
+                    packAuthor, 
+                    'data', 
+                    bpHeaderUuid, 
+                    bpModuleUuid
+                );
+                BP_JSON_CONTENT_PRE.textContent = JSON.stringify(generatedBpJson, null, 4);
+                BP_HEADER_UUID_DISPLAY.textContent = bpHeaderUuid;
+                BP_OUTPUT_GROUP.style.display = 'block';
+                MESSAGE_DIV.innerHTML = `✅ BPのJSONファイルを生成しました！ダウンロードしてBPフォルダに配置してください。`;
+            }
+            // --- RP 単独モード ---
+            else if (mode === 'rp_only') {
+                 const rpHeaderUuid = generateUUID();
+                 const rpModuleUuid = generateUUID();
+
+                 generatedRpJson = createManifest(
+                    packName + " Resources", 
+                    packDescription, 
+                    packAuthor, 
+                    'resources', 
+                    rpHeaderUuid, 
+                    rpModuleUuid
+                );
+                RP_JSON_CONTENT_PRE.textContent = JSON.stringify(generatedRpJson, null, 4);
+                RP_HEADER_UUID_DISPLAY.textContent = rpHeaderUuid;
+                RP_OUTPUT_GROUP.style.display = 'block';
+                MESSAGE_DIV.innerHTML = `✅ RPのJSONファイルを生成しました！ダウンロードしてRPフォルダに配置してください。`;
+            }
+
+            MESSAGE_DIV.style.display = 'block';
+            MESSAGE_DIV.className = 'message'; 
+            JSON_OUTPUT_DIV.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
