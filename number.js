@@ -1,0 +1,1 @@
+const p=new URLSearchParams(window.location.search);console.log(`p:${p.toString()}`);let v=p.get('number');console.log(`v:${v}`);if(v!==null&&!isNaN(v)){const e=document.getElementById('number');e.innerText=v;console.log(`e.innerText:${e.innerText}`);}else{console.log("v:invalid");}document.addEventListener('click',()=>console.log("clicked"));
