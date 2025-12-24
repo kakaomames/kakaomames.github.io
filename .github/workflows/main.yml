@@ -1,0 +1,26 @@
+# Gemini programming隊 サーバー起動プロトコルgithub/workflows/main.yml
+name: Minecraft Server Runner
+
+on:
+  repository_dispatch:
+    types: [start_minecraft]
+
+jobs:
+  run-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run Minecraft Server
+        run: |
+          # ここでサーバーをダウンロードして起動するぞ！
+          curl -O https://piston-data.mojang.com/v1/objects/84194a2f286cf1ad3128fa593d304f53c7113456/server.jar
+          echo "eula=true" > eula.txt
+          java -Xmx4G -Xms4G -jar server.jar nogui
