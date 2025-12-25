@@ -8,8 +8,8 @@ function print(value) {
 // ★★★ 1. クエリパラメータの解析関数 ★★★
 // ----------------------------------------------------
 function getQueryParams() {
+    print("Status: クエリパラメータの解析を開始します...");
     const params = {};
-    // audio.jsを読み込んでいるscriptタグのURLを取得する
     const scripts = document.getElementsByTagName('script');
     let scriptSrc = '';
 
@@ -20,105 +20,103 @@ function getQueryParams() {
             break;
         }
     }
+    print(`scriptSrc: ${scriptSrc}`);
     
-    // URLSearchParamsオブジェクトでクエリを解析
     if (scriptSrc) {
         const url = new URL(scriptSrc);
         const urlParams = new URLSearchParams(url.search);
         
-        // nameパラメータ
+        // nameパラメータの取得
         const name = urlParams.get('name');
         if (name) {
-            // 拡張子がない場合は .mp3 を補完
             params.name = name.endsWith('.mp3') ? name : `${name}.mp3`;
         } else {
-            // nameがない場合はデフォルトを設定（要件にはないが安全策として）
-            params.name = '/bgm/another-eden/bgm_デフォルト.mp3';
+            params.name = 'bgm/another-eden/bgm_デフォルト.mp3';
         }
+        print(`params.name: ${params.name}`);
 
         // s (start time)
         const s = parseFloat(urlParams.get('s'));
         params.start = isNaN(s) || s < 0 ? 0 : s;
+        print(`params.start: ${params.start}`);
         
         // e (end time)
         const e = parseFloat(urlParams.get('e'));
-        // eが指定されていない、または0以下の場合は、デフォルトの120秒ループを設定
         params.duration = isNaN(e) || e <= 0 ? 120 : e; 
+        print(`params.duration: ${params.duration}`);
     }
     
     return params;
 }
 
 const params = getQueryParams();
-const BGM_PATH = params.name ? `/${params.name}` : '/bgm/another-eden/bgm_デフォルト.mp3'; // ファイルパス
-const START_TIME = params.start || 0; // 再生開始時間
-const LOOP_DURATION = params.duration || 120; // ループ終了時間/間隔
+const BGM_PATH = params.name ? `/${params.name}` : '/bgm/another-eden/bgm_デフォルト.mp3';
+print(`BGM_PATH: ${BGM_PATH}`);
 
-//ループ終了時間/間隔
-sed BGM_PATH: $ BGM_PATH: );print(HParsed START_TIME (s): $_TIME (s): ${);print(EParsed LOOP_DURATION (e): $ATION (e): ${LOO);
-// ----------------------------------------------------
-// ★★★ 2. 制御ロジック (再生開始とループ処理を修正) ★★★
-// ----------------------------------------------------
-let audio; // Audioオブジェクトを保持するための変数
-let isPlaying = false; // 現在再生中かどうかの状態を保持
-const BUTTON_ID = 'kakakakakakakakaka_bgm_toggle_btn'; // 広告と干渉しないユニークID
+const START_TIME = params.start || 0;
+print(`START_TIME: ${START_TIME}`);
 
-/**
- * BGMの再生を開始し、指定された時間ごとにループさせる
- */
+const LOOP_DURATION = params.duration || 120;
+print(`LOOP_DURATION: ${LOOP_DURATION}`);
+
+// ----------------------------------------------------
+// ★★★ 2. 制御ロジック ★★★
+// ----------------------------------------------------
+let audio; 
+let isPlaying = false; 
+const BUTTON_ID = 'kakakakakakakakaka_bgm_toggle_btn'; 
+
 function startBGM() {
     if (!audio) {
+        print(`Status: Audioオブジェクトを新規作成します。Path: ${BGM_PATH}`);
         audio = new Audio(BGM_PATH);
-        print(`audio: ${audio}`);
 
-        // ループ開始位置を設定
         audio.currentTime = START_TIME; 
-        print(`audio.currentTime set to START_TIME: ${audio.currentTime}`);
+        print(`audio.currentTime initialized to: ${audio.currentTime}`);
 
-        // 再生時間の監視を設定
+        // ループ監視
         audio.addEventListener('timeupdate', function() {
-            // 現在の再生時間がLOOP_DURATIONを超えたら、START_TIMEに戻して再開
             if (audio.currentTime >= LOOP_DURATION) {
                 audio.currentTime = START_TIME;
                 audio.play();
-                console.log(`BGMを${LOOP_DURATION}秒でループリセットしました (開始位置: ${START_TIME}秒)。`);
+                print(`Loop: ${LOOP_DURATION}秒に達したため、${START_TIME}秒に戻しました。`);
             }
         });
         
-        // BGMが最後まで再生されたとき (安全策)
         audio.addEventListener('ended', function() {
             audio.currentTime = START_TIME;
             audio.play();
+            print("Event: 再生終了に伴いループリセットしました。");
         });
     }
 
-    // BGMの再生を実行
     audio.play()
         .then(() => {
             isPlaying = true;
             updateButtonLabel(true);
-            console.log(`BGM再生開始 (ファイル: ${BGM_PATH}, ループ間隔: ${LOOP_DURATION}秒)`);
+            print("Action: BGM再生開始成功！");
         })
         .catch(error => {
-            console.error("BGMの再生に失敗しました:", error);
+            print(`Error: 再生に失敗しました。ユーザー操作が必要です。 ${error}`);
             isPlaying = false;
             updateButtonLabel(false);
         });
 }
 
 // ----------------------------------------------------
-// ★★★ 3. UI/イベントロジック (前回から変更なし) ★★★
+// ★★★ 3. UIロジック ★★★
 // ----------------------------------------------------
 
 function updateButtonLabel(playing) {
     const btn = document.getElementById(BUTTON_ID);
     if (btn) {
         btn.textContent = playing ? 'BGM 停止 ⏸️' : 'BGM 再開 ▶️';
-        print(`Button label updated to: ${btn.textContent}`);
+        print(`Button UI updated: ${btn.textContent}`);
     }
 }
 
 function toggleBGM() {
+    print("Action: ユーザーがトグルボタンをクリックしました。");
     if (!audio) {
         startBGM();
         return;
@@ -127,68 +125,46 @@ function toggleBGM() {
     if (isPlaying) {
         audio.pause();
         isPlaying = false;
-        console.log("BGM一時停止。");
+        print("Status: BGMを一時停止しました。");
     } else {
         audio.play()
             .then(() => {
                 isPlaying = true;
-                console.log("BGM再開。");
+                print("Status: BGMを再開しました。");
             })
             .catch(error => {
-                console.error("BGM再開に失敗しました:", error);
-                isPlaying = false;
+                print(`Error: 再開失敗。 ${error}`);
             });
     }
     updateButtonLabel(isPlaying);
 }
 
 function createControlButton() {
-    // 1. CSSの挿入
+    print("Status: コントロールボタンを作成します...");
     const style = document.createElement('style');
-    const cssText = `
+    style.textContent = `
         #${BUTTON_ID} {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999998;
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.2s;
-        }
-        #${BUTTON_ID}:hover {
-            background-color: #45a049;
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%); z-index: 9999998;
+            padding: 10px 20px; background-color: #4CAF50;
+            color: white; border: none; border-radius: 5px;
+            cursor: pointer; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
     `;
-    style.textContent = cssText;
-    print(`style.textContent (first 50 chars): ${style.textContent.substring(0, 50)}...`);
     document.head.appendChild(style);
 
-    // 2. ボタン要素の作成
     const button = document.createElement('button');
     button.id = BUTTON_ID;
     button.textContent = 'BGM 再生 ▶️';
-    print(`Button created with ID: ${button.id}`);
-    
-    // 3. クリックイベントリスナーを設定
     button.addEventListener('click', toggleBGM);
-
-    // 4. bodyに挿入
     document.body.appendChild(button);
-    console.log("BGM制御ボタンを画面下部に配置しました。");
+    print(`Result: ボタン(ID: ${BUTTON_ID})を配置完了！`);
 }
 
-
 // ----------------------------------------------------
-// ★★★ 4. 実行ロジック ★★★
+// ★★★ 4. 実行 ★★★
 // ----------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Audioスクリプト起動。クエリパラメータ解析完了。");
+    print("Mission: Audioスクリプトを起動します！🫡");
     createControlButton();
 });
