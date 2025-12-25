@@ -108,7 +108,7 @@ function createAdElement() {
 // ダミーコンテンツの生成
 function addDummyContent() {
     print("Status: ダミーコンテンツを生成します...");
-    for (let i = 1; i <= 5; i++) { // 動作確認のため一旦5個に減らしています
+    for (let i = 1; i <= 2; i++) { // 動作確認のため一旦5個に減らしています
         const dummyDiv = document.createElement('div');
         dummyDiv.className = `${UNIQUE_PREFIX}dummy-content`;
         dummyDiv.innerHTML = `<h3>コンテンツ #${i}</h3><p>テスト用ダミーテキスト</p>`;
