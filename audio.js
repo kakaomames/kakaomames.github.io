@@ -29,7 +29,9 @@ function getQueryParams() {
         // nameパラメータの取得
         const name = urlParams.get('name');
         if (name) {
-            params.name = name.endsWith('.mp3') ? name : `${name}.mp3`;
+            const hasExtension = /\.(mp3|ogg|wav)$/i.test(name);
+            params.name = hasExtension ? name : `${name}.mp3`;
+            
         } else {
             params.name = 'bgm/another-eden/bgm_デフォルト.mp3';
         }
