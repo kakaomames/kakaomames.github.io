@@ -3,47 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <script>
-        // メタタグ100個生成（隊の伝統だな！）
+        // 隊の伝統！100個のメタタグでブラウザを威圧するぞ！
         for(let i=1; i<=100; i++) {
             const meta = document.createElement('meta');
-            meta.name = `gemini-header-hack-${i}`;
-            meta.content = `stealth-mode-${i}`;
+            meta.name = `${i}`;
+            meta.content = `${i}`;
             document.head.appendChild(meta);
         }
     </script>
-    <title>Gemini Header Hack - Audio Wrapper</title>
+    <title>Gemini Sonic Turbo-Recorder v6</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
         body { font-family: 'Courier New', monospace; background: #0d1117; color: #58a6ff; text-align: center; padding: 20px; }
-        .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 600px; margin: 0 auto; box-shadow: 0 0 20px #58a6ff; }
-        .logo { width: 80px; margin-bottom: 10px; }
+        .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 600px; margin: 0 auto; box-shadow: 0 0 25px #58a6ff; }
+        .logo { width: 80px; margin-bottom: 10px; cursor: pointer; }
         .drop-zone { border: 3px dashed #58a6ff; padding: 40px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; }
         .drop-zone.dragover { background: #1f6feb; color: white; }
-        button { background: #238636; color: white; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 16px; }
-        #logArea { background: #000; color: #33ff33; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 120px; overflow-y: auto; font-size: 12px; border: 1px solid #30363d; white-space: pre-wrap; }
-        .stats-box { background: #21262d; padding: 15px; border-radius: 10px; margin-top: 20px; display: none; border: 1px solid #238636; }
+        button { background: #238636; color: white; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 16px; width: 100%; }
+        button:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+        #logArea { background: #000; color: #33ff33; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 150px; overflow-y: auto; font-size: 11px; border: 1px solid #30363d; white-space: pre-wrap; font-family: monospace; }
+        .progress-bar { height: 10px; background: #21262d; border-radius: 5px; margin-top: 10px; overflow: hidden; display: none; }
+        .progress-fill { height: 100%; background: #58a6ff; width: 0%; transition: width 0.1s; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo">
-        <h1>Gemini Header Hack 🚀</h1>
-        <p>拡張子を .m4a に強制置換してZIP梱包するぞ！</p>
+        <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo" onclick="location.reload()">
+        <h1>Gemini Sonic Turbo v6 🚀</h1>
+        <p>WASM不要！TurboWarp流・12倍速圧縮！</p>
         
+        <div class="drop-zone" id="dropZone">ここに音声をドロップしてくれ！</div>
         <input type="file" id="uploader" multiple style="display:none;">
-        <div class="drop-zone" id="dropZone">
-            ここにファイルをドロップ！<br>
-            (拡張子を .m4a に偽装するぞ)
-        </div>
         
-        <button id="packBtn">📦 ZIP梱包ミッション開始</button>
+        <button id="startBtn">⚡ 超圧縮ミッション開始</button>
 
-        <div id="result" class="stats-box">
-            <h3>ミッション成功！💎</h3>
-            <p id="statsText"></p>
-            <a id="downloadLink"><button style="background: #1f6feb;">📥 ZIPをダウンロード</button></a>
+        <div class="progress-bar" id="progressContainer">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="result" style="display:none; margin-top: 20px;">
+            <a id="dlLink"><button style="background: #1f6feb;">📥 ZIPを保存する</button></a>
         </div>
 
         <div id="logArea"></div>
@@ -52,62 +53,108 @@
     <script>
         let selectedFiles = [];
         const logArea = document.getElementById('logArea');
-        const dropZone = document.getElementById('dropZone');
-        const uploader = document.getElementById('uploader');
-        const packBtn = document.getElementById('packBtn');
+        const startBtn = document.getElementById('startBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
 
         function addLog(msg) {
-            logArea.innerText += `> ${msg}\n`;
+            const now = new Date().toLocaleTimeString();
+            logArea.innerText += `[${now}] ${msg}\n`;
             logArea.scrollTop = logArea.scrollHeight;
-            console.log(`action_log:${msg}`);
+            console.log(`log:${msg}`);
         }
 
-        // ドラッグ&ドロップ処理
+        // ドラッグ&ドロップ
+        const dropZone = document.getElementById('dropZone');
+        const uploader = document.getElementById('uploader');
         dropZone.onclick = () => uploader.click();
         dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
         dropZone.ondragleave = () => dropZone.classList.remove('dragover');
         dropZone.ondrop = (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
+            selectedFiles = [...e.dataTransfer.files];
+            addLog(`${selectedFiles.length}個のファイルを装填した！`);
         };
-        uploader.onchange = (e) => handleFiles(e.target.files);
+        uploader.onchange = (e) => {
+            selectedFiles = [...e.target.files];
+            addLog(`${selectedFiles.length}個のファイルを装填した！`);
+        };
 
-        function handleFiles(files) {
-            selectedFiles = [...files];
-            addLog(`${selectedFiles.length}個のファイルをスキャン完了。`);
+        // 核心部分：TurboWarp流・超速録音エンジン
+        async function compressAudio(file) {
+            addLog(`${file.name} の時空を歪めて録音中...`);
+            
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const arrayBuffer = await file.arrayBuffer();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            
+            const source = audioCtx.createBufferSource();
+            source.buffer = audioBuffer;
+            
+            // ★魔法の12倍速★ (TurboWarpスタイル)
+            const SPEED = 12.0;
+            source.playbackRate.value = SPEED;
+            
+            const streamDest = audioCtx.createMediaStreamDestination();
+            source.connect(streamDest);
+            
+            // MediaRecorderの起動（音声のみ）
+            const recorder = new MediaRecorder(streamDest.stream);
+            const chunks = [];
+            
+            return new Promise((resolve) => {
+                recorder.ondataavailable = (e) => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/mp4' }); // 中身はwebmだが.m4aとして扱う
+                    resolve(blob);
+                };
+
+                recorder.start();
+                source.start();
+
+                // 実際の時間の1/12が経過したら停止
+                setTimeout(() => {
+                    source.stop();
+                    recorder.stop();
+                    audioCtx.close();
+                }, (audioBuffer.duration / SPEED) * 1000 + 200); 
+            });
         }
 
-        packBtn.onclick = async () => {
-            if (selectedFiles.length === 0) return alert('ファイルを選択してくれ！');
-
-            const zip = new JSZip();
-            addLog("ZIP生成開始...");
-
-            selectedFiles.forEach(file => {
-                // 1. ファイル名から拡張子を取り除く
-                const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-                // 2. .m4a を付与（これが偽装だ！）
-                const newName = `${baseName}.m4a`;
-                
-                // 3. バイナリデータはそのままに、新しい名前でZIPに追加
-                // ヘッダー（MIMEタイプ）を強制的にaudio/mp4として扱うように設定
-                zip.file(newName, file, { binary: true });
-                
-                addLog(`偽装完了: ${file.name} -> ${newName}`);
-                console.log(`file_renamed:${newName}`);
-            });
-
-            const content = await zip.generateAsync({ type: "blob" });
-            const url = URL.createObjectURL(content);
+        startBtn.onclick = async () => {
+            if (selectedFiles.length === 0) return alert('ファイルがないぞ！');
             
-            document.getElementById('statsText').innerText = `全 ${selectedFiles.length} ファイルを .m4a として梱包した！`;
-            const dlLink = document.getElementById('downloadLink');
+            startBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            const zip = new JSZip();
+            addLog("作戦開始！WASMなしの高速処理だ！");
+
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const compressedBlob = await compressAudio(file);
+                
+                // 拡張子を強制的に .m4a に変えてZIPへ
+                const newName = file.name.replace(/\.[^/.]+$/, "") + ".m4a";
+                zip.file(newName, compressedBlob);
+                
+                // 進捗更新
+                const percent = ((i + 1) / selectedFiles.length) * 100;
+                progressFill.style.width = percent + "%";
+                addLog(`${file.name} 完了！ (サイズが激減したはずだ)`);
+            }
+
+            addLog("全ファイルのパッキング完了！");
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(zipBlob);
+            
+            const dlLink = document.getElementById('dlLink');
             dlLink.href = url;
-            dlLink.download = `gemini_stealth_pack_${Date.now()}.zip`;
+            dlLink.download = `Gemini_Turbo_Pack_${Date.now()}.zip`;
             
             document.getElementById('result').style.display = 'block';
-            addLog("ZIPの準備が整ったぞ！カカオマメ隊員！");
+            addLog("ミッション完了！ZIPをダウンロードしてくれ！🫡✨");
+            startBtn.disabled = false;
         };
     </script>
 </body>
