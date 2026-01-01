@@ -1,3 +1,8 @@
 {
-  "user":["kakaomames":{"pw":"kakaomames"},"mirai":{"pw":"furuya"},"Gemini":{"pw":"programming"},"はげ":{"pw":"hagesima"}]
+  "user":{
+    "kakaomames":{"pw":"kakaomames","jp":"カカオマメ"},
+    "mirai":{"pw":"furuya","jp":"未來"},
+    "Gemini":{"pw":"programming","jp":"Gemini"},
+    "hage":{"pw":"hagesima","jp":"はげしま"}
+  }
 }
