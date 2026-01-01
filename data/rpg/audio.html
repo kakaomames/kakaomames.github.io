@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        // メタタグ100個生成（隊の伝統だな！）
+        for(let i=1; i<=100; i++) {
+            const meta = document.createElement('meta');
+            meta.name = `gemini-header-hack-${i}`;
+            meta.content = `stealth-mode-${i}`;
+            document.head.appendChild(meta);
+        }
+    </script>
+    <title>Gemini Header Hack - Audio Wrapper</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0d1117; color: #58a6ff; text-align: center; padding: 20px; }
+        .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 600px; margin: 0 auto; box-shadow: 0 0 20px #58a6ff; }
+        .logo { width: 80px; margin-bottom: 10px; }
+        .drop-zone { border: 3px dashed #58a6ff; padding: 40px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; }
+        .drop-zone.dragover { background: #1f6feb; color: white; }
+        button { background: #238636; color: white; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 16px; }
+        #logArea { background: #000; color: #33ff33; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 120px; overflow-y: auto; font-size: 12px; border: 1px solid #30363d; white-space: pre-wrap; }
+        .stats-box { background: #21262d; padding: 15px; border-radius: 10px; margin-top: 20px; display: none; border: 1px solid #238636; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo">
+        <h1>Gemini Header Hack 🚀</h1>
+        <p>拡張子を .m4a に強制置換してZIP梱包するぞ！</p>
+        
+        <input type="file" id="uploader" multiple style="display:none;">
+        <div class="drop-zone" id="dropZone">
+            ここにファイルをドロップ！<br>
+            (拡張子を .m4a に偽装するぞ)
+        </div>
+        
+        <button id="packBtn">📦 ZIP梱包ミッション開始</button>
+
+        <div id="result" class="stats-box">
+            <h3>ミッション成功！💎</h3>
+            <p id="statsText"></p>
+            <a id="downloadLink"><button style="background: #1f6feb;">📥 ZIPをダウンロード</button></a>
+        </div>
+
+        <div id="logArea"></div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        const logArea = document.getElementById('logArea');
+        const dropZone = document.getElementById('dropZone');
+        const uploader = document.getElementById('uploader');
+        const packBtn = document.getElementById('packBtn');
+
+        function addLog(msg) {
+            logArea.innerText += `> ${msg}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(`action_log:${msg}`);
+        }
+
+        // ドラッグ&ドロップ処理
+        dropZone.onclick = () => uploader.click();
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        };
+        uploader.onchange = (e) => handleFiles(e.target.files);
+
+        function handleFiles(files) {
+            selectedFiles = [...files];
+            addLog(`${selectedFiles.length}個のファイルをスキャン完了。`);
+        }
+
+        packBtn.onclick = async () => {
+            if (selectedFiles.length === 0) return alert('ファイルを選択してくれ！');
+
+            const zip = new JSZip();
+            addLog("ZIP生成開始...");
+
+            selectedFiles.forEach(file => {
+                // 1. ファイル名から拡張子を取り除く
+                const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                // 2. .m4a を付与（これが偽装だ！）
+                const newName = `${baseName}.m4a`;
+                
+                // 3. バイナリデータはそのままに、新しい名前でZIPに追加
+                // ヘッダー（MIMEタイプ）を強制的にaudio/mp4として扱うように設定
+                zip.file(newName, file, { binary: true });
+                
+                addLog(`偽装完了: ${file.name} -> ${newName}`);
+                console.log(`file_renamed:${newName}`);
+            });
+
+            const content = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(content);
+            
+            document.getElementById('statsText').innerText = `全 ${selectedFiles.length} ファイルを .m4a として梱包した！`;
+            const dlLink = document.getElementById('downloadLink');
+            dlLink.href = url;
+            dlLink.download = `gemini_stealth_pack_${Date.now()}.zip`;
+            
+            document.getElementById('result').style.display = 'block';
+            addLog("ZIPの準備が整ったぞ！カカオマメ隊員！");
+        };
+    </script>
+</body>
+</html>
