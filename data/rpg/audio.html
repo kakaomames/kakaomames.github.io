@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        for(let i=1; i<=100; i++) {
+            const meta = document.createElement('meta');
+            meta.name = `gemini-drag-drop-mission-${i}`;
+            meta.content = `node-data-id-${i}`;
+            document.head.appendChild(meta);
+        }
+    </script>
+    <title>Gemini Sonic Compressor - Extreme D&D Edition</title>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0d1117; color: #58a6ff; text-align: center; padding: 20px; }
+        .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 800px; margin: 0 auto; box-shadow: 0 0 25px #58a6ff; }
+        .logo { width: 80px; margin-bottom: 10px; }
+        /* ドラッグ&ドロップエリア */
+        .drop-zone { border: 3px dashed #58a6ff; padding: 50px; margin: 20px 0; border-radius: 15px; cursor: pointer; transition: 0.3s; background: #010409; }
+        .drop-zone.dragover { background: #1f6feb; color: white; border-color: white; transform: scale(1.02); }
+        .button-group { margin: 20px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        button { background: #238636; color: white; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 16px; }
+        button:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+        #logArea { display: none; background: #000; color: #33ff33; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; max-height: 150px; overflow-y: auto; font-size: 12px; border: 1px solid #30363d; white-space: pre-wrap; }
+        .file-list { text-align: left; background: #21262d; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #30363d; }
+        .file-item { font-size: 0.85em; margin: 5px 0; border-bottom: 1px solid #30363d; padding: 5px; color: #c9d1d9; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo">
+        <h1>Gemini Sonic Compressor v4 🔊</h1>
+        <p>【ドラッグ&ドロップ対応】複数ファイルを一気に圧縮・梱包せよ！</p>
+        
+        <input type="file" id="uploader" accept="audio/*" multiple webkitdirectory style="display:none;">
+        
+        <div class="drop-zone" id="dropZone">
+            ここに音声ファイルやフォルダをドロップ！<br>
+            <span style="font-size: 0.8em; color: #8b949e;">(クリックして選択も可能だ！)</span>
+        </div>
+        
+        <div class="button-group">
+            <button id="convertBtn">🚀 ミッション開始 (ZIP化)</button>
+            <button id="toggleLogBtn" style="background: #30363d;">📄 ログ表示</button>
+        </div>
+
+        <div id="statusList" class="file-list" style="display:none;">
+            <h3>現在のキュー 📁</h3>
+            <div id="fileQueue"></div>
+        </div>
+
+        <div id="result" class="file-list" style="display:none; border: 2px solid #238636; background: #1a2a1a;">
+            <h3>全ミッション完了！💎</h3>
+            <p id="stats"></p>
+            <div class="button-group">
+                <a id="downloadLink"><button style="background: #1f6feb;">📥 ZIPファイルをダウンロード</button></a>
+            </div>
+        </div>
+
+        <div id="logArea"></div>
+    </div>
+
+    <script>
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        const ffmpeg = createFFmpeg({ log: true });
+        let selectedFiles = [];
+
+        const uploader = document.getElementById('uploader');
+        const dropZone = document.getElementById('dropZone');
+        const convertBtn = document.getElementById('convertBtn');
+        const logArea = document.getElementById('logArea');
+        const fileQueue = document.getElementById('fileQueue');
+        const statusList = document.getElementById('statusList');
+        const resultArea = document.getElementById('result');
+
+        // FFmpegログ処理
+        ffmpeg.setLogger(({ message }) => {
+            logArea.innerText += `> ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+        });
+
+        // ドラッグ&ドロップイベント
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        };
+        dropZone.onclick = () => uploader.click();
+        uploader.onchange = (e) => handleFiles(e.target.files);
+
+        function handleFiles(files) {
+            selectedFiles = [...files];
+            fileQueue.innerHTML = '';
+            statusList.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.id = `file-${index}`;
+                item.textContent = `待機中: ${file.name} (${(file.size/1024).toFixed(1)}KB)`;
+                fileQueue.appendChild(item);
+            });
+        }
+
+        document.getElementById('toggleLogBtn').onclick = () => {
+            logArea.style.display = logArea.style.display === 'none' ? 'block' : 'none';
+        };
+
+        convertBtn.onclick = async () => {
+            if (selectedFiles.length === 0) return alert('まずはファイルをドロップしてくれ！');
+            
+            convertBtn.disabled = true;
+            const zip = new JSZip();
+            const zipRoot = zip.folder("gemini_compressed_audio");
+
+            if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+            let totalOrig = 0;
+            let totalComp = 0;
+
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const item = document.getElementById(`file-${i}`);
+                item.style.color = "#f1e05a"; // 処理中
+                item.textContent = `⚙️ 変換中: ${file.name}...`;
+
+                ffmpeg.FS('writeFile', 'in_file', await fetchFile(file));
+                // 高互換AAC 32kbps設定
+                await ffmpeg.run('-i', 'in_file', '-c:a', 'aac', '-b:a', '32k', 'out.m4a');
+                
+                const data = ffmpeg.FS('readFile', 'out.m4a');
+                const outFileName = file.name.substring(0, file.name.lastIndexOf('.')) + ".m4a";
+                zipRoot.file(outFileName, data);
+
+                totalOrig += file.size;
+                totalComp += data.length;
+                
+                item.style.color = "#7ee787"; // 完了
+                item.textContent = `✅ 完了: ${outFileName}`;
+                
+                console.log(`file_processed:${outFileName}`);
+                console.log(`original_size:${file.size}`);
+                console.log(`compressed_size:${data.length}`);
+            }
+
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            const zipUrl = URL.createObjectURL(zipBlob);
+            const ratio = ((1 - (totalComp / totalOrig)) * 100).toFixed(2);
+
+            document.getElementById('stats').innerHTML = 
+                `全 ${selectedFiles.length} ファイルの圧縮を完了したぞ！<br>` +
+                `総容量: ${(totalOrig/1024/1024).toFixed(2)}MB → <b>${(totalComp/1024/1024).toFixed(2)}MB</b><br>` +
+                `<b>圧縮率: ${ratio}% 削減！</b>`;
+
+            const dlLink = document.getElementById('downloadLink');
+            dlLink.href = zipUrl;
+            dlLink.download = `gemini_mission_pack_${Date.now()}.zip`;
+
+            resultArea.style.display = 'block';
+            convertBtn.disabled = false;
+        };
+    </script>
+</body>
+</html>
