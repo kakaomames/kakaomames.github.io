@@ -169,69 +169,63 @@
     }
     
     async function recordOne(file) {
-        // 基地の高性能計算機を起動
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-            
-            // 【作戦】録音せず、12個に1個のデータだけを抽出して詰め直す
-            // これにより「水の中」や「ラジオ音」の原因となる録音制限をバイパスします
-            const blob = exportUltraCompactWav(audioBuffer, 12);
-            
-            audioCtx.close();
-            return blob;
-        } catch (err) {
-            if(audioCtx) audioCtx.close();
-            throw err;
-        }
-    }
+        return new Promise(async (resolve, reject) => {
+            // AudioContextを標準の44.1kHzで固定（これが音質維持のコツ！）
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+                sampleRate: 44100
+            });
 
-    function exportUltraCompactWav(buffer, ratio) {
-        const numChannels = buffer.numberOfChannels;
-        const sampleRate = buffer.sampleRate; // 44.1kHz等
-        const newLength = Math.floor(buffer.length / ratio);
-        
-        // WAVヘッダー + データ領域のメモリ確保
-        const bufferSize = newLength * numChannels * 2 + 44;
-        const arrayBuffer = new ArrayBuffer(bufferSize);
-        const view = new DataView(arrayBuffer);
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                
+                // 【重要】12倍速（ピッチ高）で再生
+                // これにより録音時間が1/12になり、ファイル容量も物理的に1/12になります！
+                source.playbackRate.value = 12.0;
 
-        // --- ヘッダー書き込み（音質情報を守る！） ---
-        writeString(view, 0, 'RIFF');
-        view.setUint32(4, bufferSize - 8, true);
-        writeString(view, 8, 'WAVE');
-        writeString(view, 12, 'fmt ');
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true); // PCM形式
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true); // 44.1kHzとして保存
-        view.setUint32(28, sampleRate * numChannels * 2, true);
-        view.setUint16(32, numChannels * 2, true);
-        view.setUint16(34, 16, true);
-        writeString(view, 36, 'data');
-        view.setUint32(40, bufferSize - 44, true);
+                const streamDest = audioCtx.createMediaStreamDestination();
+                source.connect(streamDest);
 
-        // --- データ間引き抽出（劣化ゼロ！） ---
-        let offset = 44;
-        for (let i = 0; i < newLength; i++) {
-            for (let channel = 0; channel < numChannels; channel++) {
-                // ratio（12）個飛ばしでサンプリング
-                let sample = buffer.getChannelData(channel)[i * ratio];
-                // 16bit PCMに変換
-                sample = Math.max(-1, Math.min(1, sample));
-                view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-                offset += 2;
+                // ビットレートを低めに設定して容量をさらに絞り込む
+                const options = {
+                    audioBitsPerSecond: 64000 // 64kbps (12倍速なら十分な音質)
+                };
+                
+                const recorder = new MediaRecorder(streamDest.stream, options);
+                const chunks = [];
+                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+                
+                recorder.onstop = () => {
+                    // 隊員お気に入りのm4a (audio/mp4) で保存
+                    const blob = new Blob(chunks, { type: 'audio/mp4' });
+                    audioCtx.close().then(() => resolve(blob));
+                };
+
+                // 録音開始
+                recorder.start();
+                
+                // イントロ救出のための200ms
+                setTimeout(() => {
+                    source.start(0);
+                    addLog(`🚀 12倍速・超圧縮抽出開始... (${file.name})`);
+                }, 200);
+
+                // 停止時間は (元の長さ / 12) + 余裕
+                const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
+                setTimeout(() => {
+                    source.stop();
+                    recorder.stop();
+                    addLog(`✅ 完了！容量を確認してください。`);
+                }, waitTime);
+
+            } catch (err) {
+                if(audioCtx) audioCtx.close();
+                reject(err);
             }
-        }
-        return new Blob([arrayBuffer], { type: 'audio/wav' });
-    }
-
-    function writeString(view, offset, string) {
-        for (let i = 0; i < string.length; i++) {
-            view.setUint8(offset + i, string.charCodeAt(i));
-        }
+        });
     }
     
     
