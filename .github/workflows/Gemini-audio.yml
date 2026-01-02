@@ -1,0 +1,46 @@
+name: Gemini Sonic Turbo Actions 🚀
+
+on:
+  push:
+    paths:
+      - 'input/**' # inputフォルダに何か入れたら自動発動！
+  workflow_dispatch: # ボタンをポチッと押して手動実行も可能！
+
+jobs:
+  turbo-compress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: 🛠️ FFmpegを装備
+        run: sudo apt install -y ffmpeg
+
+      - name: 📁 出力フォルダの設営
+        run: mkdir -p output
+
+      - name: ⚡ 12倍速・時空歪曲ミッション
+        run: |
+          # inputフォルダ内の音声を再帰的に探索（階層維持）
+          find input -type f \( -name "*.mp3" -o -name "*.wav" -o -name "*.m4a" -o -name "*.mp4" -o -name "*.mov" \) | while read -r file; do
+            # 相対パスを取得して出力先を計算
+            rel_path=$(dirname "${file#input/}")
+            mkdir -p "output/$rel_path"
+            
+            # 拡張子をm4aに統一
+            filename=$(basename "$file" | sed 's/\.[^.]*$//')
+            out="output/$rel_path/$filename.m4a"
+            
+            echo "🚀 変換中: $file"
+            
+            # FFmpegのatempoフィルタ（2倍×2倍×3倍 = 12倍速）
+            # -vn は動画の場合に映像をカットして音声のみにするフラグだ
+            ffmpeg -i "$file" -filter:a "atempo=2.0,atempo=2.0,atempo=3.0" -vn "$out"
+          done
+
+      - name: 📥 勝利の成果物(ZIP)をアップロード
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gemini_v6_Evo_Result
+          path: output/
+          retention-days: 1 # 1日経ったら消える設定（エコ！）
