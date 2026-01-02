@@ -21,14 +21,14 @@
     <script>
         // --- 1. Audioオブジェクトの準備 ---
         // --- 修正版：パス指定を正確に！ ---
-const targetFile = './audio/11.m4a'; // または './audio/pigstep_master.m4a'
+const targetFile = './audio/pigstep_master.m4a'; // または ''./audio/11.m4a
 console.log(`targetFile:${targetFile}`);
 
 const bgm = new Audio(targetFile);
 bgm.loop = true;
 
 // 12倍速解凍の設定
-const DECODE_RATE = 0.088; 
+const DECODE_RATE = 0.08; 
 bgm.playbackRate = DECODE_RATE;
 bgm.preservesPitch = false; 
 
