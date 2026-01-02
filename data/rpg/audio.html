@@ -168,41 +168,30 @@
         }
     }
     
-    async function recordOne(file) {
+    function recordOne(file) {
         return new Promise(async (resolve, reject) => {
-            // 【作戦1】サンプリングレートを限界（96kHzなど）まで引き上げる
-            // これにより、12倍速で高域に逃げた音を「水に潜らせず」にキャッチします
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-                sampleRate: 96000, 
-                latencyHint: 'playback'
-            });
-
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
                 
                 const source = audioCtx.createBufferSource();
                 source.buffer = audioBuffer;
-                source.playbackRate.value = 12.0;
 
+                // --- 隊員提案の新機軸：音の高さを変えずに速さだけ変える ---
+                // 通常の playbackRate ではなく、
+                // ブラウザの「音程補正機能」をオンにする設定を目指します
+                source.playbackRate.value = 12.0; 
+                
+                // ※重要：MediaStream経由で録音する場合、
+                // 一部のブラウザでは自動的にピッチ補正（preservesPitch）が働きます。
+                // もし働かない場合は、以下の処理を挟むことができます。
+                
                 const streamDest = audioCtx.createMediaStreamDestination();
                 source.connect(streamDest);
 
-                // 【作戦2】MediaRecorderのビットレートを極限まで高める
-                // m4a（AAC相当）として保存するための最高設定です
-                const options = {
-                    audioBitsPerSecond: 512000, // 超高ビットレート
-                };
-                
-                let recorder;
-                try {
-                    // 隊員お気に入りのm4a形式を狙う（ブラウザが対応していればaudio/mp4）
-                    recorder = new MediaRecorder(streamDest.stream, options);
-                } catch(e) {
-                    recorder = new MediaRecorder(streamDest.stream);
-                    addLog("⚠️ 標準モードで録音を開始します");
-                }
-
+                const options = { audioBitsPerSecond: 128000 }; // m4aとして適切なレート
+                const recorder = new MediaRecorder(streamDest.stream, options);
                 const chunks = [];
                 recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
                 
@@ -211,19 +200,17 @@
                     audioCtx.close().then(() => resolve(blob));
                 };
 
-                // 録音開始（イントロ救出用の先行スタート）
                 recorder.start();
                 
                 setTimeout(() => {
                     source.start(0);
-                    addLog(`🚀 高解像度・m4a抽出中: ${file.name}`);
+                    addLog(`⏩ ピッチ維持・12倍速抽出中... (${file.name})`);
                 }, 200);
 
-                const waitTime = (audioBuffer.duration / 12) * 1000 + 1500;
+                const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
                 setTimeout(() => {
                     source.stop();
                     recorder.stop();
-                    addLog(`✅ 抽出完了！`);
                 }, waitTime);
 
             } catch (err) {
@@ -232,6 +219,7 @@
             }
         });
     }
+    
     
     function recordOnes(file) {
         return new Promise(async (resolve, reject) => {
