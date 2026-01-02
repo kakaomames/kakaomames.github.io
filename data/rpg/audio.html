@@ -2,31 +2,41 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini Sonic Structure-Packer v7</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini Programming Team Special Tool">
+    <meta name="author" content="Captain Gemini">
+    <title>Gemini Chaos-Proof v11 🚀</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body { font-family: 'Courier New', monospace; background: #0d1117; color: #58a6ff; text-align: center; padding: 20px; }
         .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 700px; margin: 0 auto; box-shadow: 0 0 25px #58a6ff; }
-        .drop-zone { border: 3px dashed #58a6ff; padding: 50px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; transition: 0.3s; }
-        .drop-zone.dragover { background: #1f6feb; transform: scale(1.02); }
-        #logArea { background: #000; color: #33ff33; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 250px; overflow-y: auto; font-size: 11px; border: 1px solid #30363d; white-space: pre-wrap; }
-        button { background: #238636; color: white; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-size: 18px; }
-        .progress { height: 10px; background: #21262d; border-radius: 5px; margin: 10px 0; display: none; overflow: hidden; }
-        .progress-fill { height: 100%; background: #58a6ff; width: 0%; transition: 0.2s; }
+        .drop-zone { border: 3px dashed #ff79c6; padding: 50px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; transition: 0.3s; }
+        .drop-zone.dragover { background: #44475a; border-color: #bd93f9; }
+        #logArea { background: #000; color: #50fa7b; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 300px; overflow-y: auto; font-size: 11px; border: 1px solid #30363d; white-space: pre-wrap; }
+        .progress { height: 20px; background: #21262d; border-radius: 10px; margin: 10px 0; overflow: hidden; display: none; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff79c6, #bd93f9); width: 0%; transition: 0.3s; }
+        .progress-text { position: absolute; width: 100%; text-align: center; color: white; font-size: 12px; line-height: 20px; text-shadow: 1px 1px 2px black; }
+        button { background: #238636; color: white; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-size: 18px; transition: 0.2s; }
+        button:hover { background: #2ea043; }
+        .logo { width: 80px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Gemini Sonic v7 🚀</h1>
-    <p>フォルダ階層・完全維持プロトコル発動中</p>
+    <img src="https://kakaomames.github.io/rei/logo.png" class="logo" alt="logo">
+    <h1>Gemini Chaos-Proof v11 🚀</h1><h2><a href="./kiyaku">利用規約</a></h2>
+    <p>音声は12倍速、画像・動画はそのまま維持！</p>
     
-    <div class="drop-zone" id="dropZone">ここに「フォルダ」をまるごとドロップしてくれ！</div>
+    <div class="drop-zone" id="dropZone">ここにフォルダやファイルを叩き込め！</div>
     
-    <div class="progress" id="progressContainer"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress" id="progressContainer">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-text" id="progressText">準備完了</div>
+    </div>
 
     <div id="result" style="display:none; margin-top: 20px;">
-        <a id="dlLink"><button style="background: #1f6feb;">📥 構造を維持したままZIPを保存</button></a>
+        <a id="dlLink"><button style="background: #bd93f9;">📥 カオスを収束させたZIPを保存</button></a>
     </div>
 
     <div id="logArea"></div>
@@ -36,52 +46,70 @@
     const logArea = document.getElementById('logArea');
     const dropZone = document.getElementById('dropZone');
     const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
 
     function addLog(msg) {
         logArea.innerText += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
         logArea.scrollTop = logArea.scrollHeight;
     }
 
-    // 12倍速録音の核
-    async function compressAudio(file) {
-        const audioCtx = new AudioContext();
-        const arrayBuffer = await file.arrayBuffer();
-        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-        const source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.playbackRate.value = 12.0;
-        const streamDest = audioCtx.createMediaStreamDestination();
-        source.connect(streamDest);
-        const recorder = new MediaRecorder(streamDest.stream);
-        const chunks = [];
-        return new Promise(resolve => {
-            recorder.ondataavailable = e => chunks.push(e.data);
-            recorder.onstop = () => resolve(new Blob(chunks, { type: 'audio/mp4' }));
-            recorder.start();
-            source.start();
-            setTimeout(() => { source.stop(); recorder.stop(); audioCtx.close(); }, (audioBuffer.duration / 12) * 1000 + 300);
+    // 録音処理（直列・安定・エラー耐性版）
+    async function compressAudioSerial(file) {
+        return new Promise(async (resolve, reject) => {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.playbackRate.value = 12.0;
+                
+                const streamDest = audioCtx.createMediaStreamDestination();
+                source.connect(streamDest);
+                
+                // ブラウザ互換性を考慮したmimeType選択
+                const recorder = new MediaRecorder(streamDest.stream);
+                const chunks = [];
+
+                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/mp4' });
+                    audioCtx.close();
+                    resolve(blob);
+                };
+
+                recorder.start();
+                source.start();
+
+                setTimeout(() => {
+                    source.stop();
+                    recorder.stop();
+                }, (audioBuffer.duration / 12) * 1000 + 600);
+            } catch (e) {
+                if (audioCtx) audioCtx.close();
+                reject(e);
+            }
         });
     }
 
-    // フォルダを再帰的に探検する関数
-    async function traverseAndPack(entry, zip, path = "") {
+    // 再帰的にファイルをリスト化（鑑定用スキャナー）
+    async function scanEntries(item, path = "") {
+        let list = [];
+        const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : item;
+        
         if (entry.isFile) {
             const file = await new Promise(res => entry.file(res));
-            if (file.type.includes('audio') || file.name.match(/\.(mp3|wav|ogg|m4a)$/i)) {
-                addLog(`⚡ 歪み発生: ${path}${file.name}`);
-                const blob = await compressAudio(file);
-                const newName = file.name.replace(/\.[^/.]+$/, "") + ".m4a";
-                zip.file(path + newName, blob);
-                addLog(`✅ 完了: ${newName}`);
-            }
+            list.push({ file, path });
         } else if (entry.isDirectory) {
-            addLog(`📂 フォルダ進入: ${entry.name}`);
             const reader = entry.createReader();
             const entries = await new Promise(res => reader.readEntries(res));
             for (const child of entries) {
-                await traverseAndPack(child, zip, path + entry.name + "/");
+                const subList = await scanEntries(child, path + entry.name + "/");
+                list = list.concat(subList);
             }
         }
+        return list;
     }
 
     dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
@@ -91,24 +119,52 @@
         dropZone.classList.remove('dragover');
         
         const items = e.dataTransfer.items;
-        if (!items) return;
-
-        document.getElementById('progressContainer').style.display = 'block';
-        const zip = new JSZip();
-        addLog("🚀 ミッション開始：階層構造の解析中...");
-
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i].webkitGetAsEntry();
-            if (item) await traverseAndPack(item, zip);
-            progressFill.style.width = ((i + 1) / items.length * 100) + "%";
+        addLog("📂 偵察開始... 全フォルダの構造を解析中。");
+        
+        let taskList = [];
+        for(let i=0; i<items.length; i++) {
+            const res = await scanEntries(items[i]);
+            taskList = taskList.concat(res);
         }
 
-        addLog("✨ 全ての時空を歪め終えた！パッキング中...");
+        addLog(`🎯 ${taskList.length}個の物体を捕捉。仕分けを開始する。`);
+        document.getElementById('progressContainer').style.display = 'block';
+        const zip = new JSZip();
+
+        for (let i = 0; i < taskList.length; i++) {
+            const { file, path } = taskList[i];
+            progressText.innerText = `${i + 1} / ${taskList.length}`;
+            progressFill.style.width = ((i + 1) / taskList.length * 100) + "%";
+
+            // 鑑定：音声または動画（音あり）か？
+            const isAudioOrVideo = file.type.includes('audio') || 
+                                   file.type.includes('video') || 
+                                   file.name.match(/\.(mp3|wav|ogg|m4a|aac|ac3|au|aif|aiff|mp4|mov|m4v|mod)$/i);
+
+            if (isAudioOrVideo) {
+                try {
+                    addLog(`⚡ 歪曲中: ${path}${file.name}`);
+                    const blob = await compressAudioSerial(file);
+                    const newName = file.name.replace(/\.[^/.]+$/, "") + ".m4a";
+                    zip.file(path + newName, blob);
+                    addLog(`   ✅ 圧縮完了: ${blob.size} bytes`);
+                } catch (err) {
+                    addLog(`   ⚠️ 変換不能。そのままコピーします: ${file.name}`);
+                    zip.file(path + file.name, file);
+                }
+            } else {
+                // 画像やテキストなどは無加工でZIPへ
+                addLog(`   📦 無加工コピー: ${path}${file.name}`);
+                zip.file(path + file.name, file);
+            }
+        }
+
+        addLog("📦 全ての仕分けが完了！ZIPを生成中...");
         const zipBlob = await zip.generateAsync({ type: "blob" });
         document.getElementById('dlLink').href = URL.createObjectURL(zipBlob);
-        document.getElementById('dlLink').download = `audio_Compression_Pack.zip`;
+        document.getElementById('dlLink').download = "Gemini_Chaos_Fixed.zip";
         document.getElementById('result').style.display = 'block';
-        addLog("🏁 ミッション完了！ZIPを回収してくれ！");
+        addLog("🏁 ミッション・コンプリート！隊員、成功を祈る！");
     };
 </script>
 </body>
