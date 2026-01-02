@@ -1,0 +1,22 @@
+{
+  "text.ui.title": "Gemini Sonic Survivor v15.8 🚀",
+  "text.ui.desc": "[Patch angewendet] Intro-Schutz & Hohe Bitrate",
+  "text.ui.dropzone": "📁 Ordner hier ablegen zum Konvertieren!",
+  "text.btn.zip": "📦 Als ZIP verpacken & herunterladen",
+  "text.btn.clear": "🔥 Audio löschen & neu laden",
+  "text.btn.conv": "⚡ Konvertieren",
+  "text.btn.done": "Fertig",
+  "text.status.wait": "Warten",
+  "text.status.ing": "Verzerren...",
+  "text.status.ok": "Erfolgreich verpackt!",
+  "text.status.err": "Fehler",
+  "text.log.db_ready": "📡 Bereit!",
+  "text.log.scan_start": "📂 Scannen...",
+  "text.log.success": "✅ Erfolg",
+  "text.log.miss": "❌ Fehlgeschlagen",
+  "text.log.zip_start": "📦 Audio wird wiederhergestellt...",
+  "text.log.zip_done": "🏁 ZIP-Verpackung abgeschlossen!",
+  "text.log.clear_start": "🔥 Löschen...",
+  "text.log.clear_done": "✅ Löschen abgeschlossen",
+  "text.conf.clear": "Alle Audiodaten auf dieser Seite löschen?"
+}
