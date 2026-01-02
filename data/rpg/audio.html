@@ -168,56 +168,70 @@
         }
     }
     
-    function recordOne(file) {
-        return new Promise(async (resolve, reject) => {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-                
-                const source = audioCtx.createBufferSource();
-                source.buffer = audioBuffer;
+    async function recordOne(file) {
+        // 基地の高性能計算機を起動
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            
+            // 【作戦】録音せず、12個に1個のデータだけを抽出して詰め直す
+            // これにより「水の中」や「ラジオ音」の原因となる録音制限をバイパスします
+            const blob = exportUltraCompactWav(audioBuffer, 12);
+            
+            audioCtx.close();
+            return blob;
+        } catch (err) {
+            if(audioCtx) audioCtx.close();
+            throw err;
+        }
+    }
 
-                // --- 隊員提案の新機軸：音の高さを変えずに速さだけ変える ---
-                // 通常の playbackRate ではなく、
-                // ブラウザの「音程補正機能」をオンにする設定を目指します
-                source.playbackRate.value = 12.0; 
-                
-                // ※重要：MediaStream経由で録音する場合、
-                // 一部のブラウザでは自動的にピッチ補正（preservesPitch）が働きます。
-                // もし働かない場合は、以下の処理を挟むことができます。
-                
-                const streamDest = audioCtx.createMediaStreamDestination();
-                source.connect(streamDest);
+    function exportUltraCompactWav(buffer, ratio) {
+        const numChannels = buffer.numberOfChannels;
+        const sampleRate = buffer.sampleRate; // 44.1kHz等
+        const newLength = Math.floor(buffer.length / ratio);
+        
+        // WAVヘッダー + データ領域のメモリ確保
+        const bufferSize = newLength * numChannels * 2 + 44;
+        const arrayBuffer = new ArrayBuffer(bufferSize);
+        const view = new DataView(arrayBuffer);
 
-                const options = { audioBitsPerSecond: 128000 }; // m4aとして適切なレート
-                const recorder = new MediaRecorder(streamDest.stream, options);
-                const chunks = [];
-                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
-                
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'audio/mp4' });
-                    audioCtx.close().then(() => resolve(blob));
-                };
+        // --- ヘッダー書き込み（音質情報を守る！） ---
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, bufferSize - 8, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM形式
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true); // 44.1kHzとして保存
+        view.setUint32(28, sampleRate * numChannels * 2, true);
+        view.setUint16(32, numChannels * 2, true);
+        view.setUint16(34, 16, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, bufferSize - 44, true);
 
-                recorder.start();
-                
-                setTimeout(() => {
-                    source.start(0);
-                    addLog(`⏩ ピッチ維持・12倍速抽出中... (${file.name})`);
-                }, 200);
-
-                const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
-                setTimeout(() => {
-                    source.stop();
-                    recorder.stop();
-                }, waitTime);
-
-            } catch (err) {
-                if(audioCtx) audioCtx.close();
-                reject(err);
+        // --- データ間引き抽出（劣化ゼロ！） ---
+        let offset = 44;
+        for (let i = 0; i < newLength; i++) {
+            for (let channel = 0; channel < numChannels; channel++) {
+                // ratio（12）個飛ばしでサンプリング
+                let sample = buffer.getChannelData(channel)[i * ratio];
+                // 16bit PCMに変換
+                sample = Math.max(-1, Math.min(1, sample));
+                view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                offset += 2;
             }
-        });
+        }
+        return new Blob([arrayBuffer], { type: 'audio/wav' });
+    }
+
+    function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
     }
     
     
