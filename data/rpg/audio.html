@@ -168,74 +168,73 @@
         }
     }
     
-    async function recordOne(file) {
+    function recordOne(file) {
         return new Promise(async (resolve, reject) => {
-            // 高解像度モードで基地を起動
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-                sampleRate: 44100
-            });
-
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
                 
-                const source = audioCtx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.playbackRate.value = 12.0;
+                // --- 🚀 Scratch流：録音せず、データを直接間引くハック ---
+                const ratio = 12; // 12倍速（1/12圧縮）
+                const numChannels = audioBuffer.numberOfChannels;
+                const oldLength = audioBuffer.length;
+                const newLength = Math.floor(oldLength / ratio);
+                const sampleRate = audioBuffer.sampleRate; // 44.1kHzのまま
 
-                // --- 🛠️ 音質救出ポイント：増幅器の設置 ---
-                const gainNode = audioCtx.createGain();
-                gainNode.gain.value = 1.0; // 減衰させずに等倍で送り出す
+                // 8bit WAVは1サンプル1バイト。ヘッダー44バイトを足す。
+                const bufferSize = newLength * numChannels * 1 + 44;
+                const outBuffer = new ArrayBuffer(bufferSize);
+                const view = new DataView(outBuffer);
 
-                const streamDest = audioCtx.createMediaStreamDestination();
-                
-                // 通信経路：ソース -> 増幅器 -> 録音機
-                source.connect(gainNode);
-                gainNode.connect(streamDest);
+                // WAVヘッダー書き込み
+                writeString(view, 0, 'RIFF');
+                view.setUint32(4, bufferSize - 8, true);
+                writeString(view, 8, 'WAVE');
+                writeString(view, 12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, 1, true); // PCM
+                view.setUint16(22, numChannels, true);
+                view.setUint32(24, sampleRate, true); 
+                view.setUint32(28, sampleRate * numChannels * 1, true);
+                view.setUint16(32, numChannels * 1, true);
+                view.setUint16(34, 8, true); // 8bit
+                writeString(view, 36, 'data');
+                view.setUint32(40, bufferSize - 44, true);
 
-                // --- 🛠️ 音質救出ポイント：録音設定の厳格化 ---
-                const options = {
-                    audioBitsPerSecond: 256000 // ビットレートを倍増させ、「遠さ」を解消
-                };
-                
-                // ブラウザの「余計な補正」を無効化するための制約（一部ブラウザのみ有効）
-                const tracks = streamDest.stream.getAudioTracks();
-                tracks.forEach(track => {
-                    const constraints = {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false
-                    };
-                    if (track.applyConstraints) track.applyConstraints(constraints);
-                });
+                // --- データの物理的な間引き抽出 ---
+                let offset = 44;
+                for (let i = 0; i < newLength; i++) {
+                    for (let channel = 0; channel < numChannels; channel++) {
+                        // 12個おきのデータを等間隔で正確にキャッチ！
+                        let sample = audioBuffer.getChannelData(channel)[i * ratio];
+                        
+                        // 16bit(-1.0〜1.0)を、8bit(0〜255)の符号なし整数へ変換
+                        sample = Math.max(-1, Math.min(1, sample));
+                        let s8 = Math.round((sample + 1) * 127.5);
+                        
+                        view.setUint8(offset, s8);
+                        offset += 1;
+                    }
+                }
 
-                const recorder = new MediaRecorder(streamDest.stream, options);
-                const chunks = [];
-                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
-                
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'audio/mp4' });
-                    audioCtx.close().then(() => resolve(blob));
-                };
-
-                recorder.start();
-                
-                setTimeout(() => {
-                    source.start(0);
-                    addLog(`🔥 最速・高密度モードで抽出中: ${file.name}`);
-                }, 200);
-
-                const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
-                setTimeout(() => {
-                    source.stop();
-                    recorder.stop();
-                }, waitTime);
+                addLog(`🎯 Scratch流ハック成功！物理サイズを ${ratio}分の1以下 に圧縮。`);
+                const blob = new Blob([outBuffer], { type: 'audio/wav' });
+                audioCtx.close().then(() => resolve(blob));
 
             } catch (err) {
                 if(audioCtx) audioCtx.close();
                 reject(err);
             }
         });
+    }
+
+    // ヘルパー関数：文字列をバイナリとして書き込む
+    function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
     }
     
     
