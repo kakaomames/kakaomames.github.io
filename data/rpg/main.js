@@ -4,7 +4,7 @@ let i18n = {};
 async function initI18n() {
     try {
         // 1. 言語リスト(lang.json)を取得してセレクトボックス作成
-        const langRes = await fetch('./lang.json');
+        const langRes = await fetch('./text/lang.json');
         const langList = await langRes.json();
         
         const select = document.createElement('select');
@@ -38,7 +38,7 @@ async function initI18n() {
 
 async function loadLanguage(langCode) {
     try {
-        const response = await fetch(`./${langCode}.json`);
+        const response = await fetch(`./text/${langCode}.json`);
         i18n = await response.json();
         applyTranslation();
         console.log(`📡 Language switched to: ${langCode}`);
