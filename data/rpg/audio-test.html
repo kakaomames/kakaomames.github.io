@@ -20,6 +20,14 @@
     </div>
 
     <script>
+        async function targetFile(type) {
+            const inputElement = type === 'original' ? document.getElementById('targetFile') : document.getElementById('targetFile');
+            const file = inputElement.files[0];
+            if (!file) {
+                alert('ファイルを選択してください。');
+                return;
+            }
+        };
         // --- 1. Audioオブジェクトの準備 ---
         // --- 修正版：パス指定を正確に！ ---
 const targetFile = './audio/pigstep_master.m4a'; // または ''./audio/11.m4a
