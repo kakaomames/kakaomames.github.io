@@ -15,6 +15,7 @@
     <div class="test-box">
         <h2>🔊 12倍速・解凍テスト</h2>
         <p>11.m4a を読み込み、1/12倍速で再生するぞ！</p>
+        <input type="file" id="targetFile">
         <button id="playBtn">⚡ 音の封印を解除</button>
     </div>
 
@@ -28,7 +29,7 @@ const bgm = new Audio(targetFile);
 bgm.loop = true;
 
 // 12倍速解凍の設定
-const DECODE_RATE = 0.075; 
+const DECODE_RATE = 0.095; 
 bgm.playbackRate = DECODE_RATE;
 bgm.preservesPitch = false; 
 
