@@ -1,0 +1,22 @@
+{
+  "text.ui.title": "Gemini Sonic Survivor v15.8 🚀",
+  "text.ui.desc": "【パッチ適用済】イントロ死守・高ビットレート仕様",
+  "text.ui.dropzone": "📁 フォルダをドロップして変換開始！",
+  "text.btn.zip": "📦 ZIPに包装してダウンロード",
+  "text.btn.clear": "🔥 音声をクリアして再読み込み",
+  "text.btn.conv": "⚡ 変換",
+  "text.btn.done": "済",
+  "text.status.wait": "待機中",
+  "text.status.ing": "時空歪曲中...",
+  "text.status.ok": "包装成功！",
+  "text.status.err": "エラー",
+  "text.log.db_ready": "📡 準備完了！",
+  "text.log.scan_start": "📂 スキャン中...",
+  "text.log.success": "✅ 成功",
+  "text.log.miss": "❌ 失敗",
+  "text.log.zip_start": "📦 ストレージから音声を回収...",
+  "text.log.zip_done": "🏁 ZIP包装成功！",
+  "text.log.clear_start": "🔥 削除開始...",
+  "text.log.clear_done": "✅ 削除完了",
+  "text.conf.clear": "このページの全ての音声データを削除しますか？"
+}
