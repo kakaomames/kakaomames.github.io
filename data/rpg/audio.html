@@ -167,8 +167,57 @@
             });
         }
     }
-
+    
     function recordOne(file) {
+        return new Promise(async (resolve, reject) => {
+            // 基地の通信環境（AudioContext）を構築
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.playbackRate.value = 12.0; // 12倍速の歪曲移動！
+
+                const streamDest = audioCtx.createMediaStreamDestination();
+                source.connect(streamDest);
+
+                // MediaRecorderの準備
+                const recorder = new MediaRecorder(streamDest.stream);
+                const chunks = [];
+                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+                
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/mp4' });
+                    audioCtx.close().then(() => resolve(blob));
+                };
+
+                // --- 修正ポイント：録音を先に開始し、少し待ってから再生する ---
+                recorder.start();
+                
+                // 100msのバッファを設けてから再生開始（イントロ確保！）
+                setTimeout(() => {
+                    source.start(0);
+                    addLog(`📢 再生開始... (Duration: ${audioBuffer.duration.toFixed(2)}s)`);
+                }, 100);
+
+                // 停止タイミングも少し余裕を持たせる（+1000ms）
+                const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
+                setTimeout(() => {
+                    source.stop();
+                    recorder.stop();
+                    addLog(`⏹️ 録音終了。資材を回収しました。`);
+                }, waitTime);
+
+            } catch (err) {
+                if(audioCtx) audioCtx.close();
+                reject(err);
+            }
+        });
+    }
+    
+    function recordOnes(file) {
         return new Promise(async (resolve, reject) => {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             try {
