@@ -6,7 +6,13 @@ const ASSETS = [
   './lang.js',
   './lang.json',
   './ja_jp.json',
-  './en_eu.json',
+  './en_us.json',
+  './en_us.json',
+  './en_us.json',
+  './en_us.json',
+  './en_us.json',
+  './en_us.json',
+  './en_us.json',
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
   '/rei/logo.png'
 ];
