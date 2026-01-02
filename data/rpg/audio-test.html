@@ -15,19 +15,19 @@
     <div class="test-box">
         <h2>🔊 12倍速・解凍テスト</h2>
         <p>11.m4a を読み込み、1/12倍速で再生するぞ！</p>
-        <input type="file" id="targetFile">
+        <input type="file" id="targetFile"><br>
         <button id="playBtn">⚡ 音の封印を解除</button>
     </div>
 
     <script>
-        async function targetFile(type) {
-            const inputElement = type === 'original' ? document.getElementById('targetFile') : document.getElementById('targetFile');
-            const file = inputElement.files[0];
-            if (!file) {
-                alert('ファイルを選択してください。');
-                return;
-            }
-        };
+//        async function targetFile(type) {
+//            const inputElement = type === 'original' ? document.getElementById('targetFile') : document.getElementById('targetFile');
+//            const file = inputElement.files[0];
+//            if (!file) {
+//                alert('ファイルを選択してください。');
+ //               return;
+  //          }
+ //       };
         // --- 1. Audioオブジェクトの準備 ---
         // --- 修正版：パス指定を正確に！ ---
 const targetFile = './audio/pigstep_master.m4a'; // または ''./audio/11.m4a
