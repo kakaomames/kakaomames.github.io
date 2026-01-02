@@ -1,0 +1,22 @@
+{
+  "text.ui.title": "双子座音速幸存者 v15.8 🚀",
+  "text.ui.desc": "【已应用补丁】音频开头保护 & 高比特率模式",
+  "text.ui.dropzone": "📁 拖放文件夹开始转换！",
+  "text.btn.zip": "📦 打包 ZIP 并下载",
+  "text.btn.clear": "🔥 清除音频并重载",
+  "text.btn.conv": "⚡ 转换",
+  "text.btn.done": "完成",
+  "text.status.wait": "待命",
+  "text.status.ing": "时空扭曲中...",
+  "text.status.ok": "包装成功！",
+  "text.status.err": "错误",
+  "text.log.db_ready": "📡 准备就绪！",
+  "text.log.scan_start": "📂 正在扫描...",
+  "text.log.success": "✅ 成功",
+  "text.log.miss": "❌ 失败",
+  "text.log.zip_start": "📦 正在从存储中提取音频...",
+  "text.log.zip_done": "🏁 ZIP 打包成功！",
+  "text.log.clear_start": "🔥 正在删除...",
+  "text.log.clear_done": "✅ 删除完成",
+  "text.conf.clear": "是否删除本页面的所有音频数据？"
+}
