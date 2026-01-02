@@ -1,5 +1,35 @@
 // --- 翻訳エンジン ---
 let i18n = {};
+async function initLanguageSystem() {
+    // 1. 言語リストを取得
+    const langRes = await fetch('./text/lang.json');
+    const langList = await langRes.json();
+    
+    // 2. セレクトボックスを生成 (UIに追加)
+    const select = document.createElement('select');
+    select.id = "langSelector";
+    for (let code in langList) {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.innerText = langList[code];
+        select.appendChild(opt);
+    }
+    document.querySelector('.container').prepend(select);
+
+    // 3. 切り替えイベント
+    select.addEventListener('change', (e) => {
+        loadLanguage(e.target.value);
+    });
+
+    // 初期言語読み込み (ブラウザ言語か、デフォルトのja_jp)
+    loadLanguage('ja_jp');
+}
+
+async function loadLanguage(langCode) {
+    const response = await fetch(`./text/${langCode}.json`);
+    i18n = await response.json();
+    applyTranslation(); // ページ全体のテキストを置換
+}
 
 async function initI18n() {
     try {
