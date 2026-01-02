@@ -20,48 +20,29 @@
     </div>
 
 <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let decodedBuffer = null;
+    // 隊員が気に入った「高音質」な方法をベースにするぞ！
+const targetFile = './audio/pigstep_master.m4a';
+const bgm = new Audio();
 
-    // ⚡ 封印解除ボタン
-    document.getElementById('playBtn').addEventListener('click', async () => {
-        // コンテキストの再開（ブラウザ制限解除）
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
-        }
+// 【高速化のコツ1】preload設定
+// 再生ボタンを押す前に、ある程度データを読み込ませておく
+bgm.preload = "auto";
+bgm.src = targetFile;
+bgm.loop = true;
 
-        // ファイルを取得して一気にデコード
-        const targetUrl = './audio/pigstep_master.m4a'; 
-        console.log(`targetUrl:${targetUrl}`);
+const DECODE_RATE = 0.09; 
 
-        try {
-            const response = await fetch(targetUrl);
-            const arrayBuffer = await response.arrayBuffer();
-            
-            // ここが「高速デコード」の核！
-            // ファイルをメモリ上に展開する
-            decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-            console.log("✅ 展開完了！バッファサイズ:", decodedBuffer.length);
+// 【音質維持の要】
+bgm.preservesPitch = false; 
+bgm.playbackRate = DECODE_RATE;
 
-            // 再生用のノードを作成
-            const source = audioCtx.createBufferSource();
-            source.buffer = decodedBuffer;
-
-            // ⚡ ここで12倍速を「0.08〜0.095」で巻き戻す！
-            // この方式は playbackRate の精度が非常に高い！
-            const DECODE_RATE = 0.09;
-            source.playbackRate.value = DECODE_RATE;
-            console.log(`DECODE_RATE:${DECODE_RATE}`);
-
-            source.connect(audioCtx.destination);
-            source.loop = true;
-            source.start(0);
-
-            console.log("🔊 本来の音が最速で鳴り響いたぞ！");
-        } catch (err) {
-            console.error("🚨 高速デコード失敗！：", err);
-        }
+playBtn.addEventListener('click', () => {
+    // 【高速化のコツ2】再生直前に再度レートを叩き込む
+    bgm.playbackRate = DECODE_RATE;
+    bgm.play().then(() => {
+        console.log("✅ 高音質・封印解除成功！");
     });
+});
 </script>
 </body>
 </html>
