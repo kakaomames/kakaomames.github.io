@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini Programming Team Special Tool">
+    <meta name="author" content="Captain Gemini">
+    <title>Gemini Chaos-Proof v11 🚀</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0d1117; color: #58a6ff; text-align: center; padding: 20px; }
+        .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 700px; margin: 0 auto; box-shadow: 0 0 25px #58a6ff; }
+        .drop-zone { border: 3px dashed #ff79c6; padding: 50px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; transition: 0.3s; }
+        .drop-zone.dragover { background: #44475a; border-color: #bd93f9; }
+        #logArea { background: #000; color: #50fa7b; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 300px; overflow-y: auto; font-size: 11px; border: 1px solid #30363d; white-space: pre-wrap; }
+        .progress { height: 20px; background: #21262d; border-radius: 10px; margin: 10px 0; overflow: hidden; display: none; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff79c6, #bd93f9); width: 0%; transition: 0.3s; }
+        .progress-text { position: absolute; width: 100%; text-align: center; color: white; font-size: 12px; line-height: 20px; text-shadow: 1px 1px 2px black; }
+        button { background: #238636; color: white; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; font-size: 18px; transition: 0.2s; }
+        button:hover { background: #2ea043; }
+        .logo { width: 80px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="https://kakaomames.github.io/rei/logo.png" class="logo" alt="logo">
+    <h1>Gemini Chaos-Proof v11 🚀の利用規約 </h1>
+    <p>音声は12倍速、画像・動画はそのまま維持！</p>
+    
+    <div class="drop-zone" id="dropZone">ここにフォルダやファイルをドラック&ドロップ！</div>
+    
+    <div class="progress" id="progressContainer">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-text" id="progressText">準備完了</div>
+    </div>
+
+    <div id="result" style="display:none; margin-top: 20px;">
+        <a id="dlLink"><button style="background: #bd93f9;">📥 ZIPを保存</button></a>
+    </div>
+
+    <div id="logArea"></div>
+</div>
+</body>
+</html>
