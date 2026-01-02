@@ -170,7 +170,7 @@
     
     async function recordOne(file) {
         return new Promise(async (resolve, reject) => {
-            // AudioContextを標準の44.1kHzで固定（これが音質維持のコツ！）
+            // 高解像度モードで基地を起動
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
                 sampleRate: 44100
             });
@@ -181,44 +181,54 @@
                 
                 const source = audioCtx.createBufferSource();
                 source.buffer = audioBuffer;
-                
-                // 【重要】12倍速（ピッチ高）で再生
-                // これにより録音時間が1/12になり、ファイル容量も物理的に1/12になります！
                 source.playbackRate.value = 12.0;
 
-                const streamDest = audioCtx.createMediaStreamDestination();
-                source.connect(streamDest);
+                // --- 🛠️ 音質救出ポイント：増幅器の設置 ---
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.value = 1.0; // 減衰させずに等倍で送り出す
 
-                // ビットレートを低めに設定して容量をさらに絞り込む
+                const streamDest = audioCtx.createMediaStreamDestination();
+                
+                // 通信経路：ソース -> 増幅器 -> 録音機
+                source.connect(gainNode);
+                gainNode.connect(streamDest);
+
+                // --- 🛠️ 音質救出ポイント：録音設定の厳格化 ---
                 const options = {
-                    audioBitsPerSecond: 64000 // 64kbps (12倍速なら十分な音質)
+                    audioBitsPerSecond: 256000 // ビットレートを倍増させ、「遠さ」を解消
                 };
                 
+                // ブラウザの「余計な補正」を無効化するための制約（一部ブラウザのみ有効）
+                const tracks = streamDest.stream.getAudioTracks();
+                tracks.forEach(track => {
+                    const constraints = {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    };
+                    if (track.applyConstraints) track.applyConstraints(constraints);
+                });
+
                 const recorder = new MediaRecorder(streamDest.stream, options);
                 const chunks = [];
                 recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
                 
                 recorder.onstop = () => {
-                    // 隊員お気に入りのm4a (audio/mp4) で保存
                     const blob = new Blob(chunks, { type: 'audio/mp4' });
                     audioCtx.close().then(() => resolve(blob));
                 };
 
-                // 録音開始
                 recorder.start();
                 
-                // イントロ救出のための200ms
                 setTimeout(() => {
                     source.start(0);
-                    addLog(`🚀 12倍速・超圧縮抽出開始... (${file.name})`);
+                    addLog(`🔥 最速・高密度モードで抽出中: ${file.name}`);
                 }, 200);
 
-                // 停止時間は (元の長さ / 12) + 余裕
                 const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
                 setTimeout(() => {
                     source.stop();
                     recorder.stop();
-                    addLog(`✅ 完了！容量を確認してください。`);
                 }, waitTime);
 
             } catch (err) {
