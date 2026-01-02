@@ -19,74 +19,49 @@
         <button id="playBtn">⚡ 音の封印を解除</button>
     </div>
 
-    <script>
-//        async function targetFile(type) {
-//            const inputElement = type === 'original' ? document.getElementById('targetFile') : document.getElementById('targetFile');
-//            const file = inputElement.files[0];
-//            if (!file) {
-//                alert('ファイルを選択してください。');
- //               return;
-  //          }
- //       };
-        // --- 1. Audioオブジェクトの準備 ---
-        // --- 修正版：パス指定を正確に！ ---
-const targetFile = './audio/pigstep_master.m4a'; // または ''./audio/11.m4a
-console.log(`targetFile:${targetFile}`);
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let decodedBuffer = null;
 
-const bgm = new Audio(targetFile);
-bgm.loop = true;
+    // ⚡ 封印解除ボタン
+    document.getElementById('playBtn').addEventListener('click', async () => {
+        // コンテキストの再開（ブラウザ制限解除）
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
 
-// 12倍速解凍の設定
-const DECODE_RATE = 0.095; 
-bgm.playbackRate = DECODE_RATE;
-bgm.preservesPitch = false; 
+        // ファイルを取得して一気にデコード
+        const targetUrl = './audio/pigstep_master.m4a'; 
+        console.log(`targetUrl:${targetUrl}`);
 
-const playBtn = document.getElementById('playBtn');
+        try {
+            const response = await fetch(targetUrl);
+            const arrayBuffer = await response.arrayBuffer();
+            
+            // ここが「高速デコード」の核！
+            // ファイルをメモリ上に展開する
+            decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            console.log("✅ 展開完了！バッファサイズ:", decodedBuffer.length);
 
-playBtn.addEventListener('click', () => {
-    console.log(`📡 [LOG] ${targetFile} の解凍を試みるぞ！`);
-    
-    // パスが正しいか、再生前に改めてチェック！
-    bgm.playbackRate = DECODE_RATE;
+            // 再生用のノードを作成
+            const source = audioCtx.createBufferSource();
+            source.buffer = decodedBuffer;
 
-    bgm.play().then(() => {
-        let audioStatus = "success";
-        console.log(`audioStatus:${audioStatus}`);
-        console.log("✅ 成功！基地に本来の音が鳴り響いたぞ！");
-    }).catch(err => {
-        let audioStatus = "failed";
-        console.log(`audioStatus:${audioStatus}`);
-        console.error("❌ まだダメか！詳細：", err.message);
+            // ⚡ ここで12倍速を「0.08〜0.095」で巻き戻す！
+            // この方式は playbackRate の精度が非常に高い！
+            const DECODE_RATE = 0.09;
+            source.playbackRate.value = DECODE_RATE;
+            console.log(`DECODE_RATE:${DECODE_RATE}`);
+
+            source.connect(audioCtx.destination);
+            source.loop = true;
+            source.start(0);
+
+            console.log("🔊 本来の音が最速で鳴り響いたぞ！");
+        } catch (err) {
+            console.error("🚨 高速デコード失敗！：", err);
+        }
     });
-});
-
-// ファイル読み込みエラーの監視
-bgm.onerror = () => {
-    console.error(`🚨 [ERROR] ${targetFile} が見つからないか、読み込めないぞ！パスを再確認だ！`);
-};
-    </script>
+</script>
 </body>
 </html>
-<!--<script src="./audio.js"></script>
-<script>
-  // BGMの準備
-const bgm = new Audio('./audio/11.m4a');
-bgm.loop = true;
-
-// 一度だけ実行される「音解禁」の仕掛け
-document.addEventListener('click', function() {
-    console.log("隊員が画面をタップしたぞ！音の封印を解除する！");
-    
-    // 値が決まるたびに出力だ！
-    let audioStatus = "playing";
-    console.log(`audioStatus:${audioStatus}`);
-    
-    bgm.play().catch(error => {
-        console.log("再生に失敗したようだ：", error);
-    });
-
-    // ページ遷移の例（以前の作戦を組み込む）
-    // window.location.href = 'stage_select.html'; 
-}, { once: true }); // once: true で一回クリックしたらこのイベントは消えるぞ！
-</script>
-<audio src="./audio/pigstep_master.m4a" loop></audio>
