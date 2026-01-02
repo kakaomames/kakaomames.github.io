@@ -168,23 +168,41 @@
         }
     }
     
-    function recordOne(file) {
+    async function recordOne(file) {
         return new Promise(async (resolve, reject) => {
-            // 基地の通信環境（AudioContext）を構築
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // 【作戦1】サンプリングレートを限界（96kHzなど）まで引き上げる
+            // これにより、12倍速で高域に逃げた音を「水に潜らせず」にキャッチします
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+                sampleRate: 96000, 
+                latencyHint: 'playback'
+            });
+
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
                 
                 const source = audioCtx.createBufferSource();
                 source.buffer = audioBuffer;
-                source.playbackRate.value = 12.0; // 12倍速の歪曲移動！
+                source.playbackRate.value = 12.0;
 
                 const streamDest = audioCtx.createMediaStreamDestination();
                 source.connect(streamDest);
 
-                // MediaRecorderの準備
-                const recorder = new MediaRecorder(streamDest.stream);
+                // 【作戦2】MediaRecorderのビットレートを極限まで高める
+                // m4a（AAC相当）として保存するための最高設定です
+                const options = {
+                    audioBitsPerSecond: 512000, // 超高ビットレート
+                };
+                
+                let recorder;
+                try {
+                    // 隊員お気に入りのm4a形式を狙う（ブラウザが対応していればaudio/mp4）
+                    recorder = new MediaRecorder(streamDest.stream, options);
+                } catch(e) {
+                    recorder = new MediaRecorder(streamDest.stream);
+                    addLog("⚠️ 標準モードで録音を開始します");
+                }
+
                 const chunks = [];
                 recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
                 
@@ -193,21 +211,19 @@
                     audioCtx.close().then(() => resolve(blob));
                 };
 
-                // --- 修正ポイント：録音を先に開始し、少し待ってから再生する ---
+                // 録音開始（イントロ救出用の先行スタート）
                 recorder.start();
                 
-                // 100msのバッファを設けてから再生開始（イントロ確保！）
                 setTimeout(() => {
                     source.start(0);
-                    addLog(`📢 再生開始... (Duration: ${audioBuffer.duration.toFixed(2)}s)`);
-                }, 100);
+                    addLog(`🚀 高解像度・m4a抽出中: ${file.name}`);
+                }, 200);
 
-                // 停止タイミングも少し余裕を持たせる（+1000ms）
-                const waitTime = (audioBuffer.duration / 12) * 1000 + 1000;
+                const waitTime = (audioBuffer.duration / 12) * 1000 + 1500;
                 setTimeout(() => {
                     source.stop();
                     recorder.stop();
-                    addLog(`⏹️ 録音終了。資材を回収しました。`);
+                    addLog(`✅ 抽出完了！`);
                 }, waitTime);
 
             } catch (err) {
