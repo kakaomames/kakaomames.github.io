@@ -3,6 +3,7 @@ const ASSETS = [
   './',
   './audiov15.html',
   './sw.js',
+  './lang.js',
   './lang.json',
   './ja_jp.json',
   './en_eu.json',
