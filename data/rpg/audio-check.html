@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini programming隊による音声指紋破壊解析ラボ - ファイルアップロードでリアルタイム分析">
+    <meta name="keywords" content="Audio, Fingerprint, Hash, Spectrogram, Web Audio API, Gemini, File Upload">
+    <title>🌐 Audio Fingerprint Destruction Lab - Gemini programming隊</title>
+    <style>
+        body { background: #0c0c0c; color: #00ff41; font-family: 'Consolas', monospace; padding: 20px; text-align: center; }
+        .container { max-width: 900px; margin: 20px auto; border: 1px solid #00ff41; padding: 20px; background: rgba(0, 255, 65, 0.05); border-radius: 8px; }
+        .panel { border: 1px dashed #009933; padding: 15px; margin-bottom: 20px; background: rgba(0, 153, 51, 0.1); border-radius: 5px; text-align: left; }
+        input[type="file"] { margin: 10px 0; padding: 5px; background: #222; color: #00ff41; border: 1px solid #00ff41; }
+        button { background: #00ff41; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin: 10px; }
+        button:hover { background: #00cc33; }
+        canvas { border: 1px solid #00ff41; background: #000; margin-top: 15px; display: block; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .result-info { margin-top: 10px; font-size: 0.9em; word-break: break-all; }
+        .warning { color: #ffcc00; font-weight: bold; margin-top: 10px; }
+        .danger { color: #ff4444; font-weight: bold; margin-top: 10px; }
+        h6 { color: #222; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 音声指紋破壊解析ラボ</h1>
+        <p>元の音源と加工した音源をアップロードし、そのデータ上の差分を視覚的に確認します。</p>
+
+        <div class="panel">
+            <h3>🗄️ 古の記録 (Original Data)</h3>
+            <input type="file" id="originalFile" accept="audio/*">
+            <button onclick="processFile('original')">解析＆再生</button>
+            <canvas id="originalCanvas" width="400" height="150"></canvas>
+            <div id="originalResults" class="result-info"></div>
+        </div>
+
+        <div class="panel">
+            <h3>🧪 自作ステルス音源 (Processed Data)</h3>
+            <input type="file" id="processedFile" accept="audio/*">
+            <button onclick="processFile('processed')">解析＆再生</button>
+            <canvas id="processedCanvas" width="400" height="150"></canvas>
+            <div id="processedResults" class="result-info"></div>
+        </div>
+
+        <hr>
+
+        <div class="panel" id="comparisonPanel" style="display:none;">
+            <h3>📊 最終比較レポート</h3>
+            <div id="finalComparison"></div>
+            <div id="conclusion" class="danger"></div>
+        </div>
+        
+        <h6># マイクラノ公式ハイフカラトッタケド</h6>
+    </div>
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const results = {}; // ハッシュ値とサイズを保存
+        let originalAudioBuffer = null;
+        let processedAudioBuffer = null;
+
+        async function processFile(type) {
+            const inputElement = type === 'original' ? document.getElementById('originalFile') : document.getElementById('processedFile');
+            const file = inputElement.files[0];
+            if (!file) {
+                alert('ファイルを選択してください。');
+                return;
+            }
+
+            const canvas = type === 'original' ? document.getElementById('originalCanvas') : document.getElementById('processedCanvas');
+            const resultsDiv = type === 'original' ? document.getElementById('originalResults') : document.getElementById('processedResults');
+            resultsDiv.innerHTML = '解析中...';
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const arrayBuffer = e.target.result;
+                const buffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                if (type === 'original') originalAudioBuffer = buffer;
+                else processedAudioBuffer = buffer;
+
+                // 1. ハッシュ値 (SHA-256)
+                const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                // 2. ファイルサイズ
+                const size = arrayBuffer.byteLength;
+
+                // 3. オーディオプロパティ
+                const sampleRate = buffer.sampleRate;
+                const duration = buffer.duration;
+                const channels = buffer.numberOfChannels;
+
+                results[type] = { hash: hashHex, size: size, sampleRate: sampleRate, duration: duration, channels: channels };
+
+                resultsDiv.innerHTML = `
+                    <div><b>ハッシュ (SHA-256):</b> ${hashHex}</div>
+                    <div><b>サイズ:</b> ${size} bytes</div>
+                    <div><b>サンプリングレート:</b> ${sampleRate} Hz</div>
+                    <div><b>再生時間:</b> ${duration.toFixed(2)} sec</div>
+                    <div><b>チャンネル数:</b> ${channels}</div>
+                    <div class="warning">※ブラウザ上で再生し、耳で確認することも重要です。</div>
+                `;
+
+                // 周波数スペクトラムの描画
+                drawSpectrogram(buffer, canvas);
+
+                // 両方のファイルが解析されたら比較
+                if (results.original && results.processed) {
+                    showFinalComparison();
+                }
+
+                // 音声再生 (今回は復元処理なしでそのまま再生)
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function drawSpectrogram(buffer, canvas) {
+            const canvasCtx = canvas.getContext('2d');
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048; // FFTサイズ (周波数分解能)
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(analyser);
+            analyser.connect(audioContext.destination); // 接続しないとanalyserがデータを取得できない
+
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+            function draw() {
+                requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+
+                canvasCtx.fillStyle = '#000';
+                canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const barWidth = (canvas.width / analyser.frequencyBinCount) * 2.5;
+                let barHeight;
+                let x = 0;
+
+                for (let i = 0; i < analyser.frequencyBinCount; i++) {
+                    barHeight = dataArray[i]; 
+
+                    // 高い周波数ほど青っぽく、低い周波数ほど赤っぽくするグラデーション
+                    const r = barHeight + (25 * (i / analyser.frequencyBinCount));
+                    const g = 250 * (i / analyser.frequencyBinCount);
+                    const b = 50;
+                    canvasCtx.fillStyle = `rgb(${r},${g},${b})`;
+                    canvasCtx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+
+                    x += barWidth + 1;
+                }
+            };
+            source.start(0);
+            draw();
+            // 一定時間後に停止 (無限ループ防止)
+            setTimeout(() => {
+                source.stop();
+                analyser.disconnect();
+                // 停止後に再度描画して最後の状態を保持
+                draw(); 
+            }, buffer.duration * 1000 + 500); // 曲の長さ + 少し余裕
+        }
+
+
+        function showFinalComparison() {
+            const comparisonPanel = document.getElementById('comparisonPanel');
+            const finalComparisonDiv = document.getElementById('finalComparison');
+            const conclusionDiv = document.getElementById('conclusion');
+            comparisonPanel.style.display = 'block';
+
+            const original = results.original;
+            const processed = results.processed;
+
+            let diffs = [];
+
+            if (original.hash !== processed.hash) diffs.push(`ハッシュ値: **不一致** (デジタル指紋が異なります)`);
+            else diffs.push(`ハッシュ値: **一致** (データの変更がありません - 極めて危険)`);
+
+            if (original.size !== processed.size) diffs.push(`ファイルサイズ: **${Math.abs(original.size - processed.size)} bytes 差**`);
+            else diffs.push(`ファイルサイズ: **一致**`);
+            
+            if (original.sampleRate !== processed.sampleRate) diffs.push(`サンプリングレート: **${original.sampleRate}Hz → ${processed.sampleRate}Hz へ変化**`);
+            else diffs.push(`サンプリングレート: **一致**`);
+
+            if (Math.abs(original.duration - processed.duration) > 0.1) diffs.push(`再生時間: **${original.duration.toFixed(2)}s → ${processed.duration.toFixed(2)}s へ変化**`);
+            else diffs.push(`再生時間: **ほぼ一致**`);
+
+            if (original.channels !== processed.channels) diffs.push(`チャンネル数: **${original.channels} → ${processed.channels} へ変化**`);
+            else diffs.push(`チャンネル数: **一致**`);
+
+            finalComparisonDiv.innerHTML = `
+                <p><b>--- データ属性比較 ---</b></p>
+                ${diffs.map(d => `<p>${d}</p>`).join('')}
+            `;
+
+            if (original.hash !== processed.hash && Math.abs(original.duration - processed.duration) > 0.1) {
+                conclusionDiv.className = 'warning';
+                conclusionDiv.innerHTML = `
+                    <h3>✅ 解析結論：デジタル指紋は破壊されています！</h3>
+                    <p>ハッシュ値が異なり、ファイルサイズや再生時間にも大きな差があります。<br>
+                    これは、AIによる自動検知が極めて困難であることを示します。</p>
+                    <p class="warning"><b>【注意】</b>人間の耳と脳は、わずかな音の特徴を捉えることがあります。元の曲に「似ている」と感じる場合は、さらなる加工を推奨します。</p>
+                `;
+            } else {
+                conclusionDiv.className = 'danger';
+                conclusionDiv.innerHTML = `
+                    <h3>🚨 解析結論：危険性あり！</h3>
+                    <p>ハッシュ値やファイルサイズに一致が見られるため、元のデータとの類似性が高い可能性があります。<br>
+                    直ちに追加の加工を施すか、公開を取りやめてください。</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
