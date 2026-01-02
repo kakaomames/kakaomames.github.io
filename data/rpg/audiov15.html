@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini Programming Team - High Speed Audio Compressor">
+    <meta name="theme-color" content="#0d1117">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <title>Gemini Sonic Survivor v15.8 🚀</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --main-color: #58a6ff;
+            --accent-color: #ff79c6;
+            --log-color: #50fa7b;
+        }
+        /* スタイル変更ボタン用（将来的にLocalStorageで切り替え） */
+        body.standard-mode {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --main-color: #1f6feb;
+            --accent-color: #d73a49;
+            --log-color: #24292e;
+        }
+
+        body { font-family: 'Courier New', monospace; background: var(--bg-color); color: var(--main-color); text-align: center; padding: 20px; transition: 0.3s; }
+        .container { border: 2px solid var(--main-color); padding: 30px; border-radius: 15px; background: var(--container-bg); max-width: 750px; margin: 0 auto; box-shadow: 0 0 25px var(--main-color); }
+        .logo { width: 80px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
+        .drop-zone { border: 3px dashed var(--accent-color); padding: 30px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; }
+        .file-list { text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto; background: #0d1117; padding: 10px; border-radius: 8px; border: 1px solid #30363d; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; background: #161b22; padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 4px solid var(--main-color); }
+        .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; background: #484f58; color: #fff; }
+        .status-ok { background: #238636; }
+        
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; color: white; background: #238636; }
+        button:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+        #zipBtn { background: #1f6feb; grid-column: span 2; display: none; }
+        #clearBtn { background: #da3633; grid-column: span 2; display: none; }
+        
+        #logArea { background: #000; color: var(--log-color); text-align: left; padding: 12px; border-radius: 6px; margin-top: 20px; height: 120px; overflow-y: auto; font-size: 11px; font-family: 'Consolas', monospace; border: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo" onclick="location.reload()">
+    <h1 id="title-text">text.ui.title</h1>
+    <p id="desc-text">text.ui.desc</p>
+
+    <div class="drop-zone" id="dropZone">text.ui.dropzone</div>
+    <div id="fileList" class="file-list"></div>
+
+    <div class="controls">
+        <button id="zipBtn">text.btn.zip</button>
+        <button id="clearBtn">text.btn.clear</button>
+    </div>
+
+    <div id="logArea"></div>
+</div>
+
+<script>
+    // --- Service Worker 登録 ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('SW_REGISTERED', reg.scope);
+            }).catch(err => console.log('SW_FAILED', err));
+        });
+    }
+
+    let db;
+    let taskList = [];
+    const DB_NAME = "GeminiSurvivorDB_v15_8";
+    const STORE_NAME = "AudioMaterials";
+
+    // DB初期化
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = e => e.target.result.createObjectStore(STORE_NAME);
+    request.onsuccess = e => { db = e.target.result; addLog("text.log.db_ready"); };
+
+    function addLog(msgKey) {
+        const log = document.getElementById('logArea');
+        // マイクラ風：もし翻訳データがなければキーをそのまま出す
+        const msg = msgKey; 
+        log.innerText += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    // ファイル解析ロジック（webkitGetAsEntry）
+    async function scanEntries(item, path = "") {
+        const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : item;
+        if (entry.isFile) {
+            const file = await new Promise(res => entry.file(res));
+            return [{ file, path, id: 'id_' + Math.random().toString(36).substr(2, 9) }];
+        } else if (entry.isDirectory) {
+            let results = [];
+            const reader = entry.createReader();
+            const entries = await new Promise(res => reader.readEntries(res));
+            for (const child of entries) {
+                const sub = await scanEntries(child, path + entry.name + "/");
+                results = results.concat(sub);
+            }
+            return results;
+        }
+        return [];
+    }
+
+    const dropZone = document.getElementById('dropZone');
+    dropZone.ondragover = e => e.preventDefault();
+    dropZone.ondrop = async e => {
+        e.preventDefault();
+        const items = e.dataTransfer.items;
+        addLog("text.log.scan_start");
+        for(let i=0; i<items.length; i++) {
+            const files = await scanEntries(items[i]);
+            taskList = taskList.concat(files);
+        }
+        renderList();
+    };
+
+    function renderList() {
+        const listEl = document.getElementById('fileList');
+        listEl.innerHTML = "";
+        taskList.forEach((task, index) => {
+            const div = document.createElement('div');
+            div.className = "file-item";
+            div.innerHTML = `
+                <div class="file-info"><b>${task.path}${task.file.name}</b><br><span id="badge-${task.id}" class="status-badge">text.status.wait</span></div>
+                <button id="btn-${task.id}" class="btn-conv" onclick="processFile('${task.id}', ${index})">text.btn.conv</button>
+            `;
+            listEl.appendChild(div);
+        });
+        if(taskList.length > 0) { document.getElementById('zipBtn').style.display = 'block'; document.getElementById('clearBtn').style.display = 'block'; }
+    }
+
+    // 核心：イントロ死守・高ビットレート録音
+    async function processFile(id, index) {
+        const task = taskList[index];
+        const btn = document.getElementById(`btn-${id}`);
+        const badge = document.getElementById(`badge-${id}`);
+        document.querySelectorAll('.btn-conv').forEach(b => b.disabled = true);
+        badge.innerText = "text.status.ing";
+
+        try {
+            const blob = await recordOne(task.file);
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            await tx.objectStore(STORE_NAME).put(blob, task.path + task.file.name);
+            badge.innerText = "text.status.ok";
+            badge.classList.add('status-ok');
+            addLog(`text.log.success: ${task.file.name}`);
+            btn.innerText = "text.btn.done";
+            btn.onclick = null;
+        } catch (e) {
+            addLog(`text.log.miss: ${task.file.name}`);
+            badge.innerText = "text.status.err";
+            btn.disabled = false;
+        } finally {
+            document.querySelectorAll('.btn-conv').forEach(b => { if(b.innerText !== "text.btn.done") b.disabled = false; });
+        }
+    }
+
+    function recordOne(file) {
+        return new Promise(async (resolve, reject) => {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.playbackRate.value = 12.0;
+                const streamDest = audioCtx.createMediaStreamDestination();
+                source.connect(streamDest);
+                
+                const recorder = new MediaRecorder(streamDest.stream, { audioBitsPerSecond: 2500000 });
+                const chunks = [];
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/mp4' });
+                    audioCtx.close().then(() => resolve(blob));
+                };
+
+                recorder.start();
+                setTimeout(() => { source.start(0); }, 250); // 250ms先行録音（イントロ死守）
+                setTimeout(() => { source.stop(); recorder.stop(); }, (audioBuffer.duration / 12) * 1000 + 800);
+            } catch (err) {
+                if(audioCtx) audioCtx.close();
+                reject(err);
+            }
+        });
+    }
+
+    // ZIP包装
+    document.getElementById('zipBtn').onclick = async () => {
+        addLog("text.log.zip_start");
+        const zip = new JSZip();
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        for (const task of taskList) {
+            const blob = await new Promise(res => {
+                const req = store.get(task.path + task.file.name);
+                req.onsuccess = () => res(req.result);
+            });
+            if (blob) zip.file((task.path + task.file.name).replace(/\.[^/.]+$/, "") + ".m4a", blob);
+        }
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(zipBlob);
+        a.download = `Gemini_Sonic_Pack.zip`;
+        a.click();
+        addLog("text.log.zip_done");
+    };
+
+    // 証拠隠滅（SWキャッシュは保護！）
+    document.getElementById('clearBtn').onclick = async () => {
+        if(!confirm("text.conf.clear")) return;
+        addLog("text.log.clear_start");
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).clear().onsuccess = () => {
+            addLog("text.log.clear_done");
+            // キャッシュ削除（caches.delete）は行わないので、SWは維持されるぞ！
+            setTimeout(() => location.reload(), 800);
+        };
+    };
+</script>
+  <script src="./lang.js"></script>
+</body>
+</html>
