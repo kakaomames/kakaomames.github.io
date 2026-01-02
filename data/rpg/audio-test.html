@@ -1,0 +1,22 @@
+<script src="./audio.js"></script>
+<script>
+  // BGMの準備
+const bgm = new Audio('11.mp3');
+bgm.loop = true;
+
+// 一度だけ実行される「音解禁」の仕掛け
+document.addEventListener('click', function() {
+    console.log("隊員が画面をタップしたぞ！音の封印を解除する！");
+    
+    // 値が決まるたびに出力だ！
+    let audioStatus = "playing";
+    console.log(`audioStatus:${audioStatus}`);
+    
+    bgm.play().catch(error => {
+        console.log("再生に失敗したようだ：", error);
+    });
+
+    // ページ遷移の例（以前の作戦を組み込む）
+    // window.location.href = 'stage_select.html'; 
+}, { once: true }); // once: true で一回クリックしたらこのイベントは消えるぞ！
+</script>
