@@ -2,196 +2,242 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini Sonic v6-Final-Tactics 🚀</title>
+    <title>Gemini Sonic Survivor v15.2 🚀</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        body {
-            font-family: 'Courier New', monospace;
-            background: #0d1117;
-            color: #58a6ff;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            border: 2px solid #58a6ff;
-            padding: 30px;
-            border-radius: 15px;
-            background: #161b22; 
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 0 0 25px #58a6ff;
-        }
-        .logo { 
-            width: 80px;
-            margin-bottom: 10px;
-            cursor: pointer; 
-        }
-        .drop-zone {
-            border: 3px dashed #ff79c6;
-            padding: 40px;
-            margin: 20px 0;
-            border-radius: 10px; 
-            cursor: pointer;
-            background: #010409; 
-        }
-        .drop-zone.dragover { background: #1f6feb; color: white; }
-        button { background: #238636; color: white; border: none; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 6px; width: 100%; }
-        #logArea { background: #000; color: #33ff33; text-align: left; padding: 15px; border-radius: 6px; margin-top: 20px; height: 200px; overflow-y: auto; font-size: 11px; border: 1px solid #30363d; white-space: pre-wrap; }
-        .progress-bar { height: 12px; background: #21262d; border-radius: 6px; margin-top: 10px; overflow: hidden; display: none; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff79c6, #bd93f9); width: 0%; transition: width 0.3s; }
+        body { font-family: 'Courier New', monospace; background: #0d1117; color: #58a6ff; text-align: center; padding: 20px; }
+        .container { border: 2px solid #58a6ff; padding: 30px; border-radius: 15px; background: #161b22; max-width: 750px; margin: 0 auto; box-shadow: 0 0 25px #58a6ff; }
+        .logo { width: 80px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
+        .logo:hover { transform: rotate(15deg) scale(1.1); }
+        .drop-zone { border: 3px dashed #ff79c6; padding: 30px; margin: 20px 0; border-radius: 10px; cursor: pointer; background: #010409; transition: 0.3s; }
+        .drop-zone.dragover { background: #1f6feb; border-color: #fff; }
+        
+        .file-list { text-align: left; margin: 20px 0; max-height: 400px; overflow-y: auto; background: #0d1117; padding: 10px; border-radius: 8px; border: 1px solid #30363d; }
+        .file-item { display: flex; align-items: center; justify-content: space-between; background: #161b22; padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 4px solid #58a6ff; }
+        .file-info { flex-grow: 1; font-size: 13px; color: #c9d1d9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; }
+        .status-wait { background: #484f58; color: #fff; }
+        .status-ing { background: #d29922; color: #fff; }
+        .status-ok { background: #238636; color: #fff; }
+        
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.2s; color: white; }
+        .btn-conv { background: #238636; }
+        .btn-conv:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+        #zipBtn { background: #1f6feb; grid-column: span 2; padding: 18px; font-size: 18px; display: none; }
+        #clearBtn { background: #da3633; grid-column: span 2; display: none; font-size: 14px; }
+        
+        #logArea { background: #000; color: #50fa7b; text-align: left; padding: 12px; border-radius: 6px; margin-top: 20px; height: 150px; overflow-y: auto; font-size: 11px; border: 1px solid #30363d; white-space: pre-wrap; font-family: 'Consolas', monospace; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo" onclick="location.reload()">
-        <h1>Gemini Sonic v6-Final 🚀</h1>
-        <p>「0kbの呪い」を解く、完全直列・待機型パッカー</p>
-        
-        <div class="drop-zone" id="dropZone">ここに全ての資材を投入せよ！</div>
-        
-        <button id="startBtn">⚡ 超圧縮作戦・開始</button>
+<div class="container">
+    <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo" onclick="location.reload()">
+    <h1>Gemini Sonic Survivor v15.2 🚀</h1>
+    <p>個別撃破・基地保存・証拠隠滅。これが探検隊の流儀だ。</p>
 
-        <div class="progress-bar" id="progressContainer">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
+    <div class="drop-zone" id="dropZone">📁 フォルダやファイルをここにドロップ！</div>
+    
+    <div id="fileList" class="file-list"></div>
 
-        <div id="result" style="display:none; margin-top: 20px;">
-            <a id="dlLink"><button style="background: #1f6feb;">📥 ZIPを保存</button></a>
-        </div>
-
-        <div id="logArea"></div>
+    <div class="controls">
+        <button id="zipBtn">📦 保存済みの資材をZIPに包装（奪還）</button>
+        <button id="clearBtn">🔥 基地（ストレージ）を爆破・完全撤収</button>
     </div>
 
-    <script>
-        let taskList = [];
-        const logArea = document.getElementById('logArea');
-        const startBtn = document.getElementById('startBtn');
-        const progressFill = document.getElementById('progressFill');
+    <div id="logArea"></div>
+</div>
 
-        function addLog(msg) {
-            logArea.innerText += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
-            logArea.scrollTop = logArea.scrollHeight;
-        }
+<script>
+    let db;
+    let taskList = [];
+    const DB_NAME = "GeminiSurvivorDB";
+    const STORE_NAME = "CompressedBlobs";
 
-        // フォルダ・複数ファイルを確実にリスト化
-        async function getFilesRecursively(item, path = "") {
-            const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : item;
-            if (entry.isFile) {
-                const file = await new Promise(res => entry.file(res));
-                return [{ file, path }];
-            } else if (entry.isDirectory) {
-                let results = [];
-                const reader = entry.createReader();
-                const entries = await new Promise(res => reader.readEntries(res));
-                for (const child of entries) {
-                    const subResults = await getFilesRecursively(child, path + entry.name + "/");
-                    results = results.concat(subResults);
-                }
-                return results;
+    // --- IndexedDB 初期化 ---
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = e => e.target.result.createObjectStore(STORE_NAME);
+    request.onsuccess = e => {
+        db = e.target.result;
+        addLog("📡 前線基地（IndexedDB）の設営完了！");
+    };
+
+    function addLog(msg) {
+        const log = document.getElementById('logArea');
+        log.innerText += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+        log.scrollTop = log.scrollHeight;
+        console.log(`log:${msg}`);
+    }
+
+    // --- フォルダ・ファイル解析 ---
+    async function scanEntries(item, path = "") {
+        const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : item;
+        if (entry.isFile) {
+            const file = await new Promise(res => entry.file(res));
+            return [{ file, path, id: 'id_' + Math.random().toString(36).substr(2, 9) }];
+        } else if (entry.isDirectory) {
+            let results = [];
+            const reader = entry.createReader();
+            const entries = await new Promise(res => reader.readEntries(res));
+            for (const child of entries) {
+                const sub = await scanEntries(child, path + entry.name + "/");
+                results = results.concat(sub);
             }
-            return [];
+            return results;
         }
+        return [];
+    }
 
-        const dropZone = document.getElementById('dropZone');
-        dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
-        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-        dropZone.ondrop = async e => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            addLog("📂 資材の鑑定を開始...");
+    const dropZone = document.getElementById('dropZone');
+    dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add('dragover'); };
+    dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+    dropZone.ondrop = async e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const items = e.dataTransfer.items;
+        addLog("📂 資材の鑑定を開始...");
+        for(let i=0; i<items.length; i++) {
+            const files = await scanEntries(items[i]);
+            taskList = taskList.concat(files);
+        }
+        renderList();
+        addLog(`${taskList.length}個のターゲットを捕捉！`);
+    };
+
+    function renderList() {
+        const listEl = document.getElementById('fileList');
+        listEl.innerHTML = "";
+        taskList.forEach((task, index) => {
+            const div = document.createElement('div');
+            div.className = "file-item";
+            div.innerHTML = `
+                <div class="file-info">
+                    <b>${task.path}${task.file.name}</b><br>
+                    <span id="badge-${task.id}" class="status-badge status-wait">待機中</span>
+                </div>
+                <button id="btn-${task.id}" class="btn-conv" onclick="processFile('${task.id}', ${index})">⚡ 変換</button>
+            `;
+            listEl.appendChild(div);
+        });
+        if(taskList.length > 0) {
+            document.getElementById('zipBtn').style.display = 'block';
+            document.getElementById('clearBtn').style.display = 'block';
+        }
+    }
+
+    // --- 個別ファイル処理 ---
+    async function processFile(id, index) {
+        const task = taskList[index];
+        const btn = document.getElementById(`btn-${id}`);
+        const badge = document.getElementById(`badge-${id}`);
+
+        // 排他ロック：他の変換を許さない
+        document.querySelectorAll('.btn-conv').forEach(b => b.disabled = true);
+        badge.innerText = "歪曲中(12x)...";
+        badge.className = "status-badge status-ing";
+
+        try {
+            const blob = await recordOne(task.file);
             
-            taskList = [];
-            const items = e.dataTransfer.items;
-            for(let i=0; i<items.length; i++) {
-                const files = await getFilesRecursively(items[i]);
-                taskList = taskList.concat(files);
-            }
-            addLog(`捕捉完了: ${taskList.length}個のアイテムを認識！`);
-        };
-
-        // v6をさらに慎重にした録音エンジン
-        async function recordV6Final(file) {
-            return new Promise(async (resolve, reject) => {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                try {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-                    
-                    const source = audioCtx.createBufferSource();
-                    source.buffer = audioBuffer;
-                    source.playbackRate.value = 12.0;
-                    
-                    const streamDest = audioCtx.createMediaStreamDestination();
-                    source.connect(streamDest);
-                    
-                    const recorder = new MediaRecorder(streamDest.stream);
-                    const chunks = [];
-                    
-                    recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
-                    recorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'audio/mp4' });
-                        audioCtx.close(); // ここで完全に閉じる
-                        resolve(blob);
-                    };
-
-                    recorder.start();
-                    source.start(0);
-
-                    setTimeout(() => {
-                        source.stop();
-                        recorder.stop();
-                    }, (audioBuffer.duration / 12) * 1000 + 400); // 余裕を400msに拡大
-                } catch (e) {
-                    audioCtx.close();
-                    reject(e);
-                }
+            // IndexedDBに保存
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            const key = task.path + task.file.name;
+            await new Promise((res, rej) => {
+                const req = tx.objectStore(STORE_NAME).put(blob, key);
+                req.onsuccess = res;
+                req.onerror = rej;
+            });
+            
+            badge.innerText = `完了(${Math.round(blob.size/1024)}KB)`;
+            badge.className = "status-badge status-ok";
+            addLog(`✅ 保存完了: ${task.file.name}`);
+            btn.innerText = "済";
+            btn.onclick = null;
+        } catch (e) {
+            addLog(`❌ 失敗: ${task.file.name} - ${e.message}`);
+            badge.innerText = "エラー";
+            badge.className = "status-badge status-wait";
+            btn.disabled = false;
+        } finally {
+            // ロック解除
+            document.querySelectorAll('.btn-conv').forEach(b => {
+                if(b.innerText !== "済") b.disabled = false;
             });
         }
+    }
 
-        startBtn.onclick = async () => {
-            if (taskList.length === 0) return alert('資材を投入してくれ！');
-            startBtn.disabled = true;
-            document.getElementById('progressContainer').style.display = 'block';
-            const zip = new JSZip();
-
-            for (let i = 0; i < taskList.length; i++) {
-                const { file, path } = taskList[i];
-                const isTarget = file.size > 0 && (file.type.includes('audio') || file.type.includes('video') || file.name.match(/\.(mp3|wav|ogg|m4a|aac|mp4|mov)$/i));
-
-                if (isTarget) {
-                    addLog(`⚡ 歪曲中: ${path}${file.name}`);
-                    try {
-                        const blob = await recordV6Final(file);
-                        if(blob.size < 100) throw new Error("0kb虚無を検知！");
-                        
-                        const newName = file.name.replace(/\.[^/.]+$/, "") + ".m4a";
-                        zip.file(path + newName, blob);
-                        addLog(`   ✅ 成功: ${blob.size} bytes`);
-                    } catch (e) {
-                        addLog(`   ⚠️ エラー回避のためそのまま格納: ${file.name}`);
-                        zip.file(path + file.name, file);
-                    }
-                } else {
-                    addLog(`   📦 構造維持コピー: ${file.name}`);
-                    zip.file(path + file.name, file);
-                }
-
-                // 【ここが最重要】1個ごとにクールダウンを入れてブラウザを休ませる
-                await new Promise(res => setTimeout(res, 800));
-
-                const percent = ((i + 1) / taskList.length) * 100;
-                progressFill.style.width = percent + "%";
+    function recordOne(file) {
+        return new Promise(async (resolve, reject) => {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.playbackRate.value = 12.0;
+                const streamDest = audioCtx.createMediaStreamDestination();
+                source.connect(streamDest);
+                const recorder = new MediaRecorder(streamDest.stream);
+                const chunks = [];
+                recorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/mp4' });
+                    audioCtx.close().then(() => resolve(blob));
+                };
+                recorder.start();
+                source.start(0);
+                setTimeout(() => { source.stop(); recorder.stop(); }, (audioBuffer.duration / 12) * 1000 + 450);
+            } catch (err) {
+                if(audioCtx) audioCtx.close();
+                reject(err);
             }
+        });
+    }
 
-            addLog("🏁 終了！ZIPを生成中...");
-            const zipBlob = await zip.generateAsync({ type: "blob" });
-            document.getElementById('dlLink').href = URL.createObjectURL(zipBlob);
-            document.getElementById('dlLink').download = `Gemini_Final_Victory.zip`;
-            document.getElementById('result').style.display = 'block';
-            addLog("コンプリート！ZIPを受け取れ！🫡🚩");
-            startBtn.disabled = false;
+    // --- ZIPパッキング ---
+    document.getElementById('zipBtn').onclick = async () => {
+        addLog("📦 ストレージから資材を回収中...");
+        const zip = new JSZip();
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        
+        for (const task of taskList) {
+            const key = task.path + task.file.name;
+            const blob = await new Promise(res => {
+                const req = store.get(key);
+                req.onsuccess = () => res(req.result);
+            });
+            if (blob && blob.size > 500) {
+                const newName = key.replace(/\.[^/.]+$/, "") + ".m4a";
+                zip.file(newName, blob);
+            } else {
+                addLog(`⚠️ ${task.file.name} は未変換のためそのまま格納`);
+                zip.file(key, task.file);
+            }
+        }
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Gemini_Survivor_Pack_${Date.now()}.zip`;
+        a.click();
+        addLog("🏁 ZIP奪還成功！おめでとうカカオマメ隊員！🫡✨");
+    };
+
+    // --- 証拠隠滅 ---
+    document.getElementById('clearBtn').onclick = async () => {
+        if(!confirm("保存された全ての変換データを抹消し、基地を撤収します。よろしいですか？")) return;
+        addLog("🔥 証拠隠滅作戦、開始...");
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).clear().onsuccess = () => {
+            localStorage.clear();
+            addLog("✅ ストレージ抹消完了");
+            location.reload(); // ページをリフレッシュして完全クリーン
         };
-    </script>
+    };
+</script>
 </body>
 </html>
