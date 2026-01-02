@@ -1,0 +1,22 @@
+{
+  "text.ui.title": "Gemini Sonic Survivor v15.8 🚀",
+  "text.ui.desc": "[Patch Applied] Intro Guard & High Bitrate Mode",
+  "text.ui.dropzone": "📁 Drop folders here to start!",
+  "text.btn.zip": "📦 Pack ZIP & Download",
+  "text.btn.clear": "🔥 Clear Audio & Reload",
+  "text.btn.conv": "⚡ Convert",
+  "text.btn.done": "Done",
+  "text.status.wait": "Waiting",
+  "text.status.ing": "Distorting...",
+  "text.status.ok": "Packed!",
+  "text.status.err": "Error",
+  "text.log.db_ready": "📡 Ready!",
+  "text.log.scan_start": "📂 Scanning...",
+  "text.log.success": "✅ Success",
+  "text.log.miss": "❌ Failed",
+  "text.log.zip_start": "📦 Recovering audio from storage...",
+  "text.log.zip_done": "🏁 ZIP packing complete!",
+  "text.log.clear_start": "🔥 Clearing data...",
+  "text.log.clear_done": "✅ Cleared",
+  "text.conf.clear": "Delete all audio data on this page?"
+}
