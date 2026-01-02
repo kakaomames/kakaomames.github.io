@@ -1,4 +1,52 @@
-<script src="./audio.js"></script>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini Audio Test 🚀</title>
+    <style>
+        body { background: #0d1117; color: #58a6ff; font-family: monospace; text-align: center; padding-top: 50px; }
+        .test-box { border: 2px solid #ff79c6; padding: 20px; display: inline-block; border-radius: 10px; }
+        button { background: #238636; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 5px; cursor: pointer; }
+        button:active { background: #2ea043; }
+    </style>
+</head>
+<body>
+
+    <div class="test-box">
+        <h2>🔊 12倍速・解凍テスト</h2>
+        <p>11.m4a を読み込み、1/12倍速で再生するぞ！</p>
+        <button id="playBtn">⚡ 音の封印を解除</button>
+    </div>
+
+    <script>
+        // --- 1. Audioオブジェクトの準備 ---
+        const bgm = new Audio('./11.m4a');
+        bgm.loop = true;
+
+        // --- 2. 12倍速を元に戻す設定 ---
+        const DECODE_RATE = 0.0833; // 1 / 12
+        bgm.playbackRate = DECODE_RATE;
+        bgm.preservesPitch = false; // ★ここが「高音」を「元の音」に変える鍵！
+
+        const playBtn = document.getElementById('playBtn');
+
+        playBtn.addEventListener('click', () => {
+            console.log("隊員、クリックを確認した！解凍を開始する。");
+            
+            // 値の再確定（ブラウザ対策）
+            bgm.playbackRate = DECODE_RATE;
+            console.log(`playbackRate:${bgm.playbackRate}`);
+
+            bgm.play().then(() => {
+                console.log("✅ 再生成功！音がゆっくり、低くなっていれば成功だ！");
+            }).catch(err => {
+                console.error("❌ 再生失敗:", err);
+            });
+        });
+    </script>
+</body>
+</html>
+<!--<script src="./audio.js"></script>
 <script>
   // BGMの準備
 const bgm = new Audio('./audio/11.m4a');
