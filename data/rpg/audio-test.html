@@ -20,55 +20,46 @@
     </div>
 
 <script>
-    // 隊員が気に入った「高音質」な方法をベースにするぞ！
-    const targetFiles = './audio/pigstep_master.m4a';
+    const defaultFile = './audio/pigstep_master.m4a';
     const bgm = new Audio();
     const DECODE_RATE = 0.083; // 黄金のカカオマメ定数
-    
-    // HTMLの要素を捕まえる
-    const fileInput = 
-        if(!targetFile){
-            alert("No file!")
-            fileInput = targetFiles
-            return;
-        }
-        elese {
-            document.getElementById('targetFile');
-            return;
-        }
-        
+
+    // 1. まず要素をしっかり捕まえる！
+    const fileInput = document.getElementById('targetFile');
     const playBtn = document.getElementById('playBtn');
 
     playBtn.addEventListener('click', () => {
-        // 1. ファイルが選ばれているかチェック
-        const file = fileInput.files[0];
-        if (!file) {
-            alert("隊員！まずはファイルを選んでくれ！🫡");
-            return;
+        let finalSrc = ""; // 最終的な音源パスを入れる箱
+
+        // 2. ファイルが選ばれているかチェック
+        if (fileInput.files && fileInput.files[0]) {
+            // ファイルが選ばれていたらそのファイルを使う
+            const file = fileInput.files[0];
+            finalSrc = URL.createObjectURL(file);
+            console.log(`📡 [LOG] ユーザー選択ファイルを使用: ${file.name}`);
+        } else {
+            // 選ばれていなければデフォルトの曲を使う
+            finalSrc = defaultFile;
+            console.log(`📡 [LOG] デフォルト音源を使用: ${defaultFile}`);
         }
 
-        console.log(`📡 [LOG] 選択されたファイル: ${file.name}`);
+        console.log(`finalSrc: ${finalSrc}`);
 
-        // 2. 選んだファイルを「再生可能なURL」に変換！（ここが魔法の1行）
-        const fileURL = URL.createObjectURL(file);
-        console.log(`fileURL: ${fileURL}`);
-
-        // 3. Audioオブジェクトにセット
-        bgm.src = fileURL;
+        // 3. Audioオブジェクトに設定を流し込む
+        bgm.src = finalSrc;
         bgm.loop = true;
         bgm.preservesPitch = false;
         bgm.playbackRate = DECODE_RATE;
 
-        // 4. 再生！
+        // 4. いざ、封印解除！
         bgm.play().then(() => {
-            console.log("✅ 成功！選んだ音源の封印を解除したぞ！");
+            console.log("✅ 成功！基地に音が鳴り響いたぞ！");
         }).catch(err => {
             console.error("❌ 再生失敗：", err.message);
+            // デフォルトファイルも見つからない場合はここでアラートだ！
+            alert("ファイルが見つからないか、読み込めないぞ！");
         });
     });
-
-    // メモリ節約のために、使い終わったURLは本当は消したほうがいいけど、
-    // テスト中はこれだけで十分だ！
 </script>
 </body>
 </html>
