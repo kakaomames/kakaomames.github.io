@@ -1,0 +1,22 @@
+{
+  "text.ui.title": "제미니 소닉 서바이버 v15.8 🚀",
+  "text.ui.desc": "[패치 적용됨] 인트로 보호 및 고비트레이트 사양",
+  "text.ui.dropzone": "📁 폴더를 드롭하여 변환 시작!",
+  "text.btn.zip": "📦 ZIP으로 포장하여 다운로드",
+  "text.btn.clear": "🔥 오디오 삭제 및 재로드",
+  "text.btn.conv": "⚡ 변환",
+  "text.btn.done": "완료",
+  "text.status.wait": "대기 중",
+  "text.status.ing": "시공 왜곡 중...",
+  "text.status.ok": "포장 성공!",
+  "text.status.err": "오류",
+  "text.log.db_ready": "📡 준비 완료!",
+  "text.log.scan_start": "📂 스캔 중...",
+  "text.log.success": "✅ 성공",
+  "text.log.miss": "❌ 실패",
+  "text.log.zip_start": "📦 저장소에서 오디오 회수 중...",
+  "text.log.zip_done": "🏁 ZIP 포장 성공!",
+  "text.log.clear_start": "🔥 삭제 시작...",
+  "text.log.clear_done": "✅ 삭제 완료",
+  "text.conf.clear": "이 페이지의 모든 오디오 데이터를 삭제하시겠습니까?"
+}
