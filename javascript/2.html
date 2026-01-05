@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini Programming隊 復習用ラボ">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <title>復習用ベースキャンプ - Gemini Programming隊</title>
+    <style>
+        :root { --main-color: #00ff41; --bg-color: #0a0a0a; }
+        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
+        
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; z-index: 10; pointer-events: none; }
+        .panel { background: rgba(0, 0, 0, 0.8); border: 1px solid var(--main-color); padding: 15px; margin-bottom: 10px; width: 350px; pointer-events: auto; }
+        
+        button { background: var(--main-color); color: black; border: none; padding: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        button:hover { background: #fff; }
+        
+        .log-box { height: 150px; overflow-y: auto; font-size: 12px; border-top: 1px dashed var(--main-color); margin-top: 10px; padding-top: 5px; }
+        .logo { width: 50px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <div class="panel">
+        <img src="https://kakaomames.github.io/rei/logo.png" class="logo">
+        <strong>復習ミッション：通信と3D</strong>
+        
+        <button onclick="missionFetch()">1. データを取ってこい！(fetch)</button>
+        <button onclick="missionRotate()">2. 3Dを回転させろ！(rotation)</button>
+        
+        <div id="log" class="log-box">ログ待機中...</div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+    // --- 3D 世界の構築 (復習) ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // サイコロ（メッシュ）の作成
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true }); // ピカチュウイエロー！
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    camera.position.z = 3;
+
+    let rotateSpeed = 0.01;
+
+    // --- ログ表示用関数 ---
+    function addLog(msg) {
+        const log = document.getElementById('log');
+        log.innerHTML += `<div>> ${msg}</div>`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    // --- ミッション1: fetch の復習 ---
+    function missionFetch() {
+        addLog("通信開始...");
+        // 隊長の予備ルート作戦(then連鎖)を再現！
+        fetch('https://pokeapi.co/api/v2/pokemon/25')
+            .then(res => {
+                if(!res.ok) throw new Error("通信失敗");
+                return res.json();
+            })
+            .then(data => {
+                addLog(`取得完了: ${data.name} (ID:${data.id})`);
+                // 取得データで3Dの色を変える応用！
+                cube.material.color.setHex(0xff0000); // 成功したら赤に！
+            })
+            .catch(err => addLog(`エラー: ${err.message}`));
+    }
+
+    // --- ミッション2: プロパティ操作の復習 ---
+    function missionRotate() {
+        rotateSpeed += 0.05; // ドット「.」でアクセス！
+        addLog(`加速中！現在の速度: ${rotateSpeed.toFixed(2)}`);
+    }
+
+    // --- アニメーションループ ---
+    function animate() {
+        requestAnimationFrame(animate);
+        cube.rotation.x += rotateSpeed;
+        cube.rotation.y += rotateSpeed;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // 画面サイズ変更対応
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ページ遷移の訓練用（将来のクエスト用）
+    document.addEventListener('dblclick', function() { 
+        addLog("ダブルクリック検知！ページ遷移命令...");
+        // window.location.href = '対象.html'; 
+    });
+</script>
+</body>
+</html>
