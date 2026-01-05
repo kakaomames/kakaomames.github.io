@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>JS実働ラボ DX - Gemini Programming隊</title>
+    <style>
+        :root { --main-color: #00ff41; --bg-color: #0a0a0a; --accent-color: #ffaa00; }
+        body { background-color: var(--bg-color); color: var(--main-color); font-family: 'Courier New', monospace; margin: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        textarea { width: 100%; height: 300px; background: #111; color: #fff; border: 1px solid var(--main-color); padding: 15px; font-size: 14px; border-radius: 5px; grid-column: span 2; }
+        button { padding: 15px; background: var(--main-color); color: black; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 18px; grid-column: span 2; }
+        
+        /* モニターエリア */
+        .monitor-title { color: var(--accent-color); margin-bottom: 5px; font-size: 14px; text-transform: uppercase; }
+        .monitor-box { background: #000; border: 1px solid #333; height: 250px; overflow-y: auto; padding: 10px; font-size: 13px; }
+        .log-entry { border-bottom: 1px solid #111; padding: 2px 0; }
+        .log-system { color: #888; } /* システムログは少し暗めに */
+        .log-display { color: var(--main-color); font-weight: bold; } /* 表示命令は明るく */
+        .log-error { color: #ff4444; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Gemini Programming隊：JS実働ラボ DX</h1>
+
+    <div class="grid">
+        <textarea id="codeEditor">
+// --- 訓練: ログと変数の追跡 ---
+let hp = 100;
+console.log(`初期HP: ${hp}`); // システムログへ
+
+display("モンスターがあらわれた！");
+
+hp = hp - 30;
+console.log(`ダメージ計算: 100 - 30 = ${hp}`);
+
+display(`隊長の残りHP: ${hp}`);
+
+if(hp > 50) {
+    console.log("状態判定: まだ余裕がある");
+}
+        </textarea>
+
+        <button onclick="runCode()">⚡ 命令実行 & ログ解析！</button>
+
+        <div>
+            <div class="monitor-title">📊 Result Monitor (display)</div>
+            <div id="displayMonitor" class="monitor-box"></div>
+        </div>
+
+        <div>
+            <div class="monitor-title">📡 System Log (console.log)</div>
+            <div id="systemLog" class="monitor-box"></div>
+        </div>
+    </div>
+
+    <script>
+        const displayMon = document.getElementById('displayMonitor');
+        const systemLog = document.getElementById('systemLog');
+
+        // ログ出力を乗っ取る魔法
+        const originalLog = console.log;
+        console.log = function(message) {
+            const div = document.createElement('div');
+            div.className = 'log-entry log-system';
+            div.innerText = `[LOG] ${message}`;
+            systemLog.appendChild(div);
+            systemLog.scrollTop = systemLog.scrollHeight;
+            originalLog.apply(console, arguments);
+        };
+
+        function display(text) {
+            const div = document.createElement('div');
+            div.className = 'log-entry log-display';
+            div.innerText = `> ${text}`;
+            displayMon.appendChild(div);
+            displayMon.scrollTop = displayMon.scrollHeight;
+        }
+
+        function runCode() {
+            // リセット
+            displayMon.innerHTML = '';
+            systemLog.innerHTML = '';
+            const code = document.getElementById('codeEditor').value;
+
+            try {
+                eval(code);
+                console.log("--- 実行完了 ---");
+            } catch (e) {
+                const div = document.createElement('div');
+                div.className = 'log-entry log-error';
+                div.innerText = `❌ ERROR: ${e.message}`;
+                systemLog.appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>
