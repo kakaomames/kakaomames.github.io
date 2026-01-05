@@ -26,7 +26,7 @@
     <div class="panel">
         <img src="https://kakaomames.github.io/rei/logo.png" class="logo">
         <strong>復習ミッション：通信</strong>
-        URL:<texterea></texterea>
+        URL:<textarea id="urlInput"></textarea>
         <button onclick="urlFetch()">1. データを取ってこい！(fetch)</button>
         
         <div id="log" class="log-box">ログ待機中...</div>
@@ -48,7 +48,7 @@
     function urlFetch() {
         addLog("通信開始...");
         // 隊長の予備ルート作戦(then連鎖)を再現！
-        fetch('url')
+        fetch(urlInput.value)
             .then(res => {
                 if(!res.ok) throw new Error("通信失敗");
                 return res.json();
