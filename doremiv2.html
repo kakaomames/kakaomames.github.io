@@ -2,101 +2,145 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
-    <title>Turbo Analyzer v2 - Gemini</title>
+    <title>10-Engine Multi-Band Analyzer</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #000d00; color: #00ff00; text-align: center; padding: 20px; }
-        .panel { border: 2px solid #00ff00; background: #111; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 0 20px #00ff00; }
-        #progress { width: 400px; height: 30px; background: #222; margin: 20px auto; border: 1px solid #00ff00; overflow: hidden; }
-        #bar { width: 0%; height: 100%; background: #00ff00; transition: width 0.1s; }
-        button { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; font-size: 1.2rem; margin: 10px; }
-        button:disabled { background: #444; cursor: not-allowed; }
-        #status { font-size: 1.5rem; margin: 20px 0; color: #fff; }
+        body { font-family: 'Courier New', monospace; background: #000; color: #00ff00; text-align: center; padding: 20px; }
+        .panel { border: 3px solid #00ff00; background: #0a0a0a; padding: 30px; border-radius: 20px; box-shadow: 0 0 50px #00ff00; }
+        #progress-container { width: 100%; height: 30px; background: #111; border: 1px solid #00ff00; margin: 20px 0; }
+        #bar { width: 0%; height: 100%; background: #00ff00; }
+        .engine-status { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+        .engine-box { border: 1px solid #00ff00; padding: 10px; font-size: 0.7rem; background: #050505; }
+        .engine-box.active { background: #004400; color: #fff; box-shadow: inset 0 0 10px #00ff00; }
+        button { background: #00ff00; color: #000; border: none; padding: 20px 40px; font-weight: bold; cursor: pointer; font-size: 1.5rem; border-radius: 10px; }
+        button:disabled { background: #333; cursor: not-allowed; }
+        #status { font-size: 1.2rem; color: #00ffff; margin-bottom: 15px; }
     </style>
 </head>
 <body>
-    <img src="https://kakaomames.github.io/rei/logo.png" width="80">
-    <h1>🚀 TURBO ANALYZER v2 🚀</h1>
+    <img src="https://kakaomames.github.io/rei/logo.png" width="100">
+    <h1>🛰️ 10-ENGINE PARALLEL ANALYZER 🛰️</h1>
     
     <div class="panel">
         <input type="file" id="audioFile" accept="audio/*">
-        <div id="status">1. ファイルを選択せよ</div>
+        <div id="status">UNITS STANDBY...</div>
         
-        <div id="progress"><div id="bar"></div></div>
+        <div id="progress-container"><div id="bar"></div></div>
         
-        <button id="startBtn" disabled onclick="startTurboAnalysis()">⚡ 解析開始（爆速モード）</button>
-        <button id="dlBtn" style="display:none;" onclick="downloadJSON()">💾 JSONを保存</button>
+        <div class="engine-status" id="engineStatus">
+            </div>
+
+        <button id="startBtn" disabled onclick="launchAnalysis()">🚀 解析開始（全エンジン点火）</button>
+        <button id="dlBtn" style="display:none;" onclick="downloadJSON()">💾 高精度JSONを保存</button>
     </div>
 
     <script>
+        const engineStatusDiv = document.getElementById('engineStatus');
+        for (let i = 1; i <= 10; i++) {
+            const box = document.createElement('div');
+            box.className = 'engine-box';
+            box.id = `engine-${i}`;
+            box.innerText = `ENGINE ${i}\nWAITING`;
+            engineStatusDiv.appendChild(box);
+        }
+
         let musicScore = [];
         let selectedFile = null;
         const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-        document.getElementById('audioFile').addEventListener('change', (e) => {
+        document.getElementById('audioFile').addEventListener('change', e => {
             selectedFile = e.target.files[0];
-            if(selectedFile) {
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('status').innerText = "2. 開始ボタンを押せ！";
-            }
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('status').innerText = "READY FOR LAUNCH";
         });
 
-        async function startTurboAnalysis() {
+        async function launchAnalysis() {
             if (!selectedFile) return;
-            
             document.getElementById('startBtn').disabled = true;
-            document.getElementById('status').innerText = "🚀 爆速解析中...（音は出ません）";
-            
-            const arrayBuffer = await selectedFile.arrayBuffer();
-            const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // 音声データのデコード
-            const audioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
-            const data = audioBuffer.getChannelData(0); // 最初のチャンネルのみ
-            const sampleRate = audioBuffer.sampleRate;
-            const step = 2048; // 解析の細かさ
-            
-            musicScore = [];
-            let lastNote = "";
+            document.getElementById('status').innerText = "ANALYZING WITH 10 ENGINES...";
 
-            // 非同期でループを回してブラウザのフリーズを防ぐ
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            const data = audioBuffer.getChannelData(0);
+            const sampleRate = audioBuffer.sampleRate;
+            const step = 512; // 精度重視！
+
+            musicScore = [];
+            
+            // 10個の周波数帯域（対数分割）
+            const bands = [
+                {min: 20, max: 100},    {min: 100, max: 250},   {min: 250, max: 500},
+                {min: 500, max: 1000},  {min: 1000, max: 2000}, {min: 2000, max: 4000},
+                {min: 4000, max: 7000}, {min: 7000, max: 10000},{min: 10000, max: 15000},
+                {min: 15000, max: 20000}
+            ];
+
             for (let i = 0; i < data.length; i += step) {
                 const segment = data.slice(i, i + step);
-                const freq = autoCorrelate(segment, sampleRate);
-                
-                if (freq > 0) {
-                    const n = Math.round(12 * (Math.log(freq / 440) / Math.log(2))) + 69;
-                    const note = noteStrings[n % 12] + (Math.floor(n / 12) - 1);
+                let detectedNotesAtTime = [];
+
+                // 10個のエンジンで並列スキャン！
+                bands.forEach((band, index) => {
+                    const freq = autoCorrelate(segment, sampleRate, band.min, band.max);
+                    if (freq > 0) {
+                        const n = Math.round(12 * (Math.log(freq / 440) / Math.log(2))) + 69;
+                        const note = noteStrings[n % 12] + (Math.floor(n / 12) - 1);
+                        detectedNotesAtTime.push(note);
+                        
+                        // エンジンランプ点灯（50回に1回）
+                        if (i % (step * 50) === 0) {
+                            const box = document.getElementById(`engine-${index+1}`);
+                            box.className = 'engine-box active';
+                            box.innerText = `ENGINE ${index+1}\n${note}`;
+                        }
+                    } else if (i % (step * 50) === 0) {
+                        document.getElementById(`engine-${index+1}`).className = 'engine-box';
+                    }
+                });
+
+                if (detectedNotesAtTime.length > 0) {
+                    // 同じ時間に複数の音が検出されたら、最初の音をメイン、残りを倍音として保存
+                    const primary = detectedNotesAtTime[0];
+                    const harmonics = Array.from(new Set(detectedNotesAtTime.slice(1)));
                     
-                    if (note !== lastNote) {
-                        musicScore.push({ t: parseFloat((i / sampleRate).toFixed(3)), n: note });
-                        lastNote = note;
+                    // 重複チェックを簡易化
+                    if (musicScore.length === 0 || musicScore[musicScore.length - 1].n !== primary) {
+                        musicScore.push({
+                            t: parseFloat((i / sampleRate).toFixed(3)),
+                            n: primary,
+                            h: harmonics
+                        });
                     }
                 }
 
-                // 100回に1回進捗を更新
-                if (i % (step * 100) === 0) {
+                if (i % (step * 200) === 0) {
                     const percent = (i / data.length * 100).toFixed(1);
                     document.getElementById('bar').style.width = percent + "%";
-                    // 描画を許可するために一瞬待つ
-                    if (i % (step * 500) === 0) await new Promise(r => setTimeout(r, 0));
+                    await new Promise(r => setTimeout(r, 0));
                 }
             }
 
+            document.getElementById('status').innerText = "MISSION COMPLETE!";
             document.getElementById('bar').style.width = "100%";
-            document.getElementById('status').innerText = "✅ 解析完了！";
             document.getElementById('dlBtn').style.display = "inline-block";
         }
 
-        function autoCorrelate(buffer, sampleRate) {
+        function autoCorrelate(buffer, sampleRate, minFreq, maxFreq) {
             let n = buffer.length;
             let rms = 0;
             for (let i = 0; i < n; i++) rms += buffer[i] * buffer[i];
-            if (Math.sqrt(rms / n) < 0.02) return -1;
+            if (Math.sqrt(rms / n) < 0.01) return -1;
+
+            let minOffset = Math.floor(sampleRate / maxFreq);
+            let maxOffset = Math.floor(sampleRate / minFreq);
 
             let bestOffset = -1;
             let bestCorrelation = 0;
-            for (let offset = 20; offset < n; offset++) {
+            
+            // 担当範囲（Offset）のみをスキャン！
+            for (let offset = minOffset; offset < Math.min(n, maxOffset); offset++) {
                 let corr = 0;
                 for (let i = 0; i < n - offset; i++) {
                     corr += buffer[i] * buffer[i + offset];
@@ -112,9 +156,7 @@
         function downloadJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(musicScore, null, 2));
             const link = document.createElement('a');
-            link.href = dataStr;
-            link.download = "turbo_score.json";
-            link.click();
+            link.href = dataStr; link.download = "ultra_high_precision_score.json"; link.click();
         }
     </script>
 </body>
