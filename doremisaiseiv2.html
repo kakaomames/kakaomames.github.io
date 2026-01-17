@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    <title>kp3 Player - Gemini Programming</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #000510; color: #00ffff; text-align: center; padding: 20px; }
+        .unit { border: 4px solid #00ffff; background: #0a111a; padding: 40px; border-radius: 30px; display: inline-block; box-shadow: 0 0 40px #00ffff; }
+        .display { font-size: 5rem; color: #fff; text-shadow: 0 0 20px #00ffff; margin: 20px 0; min-height: 1.2em; }
+        button { background: #00ffff; color: #000; border: none; padding: 20px 50px; font-weight: bold; cursor: pointer; font-size: 1.5rem; border-radius: 10px; margin: 10px; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        button:disabled { background: #333; color: #666; }
+        .info { color: #ff00ff; margin-bottom: 10px; }
+        .logo { width: 80px; }
+    </style>
+    <meta name="description" content="Kakaomame-mP3 (kp3) format decoder player for Gemini programming team.">
+</head>
+<body>
+    <img src="https://kakaomames.github.io/rei/logo.png" class="logo">
+    <h1>🎹 kp3 SYMBOLIC PLAYER 🎹</h1>
+    
+    <div class="unit">
+        <input type="file" id="kp3File" accept=".txt,.kp3">
+        <div class="info" id="fileInfo">.kp3ファイル（21KBの奇跡）を選択せよ</div>
+        
+        <div class="display" id="noteDisplay">---</div>
+        
+        <button id="playBtn" disabled onclick="playKP3()">▶️ 演奏開始</button>
+        <button onclick="stopMusic()">🛑 停止</button>
+    </div>
 
+    <script>
+        let audioCtx = null;
+        let isPlaying = false;
+        let scoreText = "";
+
+        const noteFreqs = {
+            "C": 261.63, "C#": 277.18, "D": 293.66, "D#": 311.13, "E": 329.63, 
+            "F": 349.23, "F#": 369.99, "G": 392.00, "G#": 415.30, "A": 440.00, 
+            "A#": 466.16, "B": 493.88
+        };
+
+        document.getElementById('kp3File').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            scoreText = await file.text();
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('fileInfo').innerText = `LOADED: ${file.size} bytes`;
+        });
+
+        async function playKP3() {
+            if (isPlaying) stopMusic();
+            isPlaying = true;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            let currentTimeOffset = 0;
+            let i = 0;
+
+            while (i < scoreText.length && isPlaying) {
+                let char = scoreText[i];
+
+                if (char === ':') break; // 終了
+
+                // 時間記号の処理
+                if (char === '.') { currentTimeOffset += 0.01; i++; continue; }
+                if (char === '\n') { currentTimeOffset += 0.1; i++; continue; }
+                if (char === ' ') { currentTimeOffset += 1.0; i++; continue; }
+
+                // 音符の処理 (C4, D#5 など)
+                let noteMatch = scoreText.substring(i).match(/^([A-G]#?\d)/);
+                if (noteMatch) {
+                    let noteStr = noteMatch[1];
+                    scheduleNote(noteStr, currentTimeOffset);
+                    i += noteStr.length;
+                } else {
+                    i++; // 未知の文字は飛ばす
+                }
+            }
+        }
+
+        function scheduleNote(noteStr, time) {
+            const match = noteStr.match(/([A-G]#?)(\d)/);
+            if (!match) return;
+            const name = match[1];
+            const octave = parseInt(match[2]);
+            const freq = noteFreqs[name] * Math.pow(2, octave - 4);
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle'; // 優しい音色
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + time);
+
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime + time);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + time + 0.2);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(audioCtx.currentTime + time);
+            osc.stop(audioCtx.currentTime + time + 0.2);
+
+            // 画面表示用
+            setTimeout(() => {
+                if(isPlaying) document.getElementById('noteDisplay').innerText = noteStr;
+            }, time * 1000);
+        }
+
+        function stopMusic() {
+            isPlaying = false;
+            if (audioCtx) audioCtx.close();
+            document.getElementById('noteDisplay').innerText = "---";
+        }
+    </script>
+</body>
+</html>
