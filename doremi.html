@@ -1,3 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Audio Analyzer with Play Button">
+    <meta name="author" content="Gemini Programming Team">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    <title>Precision Capture - Start Unit</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #050505; color: #00ff00; text-align: center; margin: 0; padding: 20px; }
+        .logo { width: 60px; margin: 10px; }
+        .monitor-panel { background: #111; border: 2px solid #00ffff; padding: 20px; margin: 20px auto; width: 90%; max-width: 800px; box-shadow: 0 0 20px rgba(0,255,255,0.3); border-radius: 10px; }
+        #noteDisplay { font-size: 6rem; color: #fff; text-shadow: 0 0 30px #00ff00; margin: 10px 0; font-weight: bold; }
+        canvas { background: #000; border: 1px solid #333; width: 100%; height: 150px; border-radius: 5px; }
+        .controls { margin: 20px; padding: 15px; background: #222; border-radius: 8px; }
+        /* 開始ボタンを目立たせる */
+        .start-btn { background: #00ffff !important; color: #000 !important; font-size: 1.5rem !important; padding: 15px 40px !important; }
+        button { background: #00ff00; color: #000; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 5px; margin: 5px; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        #log { width: 100%; height: 150px; background: #000; color: #0f0; overflow-y: scroll; border: 1px solid #00ff00; margin-top: 20px; text-align: left; padding: 10px; font-size: 0.85rem; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo">
+    <h1>🛰️ ANALYZER ENGINE START 🛰️</h1>
+
+    <div class="controls">
+        <input type="file" id="audioFile" accept="audio/*">
+        <br><br>
+        <button id="startBtn" class="start-btn" disabled onclick="bootSystem()">▶️ 解析・再生開始！</button>
+        <br><br>
+        <button onclick="downloadJSON()">💾 JSON保存</button>
+        <button onclick="clearData()" style="background: #ff4444; color: white;">🗑️ クリア</button>
+    </div>
+
+    <div class="monitor-panel">
+        <div id="noteDisplay">READY</div>
+        <div id="freqDisplay">--- Hz</div>
+        <canvas id="waveCanvas"></canvas>
+    </div>
+    
+    <div id="log">1. ファイルを選択<br>2. 開始ボタンを押せ！</div>
+
+    <script>
+        const processorCode = `
+            class PitchProcessor extends AudioWorkletProcessor {
+                constructor() { super(); this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; }
+                autoCorrelate(buffer, sampleRate) {
+                    let n = buffer.length; let rms = 0;
+                    for (let i = 0; i < n; i++) rms += buffer[i] * buffer[i];
+                    rms = Math.sqrt(rms / n); if (rms < 0.02) return -1;
+                    let bestOffset = -1; let bestCorrelation = 0;
+                    for (let offset = 20; offset < n; offset++) {
+                        let correlation = 0; for (let i = 0; i < n - offset; i++) correlation += buffer[i] * buffer[i + offset];
+                        if (correlation > bestCorrelation) { bestCorrelation = correlation; bestOffset = offset; }
+                    }
+                    return bestOffset > 0 ? sampleRate / bestOffset : -1;
+                }
+                process(inputs) {
+                    const input = inputs[0];
+                    if (input.length > 0) {
+                        const samples = input[0];
+                        const freq = this.autoCorrelate(samples, sampleRate);
+                        let note = null;
+                        if (freq !== -1) {
+                            const n = Math.round(12 * (Math.log(freq / 440) / Math.log(2))) + 69;
+                            note = this.noteStrings[n % 12] + (Math.floor(n / 12) - 1);
+                        }
+                        this.port.postMessage({ samples: Array.from(samples), freq, note, t: currentTime });
+                    }
+                    return true;
+                }
+            }
+            registerProcessor('pitch-processor', PitchProcessor);
+        `;
+
+        let audioCtx, workletNode, musicScore = [], lastNote = "", audioFile;
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // ファイルが選択されたらボタンを有効化
+        document.getElementById('audioFile').addEventListener('change', e => {
+            audioFile = e.target.files[0];
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('log').innerHTML = "Ready to Boot... Push Start!";
+        });
+
+        async function bootSystem() {
+            if (!audioFile) return;
+            
+            // AudioContextを作成（ユーザー操作のタイミングで！）
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const blob = new Blob([processorCode], { type: 'application/javascript' });
+            await audioCtx.audioWorklet.addModule(URL.createObjectURL(blob));
+
+            const audio = new Audio(URL.createObjectURL(audioFile));
+            const source = audioCtx.createMediaElementSource(audio);
+            //workletNode = new AudioWorkletNode(audioCtx, 'pitch-processor');
+            // bootSystem関数の中のここを書き換え！
+            workletNode = new AudioWorkletNode(audioCtx, 'pitch-processor', {processorOptions: {bufferSize: 512}});
+
+            workletNode.port.onmessage = (e) => {
+                const { samples, freq, note, t } = e.data;
+                draw(samples);
+                if (note && note !== lastNote) {
+                    musicScore.push({ t: parseFloat(t.toFixed(3)), n: note });
+                    document.getElementById('noteDisplay').innerText = note;
+                    document.getElementById('freqDisplay').innerText = freq.toFixed(2) + " Hz";
+                    const log = document.getElementById('log');
+                    log.innerHTML = `[${t.toFixed(2)}s] ${note}<br>` + log.innerHTML;
+                    lastNote = note;
+                } else if (!note) { lastNote = ""; }
+            };
+
+            source.connect(workletNode);
+            workletNode.connect(audioCtx.destination);
+            
+            // 明示的に再開させてから再生
+            await audioCtx.resume();
+            audio.play();
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('log').innerHTML = "SYSTEM RUNNING...";
+        }
+
+        function draw(samples) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#00ffff'; ctx.beginPath();
+            const sliceWidth = canvas.width / samples.length; let x = 0;
+            for (let i = 0; i < samples.length; i++) {
+                const y = (samples[i] * 0.5 + 0.5) * canvas.height;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                x += sliceWidth;
+            }
+            ctx.stroke();
+        }
+
+        function downloadJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(musicScore, null, 2));
+            const link = document.createElement('a');
+            link.setAttribute("href", dataStr); link.setAttribute("download", "gemini_score.json");
+            link.click();
+        }
+
+        function clearData() { musicScore = []; document.getElementById('log').innerHTML = "Data Cleared."; }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
 <!--<script>
   //PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJqYSI+DQo8aGVhZD4NCiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+
   //DQogICAgPHRpdGxlPkF1ZGlvV29ya2xldCBQcmVjaXNpb24gQW5hbHl6ZXI8L3RpdGxlPg0KICAgIDxzdHlsZT4NCiAgICAgICAgYm9keSB7IGZvbnQtZmFtaWx5OiAnQ291cmllciBOZXcnLCBtb25vc3BhY2U7IGJhY2tncm91bmQ6ICMwMDA7IGNvbG9yOiAjMGYwOyB0ZXh0
@@ -186,149 +342,3 @@
 </body>
 </html>
 ``-->
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Audio Analyzer with Play Button">
-    <meta name="author" content="Gemini Programming Team">
-    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
-    <title>Precision Capture - Start Unit</title>
-    <style>
-        body { font-family: 'Courier New', monospace; background: #050505; color: #00ff00; text-align: center; margin: 0; padding: 20px; }
-        .logo { width: 60px; margin: 10px; }
-        .monitor-panel { background: #111; border: 2px solid #00ffff; padding: 20px; margin: 20px auto; width: 90%; max-width: 800px; box-shadow: 0 0 20px rgba(0,255,255,0.3); border-radius: 10px; }
-        #noteDisplay { font-size: 6rem; color: #fff; text-shadow: 0 0 30px #00ff00; margin: 10px 0; font-weight: bold; }
-        canvas { background: #000; border: 1px solid #333; width: 100%; height: 150px; border-radius: 5px; }
-        .controls { margin: 20px; padding: 15px; background: #222; border-radius: 8px; }
-        /* 開始ボタンを目立たせる */
-        .start-btn { background: #00ffff !important; color: #000 !important; font-size: 1.5rem !important; padding: 15px 40px !important; }
-        button { background: #00ff00; color: #000; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 5px; margin: 5px; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        #log { width: 100%; height: 150px; background: #000; color: #0f0; overflow-y: scroll; border: 1px solid #00ff00; margin-top: 20px; text-align: left; padding: 10px; font-size: 0.85rem; box-sizing: border-box; }
-    </style>
-</head>
-<body>
-    <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo">
-    <h1>🛰️ ANALYZER ENGINE START 🛰️</h1>
-
-    <div class="controls">
-        <input type="file" id="audioFile" accept="audio/*">
-        <br><br>
-        <button id="startBtn" class="start-btn" disabled onclick="bootSystem()">▶️ 解析・再生開始！</button>
-        <br><br>
-        <button onclick="downloadJSON()">💾 JSON保存</button>
-        <button onclick="clearData()" style="background: #ff4444; color: white;">🗑️ クリア</button>
-    </div>
-
-    <div class="monitor-panel">
-        <div id="noteDisplay">READY</div>
-        <div id="freqDisplay">--- Hz</div>
-        <canvas id="waveCanvas"></canvas>
-    </div>
-    
-    <div id="log">1. ファイルを選択<br>2. 開始ボタンを押せ！</div>
-
-    <script>
-        const processorCode = `
-            class PitchProcessor extends AudioWorkletProcessor {
-                constructor() { super(); this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]; }
-                autoCorrelate(buffer, sampleRate) {
-                    let n = buffer.length; let rms = 0;
-                    for (let i = 0; i < n; i++) rms += buffer[i] * buffer[i];
-                    rms = Math.sqrt(rms / n); if (rms < 0.02) return -1;
-                    let bestOffset = -1; let bestCorrelation = 0;
-                    for (let offset = 20; offset < n; offset++) {
-                        let correlation = 0; for (let i = 0; i < n - offset; i++) correlation += buffer[i] * buffer[i + offset];
-                        if (correlation > bestCorrelation) { bestCorrelation = correlation; bestOffset = offset; }
-                    }
-                    return bestOffset > 0 ? sampleRate / bestOffset : -1;
-                }
-                process(inputs) {
-                    const input = inputs[0];
-                    if (input.length > 0) {
-                        const samples = input[0];
-                        const freq = this.autoCorrelate(samples, sampleRate);
-                        let note = null;
-                        if (freq !== -1) {
-                            const n = Math.round(12 * (Math.log(freq / 440) / Math.log(2))) + 69;
-                            note = this.noteStrings[n % 12] + (Math.floor(n / 12) - 1);
-                        }
-                        this.port.postMessage({ samples: Array.from(samples), freq, note, t: currentTime });
-                    }
-                    return true;
-                }
-            }
-            registerProcessor('pitch-processor', PitchProcessor);
-        `;
-
-        let audioCtx, workletNode, musicScore = [], lastNote = "", audioFile;
-        const canvas = document.getElementById('waveCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // ファイルが選択されたらボタンを有効化
-        document.getElementById('audioFile').addEventListener('change', e => {
-            audioFile = e.target.files[0];
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('log').innerHTML = "Ready to Boot... Push Start!";
-        });
-
-        async function bootSystem() {
-            if (!audioFile) return;
-            
-            // AudioContextを作成（ユーザー操作のタイミングで！）
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const blob = new Blob([processorCode], { type: 'application/javascript' });
-            await audioCtx.audioWorklet.addModule(URL.createObjectURL(blob));
-
-            const audio = new Audio(URL.createObjectURL(audioFile));
-            const source = audioCtx.createMediaElementSource(audio);
-            workletNode = new AudioWorkletNode(audioCtx, 'pitch-processor');
-
-            workletNode.port.onmessage = (e) => {
-                const { samples, freq, note, t } = e.data;
-                draw(samples);
-                if (note && note !== lastNote) {
-                    musicScore.push({ t: parseFloat(t.toFixed(3)), n: note });
-                    document.getElementById('noteDisplay').innerText = note;
-                    document.getElementById('freqDisplay').innerText = freq.toFixed(2) + " Hz";
-                    const log = document.getElementById('log');
-                    log.innerHTML = `[${t.toFixed(2)}s] ${note}<br>` + log.innerHTML;
-                    lastNote = note;
-                } else if (!note) { lastNote = ""; }
-            };
-
-            source.connect(workletNode);
-            workletNode.connect(audioCtx.destination);
-            
-            // 明示的に再開させてから再生
-            await audioCtx.resume();
-            audio.play();
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('log').innerHTML = "SYSTEM RUNNING...";
-        }
-
-        function draw(samples) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#00ffff'; ctx.beginPath();
-            const sliceWidth = canvas.width / samples.length; let x = 0;
-            for (let i = 0; i < samples.length; i++) {
-                const y = (samples[i] * 0.5 + 0.5) * canvas.height;
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                x += sliceWidth;
-            }
-            ctx.stroke();
-        }
-
-        function downloadJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(musicScore, null, 2));
-            const link = document.createElement('a');
-            link.setAttribute("href", dataStr); link.setAttribute("download", "gemini_score.json");
-            link.click();
-        }
-
-        function clearData() { musicScore = []; document.getElementById('log').innerHTML = "Data Cleared."; }
-    </script>
-</body>
-</html>
