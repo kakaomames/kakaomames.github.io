@@ -51,35 +51,44 @@
 
         async function playKP3() {
             if (isPlaying) stopMusic();
-            isPlaying = true;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             
+            // 修正ポイント1: AudioContextの作成と再開を確実に行う
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
+            isPlaying = true;
             let currentTimeOffset = 0;
             let i = 0;
+
+            // 修正ポイント2: 最初の音が出るまで少し待機（安定のため）
+            const startT = audioCtx.currentTime + 0.1;
 
             while (i < scoreText.length && isPlaying) {
                 let char = scoreText[i];
 
-                if (char === ':') break; // 終了
+                if (char === ':') break;
 
-                // 時間記号の処理
                 if (char === '.') { currentTimeOffset += 0.01; i++; continue; }
                 if (char === '\n') { currentTimeOffset += 0.1; i++; continue; }
                 if (char === ' ') { currentTimeOffset += 1.0; i++; continue; }
 
-                // 音符の処理 (C4, D#5 など)
                 let noteMatch = scoreText.substring(i).match(/^([A-G]#?\d)/);
                 if (noteMatch) {
                     let noteStr = noteMatch[1];
-                    scheduleNote(noteStr, currentTimeOffset);
+                    // 修正ポイント3: startT（開始時間）を基準にスケジュール
+                    scheduleNote(noteStr, startT + currentTimeOffset);
                     i += noteStr.length;
                 } else {
-                    i++; // 未知の文字は飛ばす
+                    i++;
                 }
             }
         }
 
-        function scheduleNote(noteStr, time) {
+        function scheduleNote(noteStr, absoluteTime) {
             const match = noteStr.match(/([A-G]#?)(\d)/);
             if (!match) return;
             const name = match[1];
@@ -89,23 +98,26 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
 
-            osc.type = 'triangle'; // 優しい音色
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + time);
+            // 修正ポイント4: 音を少し太く（sawtooth）して聞こえやすく！
+            osc.type = 'sawtooth'; 
+            osc.frequency.setValueAtTime(freq, absoluteTime);
 
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime + time);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + time + 0.2);
+            gain.gain.setValueAtTime(0.1, absoluteTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, absoluteTime + 0.15);
 
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            osc.start(audioCtx.currentTime + time);
-            osc.stop(audioCtx.currentTime + time + 0.2);
+            osc.start(absoluteTime);
+            osc.stop(absoluteTime + 0.2);
 
-            // 画面表示用
+            // 画面表示はそのまま
             setTimeout(() => {
                 if(isPlaying) document.getElementById('noteDisplay').innerText = noteStr;
-            }, time * 1000);
+            }, (absoluteTime - audioCtx.currentTime) * 1000);
         }
+        
+        
 
         function stopMusic() {
             isPlaying = false;
