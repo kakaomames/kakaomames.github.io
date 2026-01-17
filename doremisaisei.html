@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    <title>JSON Score Player - Gemini</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0b0e14; color: #ffcc00; text-align: center; padding: 20px; }
+        .player-panel { border: 3px solid #ffcc00; background: #1a1f29; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 0 30px rgba(255, 204, 0, 0.4); }
+        .monitor { font-size: 5rem; color: #fff; text-shadow: 0 0 15px #ffcc00; margin: 20px 0; min-height: 100px; }
+        button { background: #ffcc00; color: #000; border: none; padding: 15px 40px; font-weight: bold; cursor: pointer; font-size: 1.5rem; border-radius: 50px; margin: 10px; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        #progress-info { color: #aaa; margin-bottom: 10px; }
+        .logo { width: 70px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <img src="https://kakaomames.github.io/rei/logo.png" class="logo">
+    <h1>🎶 JSON SCORE PLAYER 🎶</h1>
+    
+    <div class="player-panel">
+        <input type="file" id="jsonFile" accept=".json">
+        <div id="progress-info">JSONを読み込んでください</div>
+        
+        <div class="monitor" id="noteDisplay">STOP</div>
+        
+        <button id="playBtn" disabled onclick="playScore()">▶️ 演奏開始</button>
+        <button id="stopBtn" onclick="stopScore()">🛑 停止</button>
+    </div>
+
+    <script>
+        let audioCtx = null;
+        let scoreData = [];
+        let isPlaying = false;
+        let timeouts = [];
+
+        // 周波数テーブル
+        const noteFreqs = {
+            "C": 261.63, "C#": 277.18, "D": 293.66, "D#": 311.13, "E": 329.63, 
+            "F": 349.23, "F#": 369.99, "G": 392.00, "G#": 415.30, "A": 440.00, 
+            "A#": 466.16, "B": 493.88
+        };
+
+        document.getElementById('jsonFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            const text = await file.text();
+            scoreData = JSON.parse(text);
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('progress-info').innerText = `読み込み完了：${scoreData.length}個の音符`;
+        });
+
+        function playScore() {
+            if (scoreData.length === 0) return;
+            stopScore(); // 二重再生防止
+            isPlaying = true;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const startTime = audioCtx.currentTime;
+
+            scoreData.forEach((item, index) => {
+                // 各ノートの演奏タイミングを予約
+                const t = setTimeout(() => {
+                    if (!isPlaying) return;
+                    renderNote(item.n);
+                }, item.t * 1000);
+                
+                timeouts.push(t);
+
+                // 実際の音を出す（Web Audio API）
+                playTone(item.n, item.t, startTime);
+            });
+        }
+
+        function playTone(noteStr, onsetTime, globalStartTime) {
+            const match = noteStr.match(/([A-G]#?)(\d)/);
+            if (!match) return;
+            
+            const name = match[1];
+            const octave = parseInt(match[2]);
+            const freq = noteFreqs[name] * Math.pow(2, octave - 4);
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            // 音色設定（'square'にするとマイクラやファミコン風になるぞ！）
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(freq, globalStartTime + onsetTime);
+
+            gain.gain.setValueAtTime(0.1, globalStartTime + onsetTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, globalStartTime + onsetTime + 0.2); // 余韻
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(globalStartTime + onsetTime);
+            osc.stop(globalStartTime + onsetTime + 0.2);
+        }
+
+        function renderNote(note) {
+            document.getElementById('noteDisplay').innerText = note;
+        }
+
+        function stopScore() {
+            isPlaying = false;
+            timeouts.forEach(clearTimeout);
+            timeouts = [];
+            if (audioCtx) audioCtx.close();
+            document.getElementById('noteDisplay').innerText = "STOP";
+        }
+    </script>
+</body>
+</html>
