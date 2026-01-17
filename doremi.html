@@ -1,52 +1,120 @@
 <script>
   //PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJqYSI+DQo8aGVhZD4NCiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+
-  //DQogICAgPHRpdGxlPkF1ZGlvV29ya2xldCBQcmVjaXNpb24gQW5hbHl6ZXI8L3RpdGxlPg0KICAgIDxzdHlsZT4NCiAgICAgICAgYm9keSB7IGZvbnQtZmFtaWx5OiAnQ291cmllciBOZXcnLCBtb25vc3BhY2U7IGJhY2tncm91bmQ6ICMwMDA7IGNvbG9yOiAjMGYwOyB0ZXh0LWFsaWduOiBjZW50ZXI7IH0NCiAgICAgICAgLm1vbml0b3IgeyBib3JkZXI6IDJweCBzb2xpZCAjMGYwOyBwYWRkaW5nOiAyMHB4OyBtYXJnaW46IDIwcHggYXV0bzsgd2lkdGg6IDMwMHB4OyBmb250LXNpemU6IDNyZW07IH0NCiAgICAgICAgI2xvZyB7IHdpZHRoOiA5MCU7IGhlaWdodDogMjAwcHg7IGJhY2tncm91bmQ6ICMxMTE7IGNvbG9yOiAjMGYwOyBvdmVyZmxvdy15OiBzY3JvbGw7IGJvcmRlcjogMXB4IHNvbGlkICMzMzM7IG1hcmdpbjogYXV0bzsgdGV4dC1hbGlnbjogbGVmdDsgcGFkZGluZzogMTBweDsgZm9udC1zaXplOiAwLjhyZW07IH0NCiAgICAgICAgYnV0dG9uIHsgcGFkZGluZzogMTBweCAyMHB4OyBmb250LXdlaWdodDogYm9sZDsgY3Vyc29yOiBwb2ludGVyOyBiYWNrZ3JvdW5kOiAjMGYwOyBib3JkZXI6IG5vbmU7IH0NCiAgICA8L3N0eWxlPg0KPC9oZWFkPg0KPGJvZHk
+  //DQogICAgPHRpdGxlPkF1ZGlvV29ya2xldCBQcmVjaXNpb24gQW5hbHl6ZXI8L3RpdGxlPg0KICAgIDxzdHlsZT4NCiAgICAgICAgYm9keSB7IGZvbnQtZmFtaWx5OiAnQ291cmllciBOZXcnLCBtb25vc3BhY2U7IGJhY2tncm91bmQ6ICMwMDA7IGNvbG9yOiAjMGYwOyB0ZXh0
+  //LWFsaWduOiBjZW50ZXI7IH0NCiAgICAgICAgLm1vbml0b3IgeyBib3JkZXI6IDJweCBzb2xpZCAjMGYwOyBwYWRkaW5nOiAyMHB4OyBtYXJnaW46IDIwcHggYXV0bzsgd2lkdGg6IDMwMHB4OyBmb250LXNpemU6IDNyZW07IH0NCiAgICAgICAgI2xvZyB7IHdpZHRoOiA5MCU7
+  //IGhlaWdodDogMjAwcHg7IGJhY2tncm91bmQ6ICMxMTE7IGNvbG9yOiAjMGYwOyBvdmVyZmxvdy15OiBzY3JvbGw7IGJvcmRlcjogMXB4IHNvbGlkICMzMzM7IG1hcmdpbjogYXV0bzsgdGV4dC1hbGlnbjogbGVmdDsgcGFkZGluZzogMTBweDsgZm9udC1zaXplOiAwLjhyZW07
+  //IH0NCiAgICAgICAgYnV0dG9uIHsgcGFkZGluZzogMTBweCAyMHB4OyBmb250LXdlaWdodDogYm9sZDsgY3Vyc29yOiBwb2ludGVyOyBiYWNrZ3JvdW5kOiAjMGYwOyBib3JkZXI6IG5vbmU7IH0NCiAgICA8L3N0eWxlPg0KPC9oZWFkPg0KPGJvZHk
   //+DQogICAgPGgxPvCfmoAgQXVkaW9Xb3JrbGV0IEVuZ2luZSDwn5qAPC9oMT4NCiAgICA8aW5wdXQgdHlwZT0iZmlsZSIgaWQ9ImF1ZGlvRmlsZSIgYWNjZXB0PSJhdWRpby8qIj4NCiAgICA8ZGl2IGNsYXNzPSJtb25pdG9yIiBpZD0ibm90ZURpc3BsYXkiPlJFQURZPC9kaXY
-  //+DQogICAgPGRpdiBpZD0iZnJlcURpc3BsYXkiPjAuMDAgSHo8L2Rpdj4NCiAgICA8ZGl2IGlkPSJsb2ciPjwvZGl2Pg0KDQogICAgPHNjcmlwdD4NCiAgICAgICAgLy8gMS4gQXVkaW9Xb3JrbGV0UHJvY2Vzc29y44Gu5Lit6Lqr77yI6LaF6auY6YCf44Os44O844Oz44Gn5YuV44GP44Kz44O844OJ77yJDQogICAgICAgIGNvbnN0IHByb2Nlc3NvckNvZGUgPSBgDQogICAgICAgICAgICBjbGFzcyBQaXRjaFByb2Nlc3NvciBleHRlbmRzIEF1ZGlvV29ya2xldFByb2Nlc3NvciB7DQogICAgICAgICAgICAgICAgY29uc3RydWN0b3IoKSB7DQogICAgICAgICAgICAgICAgICAgIHN1cGVyKCk7DQogICAgICAgICAgICAgICAgICAgIHRoaXMubGFzdFNhbXBsZVRpbWUgPSAwOw0KICAgICAgICAgICAgICAgIH0NCiAgICAgICAgICAgICAgICBwcm9jZXNzKGlucHV0cywgb3V0cHV0cykgew0KICAgICAgICAgICAgICAgICAgICBjb25zdCBpbnB1dCA9IGlucHV0c1swXTsNCiAgICAgICAgICAgICAgICAgICAgaWYgKGlucHV0Lmxlbmd0aCA
+  //+DQogICAgPGRpdiBpZD0iZnJlcURpc3BsYXkiPjAuMDAgSHo8L2Rpdj4NCiAgICA8ZGl2IGlkPSJsb2ciPjwvZGl2Pg0KDQogICAgPHNjcmlwdD4NCiAgICAgICAgLy8gMS4gQXVkaW9Xb3JrbGV0UHJvY2Vzc29y44Gu5Lit6Lqr77yI6LaF6auY6YCf44Os44O844Oz44Gn5Yu
+  //V44GP44Kz44O844OJ77yJDQogICAgICAgIGNvbnN0IHByb2Nlc3NvckNvZGUgPSBgDQogICAgICAgICAgICBjbGFzcyBQaXRjaFByb2Nlc3NvciBleHRlbmRzIEF1ZGlvV29ya2xldFByb2Nlc3NvciB7DQogICAgICAgICAgICAgICAgY29uc3RydWN0b3IoKSB7DQogICAgICA
+  //gICAgICAgICAgICAgIHN1cGVyKCk7DQogICAgICAgICAgICAgICAgICAgIHRoaXMubGFzdFNhbXBsZVRpbWUgPSAwOw0KICAgICAgICAgICAgICAgIH0NCiAgICAgICAgICAgICAgICBwcm9jZXNzKGlucHV0cywgb3V0cHV0cykgew0KICAgICAgICAgICAgICAgICAgICBjb25
+  //zdCBpbnB1dCA9IGlucHV0c1swXTsNCiAgICAgICAgICAgICAgICAgICAgaWYgKGlucHV0Lmxlbmd0aCA
   //+IDApIHsNCiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IHNhbXBsZXMgPSBpbnB1dFswXTsNCiAgICAgICAgICAgICAgICAgICAgICAgIC8vIDEyOOOCteODs
-  //+ODl+ODq+OBlOOBqOOBq+ODoeOCpOODs+OCueODrOODg+ODieOBuOWgseWRiu+8iOe0hDIuOW1z6ZaT6ZqU77yJDQogICAgICAgICAgICAgICAgICAgICAgICB0aGlzLnBvcnQucG9zdE1lc3NhZ2Uoew0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNhbXBsZXM6IHNhbXBsZXMsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgdDogY3VycmVudFRpbWUNCiAgICAgICAgICAgICAgICAgICAgICAgIH0pOw0KICAgICAgICAgICAgICAgICAgICB9DQogICAgICAgICAgICAgICAgICAgIHJldHVybiB0cnVlOw0KICAgICAgICAgICAgICAgIH0NCiAgICAgICAgICAgIH0NCiAgICAgICAgICAgIHJlZ2lzdGVyUHJvY2Vzc29yKCdwaXRjaC1wcm9jZXNzb3InLCBQaXRjaFByb2Nlc3Nvcik7DQogICAgICAgIGA7DQoNCiAgICAgICAgbGV0IGF1ZGlvQ3R4LCBhbmFseXplciwgc291cmNlLCB3b3JrbGV0Tm9kZTsNCiAgICAgICAgY29uc3Qgbm90ZVN0cmluZ3MgPSBbIkMiLCAiQyMiLCAiRCIsICJEIyIsICJFIiwgIkYiLCAiRiMiLCAiRyIsICJHIyIsICJBIiwgIkEjIiwgIkIiXTsNCg0KICAgICAgICBhc3luYyBmdW5jdGlvbiBpbml0QXVkaW8oZmlsZVVybCkgew0KICAgICAgICAgICAgYXVkaW9DdHggPSBuZXcgKHdpbmRvdy5BdWRpb0NvbnRleHQgfHwgd2luZG93LndlYmtpdEF1ZGlvQ29udGV4dCkoKTsNCiAgICAgICAgICAgIA0KICAgICAgICAgICAgLy8gQmxvYuOCkuS9v
-  //+OBo+OBplByb2Nlc3NvcuOCkuiqreOBv+i+vOOCgA0KICAgICAgICAgICAgY29uc3QgYmxvYiA9IG5ldyBCbG9iKFtwcm9jZXNzb3JDb2RlXSwgeyB0eXBlOiAnYXBwbGljYXRpb24vamF2YXNjcmlwdCcgfSk7DQogICAgICAgICAgICBjb25zdCB1cmwgPSBVUkwuY3JlYXRlT2JqZWN0VVJMKGJsb2IpOw0KICAgICAgICAgICAgYXdhaXQgYXVkaW9DdHguYXVkaW9Xb3JrbGV0LmFkZE1vZHVsZSh1cmwpOw0KDQogICAgICAgICAgICBjb25zdCBhdWRpbyA9IG5ldyBBdWRpbyhmaWxlVXJsKTsNCiAgICAgICAgICAgIHNvdXJjZSA9IGF1ZGlvQ3R4LmNyZWF0ZU1lZGlhRWxlbWVudFNvdXJjZShhdWRpbyk7DQogICAgICAgICAgICB3b3JrbGV0Tm9kZSA9IG5ldyBBdWRpb1dvcmtsZXROb2RlKGF1ZGlvQ3R4LCAncGl0Y2gtcHJvY2Vzc29yJyk7DQoNCiAgICAgICAgICAgIC8vIOi2hemrmOmAn
+  //+ODl+ODq+OBlOOBqOOBq+ODoeOCpOODs+OCueODrOODg+ODieOBuOWgseWRiu+8iOe0hDIuOW1z6ZaT6ZqU77yJDQogICAgICAgICAgICAgICAgICAgICAgICB0aGlzLnBvcnQucG9zdE1lc3NhZ2Uoew0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNhbXBsZXM6IHNhb
+  //XBsZXMsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgdDogY3VycmVudFRpbWUNCiAgICAgICAgICAgICAgICAgICAgICAgIH0pOw0KICAgICAgICAgICAgICAgICAgICB9DQogICAgICAgICAgICAgICAgICAgIHJldHVybiB0cnVlOw0KICAgICAgICAgICAgICAgIH0NC
+  //iAgICAgICAgICAgIH0NCiAgICAgICAgICAgIHJlZ2lzdGVyUHJvY2Vzc29yKCdwaXRjaC1wcm9jZXNzb3InLCBQaXRjaFByb2Nlc3Nvcik7DQogICAgICAgIGA7DQoNCiAgICAgICAgbGV0IGF1ZGlvQ3R4LCBhbmFseXplciwgc291cmNlLCB3b3JrbGV0Tm9kZTsNCiAgICAgI
+  //CAgY29uc3Qgbm90ZVN0cmluZ3MgPSBbIkMiLCAiQyMiLCAiRCIsICJEIyIsICJFIiwgIkYiLCAiRiMiLCAiRyIsICJHIyIsICJBIiwgIkEjIiwgIkIiXTsNCg0KICAgICAgICBhc3luYyBmdW5jdGlvbiBpbml0QXVkaW8oZmlsZVVybCkgew0KICAgICAgICAgICAgYXVkaW9Dd
+  //HggPSBuZXcgKHdpbmRvdy5BdWRpb0NvbnRleHQgfHwgd2luZG93LndlYmtpdEF1ZGlvQ29udGV4dCkoKTsNCiAgICAgICAgICAgIA0KICAgICAgICAgICAgLy8gQmxvYuOCkuS9v
+  //+OBo+OBplByb2Nlc3NvcuOCkuiqreOBv+i+vOOCgA0KICAgICAgICAgICAgY29uc3QgYmxvYiA9IG5ldyBCbG9iKFtwcm9jZXNzb3JDb2RlXSwgeyB0eXBlOiAnYXBwbGljYXRpb24vamF2YXNjcmlwdCcgfSk7DQogICAgICAgICAgICBjb25zdCB1cmwgPSBVUkwuY3JlYXRlT
+  //2JqZWN0VVJMKGJsb2IpOw0KICAgICAgICAgICAgYXdhaXQgYXVkaW9DdHguYXVkaW9Xb3JrbGV0LmFkZE1vZHVsZSh1cmwpOw0KDQogICAgICAgICAgICBjb25zdCBhdWRpbyA9IG5ldyBBdWRpbyhmaWxlVXJsKTsNCiAgICAgICAgICAgIHNvdXJjZSA9IGF1ZGlvQ3R4LmNyZ
+  //WF0ZU1lZGlhRWxlbWVudFNvdXJjZShhdWRpbyk7DQogICAgICAgICAgICB3b3JrbGV0Tm9kZSA9IG5ldyBBdWRpb1dvcmtsZXROb2RlKGF1ZGlvQ3R4LCAncGl0Y2gtcHJvY2Vzc29yJyk7DQoNCiAgICAgICAgICAgIC8vIOi2hemrmOmAn
   //+ODrOODvOODs+OBi+OCieOBruODoeODg+OCu+ODvOOCuOOCkuWPl+S/oQ0KICAgICAgICAgICAgd29ya2xldE5vZGUucG9ydC5vbm1lc3NhZ2UgPSAoZXZlbnQpID0
-  //+IHsNCiAgICAgICAgICAgICAgICBkZXRlY3RQaXRjaChldmVudC5kYXRhLnNhbXBsZXMsIGV2ZW50LmRhdGEudCk7DQogICAgICAgICAgICB9Ow0KDQogICAgICAgICAgICBzb3VyY2UuY29ubmVjdCh3b3JrbGV0Tm9kZSk7DQogICAgICAgICAgICB3b3JrbGV0Tm9kZS5jb25uZWN0KGF1ZGlvQ3R4LmRlc3RpbmF0aW9uKTsNCiAgICAgICAgICAgIGF1ZGlvLnBsYXkoKTsNCiAgICAgICAgfQ0KDQogICAgICAgIC8vIOODlOODg
-  //+ODgeaknOWHuuOCouODq+OCtOODquOCuuODoO+8iOOCvOODreS6pOW3ruazle+8muewoeaYk+eJiO+8iQ0KICAgICAgICBsZXQgbGFzdE5vdGUgPSAiIjsNCiAgICAgICAgZnVuY3Rpb24gZGV0ZWN0UGl0Y2goc2FtcGxlcywgdGltZSkgew0KICAgICAgICAgICAgbGV0IGNyb3NzaW5ncyA9IDA7DQogICAgICAgICAgICBmb3IgKGxldCBpID0gMTsgaSA8IHNhbXBsZXMubGVuZ3RoOyBpKyspIHsNCiAgICAgICAgICAgICAgICBpZiAoc2FtcGxlc1tpLTFdIDwgMCAmJiBzYW1wbGVzW2ldID49IDApIGNyb3NzaW5ncysrOw0KICAgICAgICAgICAgfQ0KICAgICAgICAgICAgDQogICAgICAgICAgICBjb25zdCBmcmVxdWVuY3kgPSBjcm9zc2luZ3MgKiAoYXVkaW9DdHguc2FtcGxlUmF0ZSAvIHNhbXBsZXMubGVuZ3RoKSAvIDI7DQogICAgICAgICAgICBpZiAoZnJlcXVlbmN5ID4gMjAgJiYgZnJlcXVlbmN5IDwgNDAwMCkgew0KICAgICAgICAgICAgICAgIGNvbnN0IG5vdGUgPSBnZXROb3RlKGZyZXF1ZW5jeSk7DQogICAgICAgICAgICAgICAgaWYgKG5vdGUgJiYgbm90ZSAhPT0gbGFzdE5vdGUpIHsNCiAgICAgICAgICAgICAgICAgICAgdXBkYXRlRGlzcGxheShub3RlLCBmcmVxdWVuY3ksIHRpbWUpOw0KICAgICAgICAgICAgICAgICAgICBsYXN0Tm90ZSA9IG5vdGU7DQogICAgICAgICAgICAgICAgfQ0KICAgICAgICAgICAgfQ0KICAgICAgICB9DQoNCiAgICAgICAgZnVuY3Rpb24gZ2V0Tm90ZShmKSB7DQogICAgICAgICAgICBjb25zdCBuID0gTWF0aC5yb3VuZCgxMiAqIChNYXRoLmxvZyhmIC8gNDQwKSAvIE1hdGgubG9nKDIpKSkgKyA2OTsNCiAgICAgICAgICAgIHJldHVybiBub3RlU3RyaW5nc1tuICUgMTJdICsgKE1hdGguZmxvb3IobiAvIDEyKSAtIDEpOw0KICAgICAgICB9DQoNCiAgICAgICAgZnVuY3Rpb24gdXBkYXRlRGlzcGxheShub3RlLCBmcmVxLCB0KSB7DQogICAgICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbm90ZURpc3BsYXknKS5pbm5lclRleHQgPSBub3RlOw0KICAgICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2ZyZXFEaXNwbGF5JykuaW5uZXJUZXh0ID0gZnJlcS50b0ZpeGVkKDIpICsgIiBIeiI7DQogICAgICAgICAgICBjb25zdCBsb2cgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbG9nJyk7DQogICAgICAgICAgICBsb2cuaW5uZXJIVE1MID0gXGBbXCR7dC50b0ZpeGVkKDMpfXNdIE5vdGU6IFwke25vdGV9IChcJHtmcmVxLnRvRml4ZWQoMil9SHopPGJyPlxgICsgbG9nLmlubmVySFRNTDsNCiAgICAgICAgfQ0KDQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhdWRpb0ZpbGUnKS5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCAoZSkgPT4gew0KICAgICAgICAgICAgY29uc3QgdXJsID0gVVJMLmNyZWF0ZU9iamVjdFVSTChlLnRhcmdldC5maWxlc1swXSk7DQogICAgICAgICAgICBpbml0QXVkaW8odXJsKTsNCiAgICAgICAgfSk7DQogICAgPC9zY3JpcHQ
-  //+DQo8L2JvZHk+DQo8L2h0bWw+
+  //+IHsNCiAgICAgICAgICAgICAgICBkZXRlY3RQaXRjaChldmVudC5kYXRhLnNhbXBsZXMsIGV2ZW50LmRhdGEudCk7DQogICAgICAgICAgICB9Ow0KDQogICAgICAgICAgICBzb3VyY2UuY29ubmVjdCh3b3JrbGV0Tm9kZSk7DQogICAgICAgICAgICB3b3JrbGV0Tm9kZS5jb25
+  //uZWN0KGF1ZGlvQ3R4LmRlc3RpbmF0aW9uKTsNCiAgICAgICAgICAgIGF1ZGlvLnBsYXkoKTsNCiAgICAgICAgfQ0KDQogICAgICAgIC8vIOODlOODg
+  //+ODgeaknOWHuuOCouODq+OCtOODquOCuuODoO+8iOOCvOODreS6pOW3ruazle+8muewoeaYk+eJiO+8iQ0KICAgICAgICBsZXQgbGFzdE5vdGUgPSAiIjsNCiAgICAgICAgZnVuY3Rpb24gZGV0ZWN0UGl0Y2goc2FtcGxlcywgdGltZSkgew0KICAgICAgICAgICAgbGV0IGNyb
+  //3NzaW5ncyA9IDA7DQogICAgICAgICAgICBmb3IgKGxldCBpID0gMTsgaSA8IHNhbXBsZXMubGVuZ3RoOyBpKyspIHsNCiAgICAgICAgICAgICAgICBpZiAoc2FtcGxlc1tpLTFdIDwgMCAmJiBzYW1wbGVzW2ldID49IDApIGNyb3NzaW5ncysrOw0KICAgICAgICAgICAgfQ0KI
+  //CAgICAgICAgICAgDQogICAgICAgICAgICBjb25zdCBmcmVxdWVuY3kgPSBjcm9zc2luZ3MgKiAoYXVkaW9DdHguc2FtcGxlUmF0ZSAvIHNhbXBsZXMubGVuZ3RoKSAvIDI7DQogICAgICAgICAgICBpZiAoZnJlcXVlbmN5ID4gMjAgJiYgZnJlcXVlbmN5IDwgNDAwMCkgew0KI
+  //CAgICAgICAgICAgICAgIGNvbnN0IG5vdGUgPSBnZXROb3RlKGZyZXF1ZW5jeSk7DQogICAgICAgICAgICAgICAgaWYgKG5vdGUgJiYgbm90ZSAhPT0gbGFzdE5vdGUpIHsNCiAgICAgICAgICAgICAgICAgICAgdXBkYXRlRGlzcGxheShub3RlLCBmcmVxdWVuY3ksIHRpbWUpO
+  //w0KICAgICAgICAgICAgICAgICAgICBsYXN0Tm90ZSA9IG5vdGU7DQogICAgICAgICAgICAgICAgfQ0KICAgICAgICAgICAgfQ0KICAgICAgICB9DQoNCiAgICAgICAgZnVuY3Rpb24gZ2V0Tm90ZShmKSB7DQogICAgICAgICAgICBjb25zdCBuID0gTWF0aC5yb3VuZCgxMiAqI
+  //ChNYXRoLmxvZyhmIC8gNDQwKSAvIE1hdGgubG9nKDIpKSkgKyA2OTsNCiAgICAgICAgICAgIHJldHVybiBub3RlU3RyaW5nc1tuICUgMTJdICsgKE1hdGguZmxvb3IobiAvIDEyKSAtIDEpOw0KICAgICAgICB9DQoNCiAgICAgICAgZnVuY3Rpb24gdXBkYXRlRGlzcGxheShub
+  //3RlLCBmcmVxLCB0KSB7DQogICAgICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbm90ZURpc3BsYXknKS5pbm5lclRleHQgPSBub3RlOw0KICAgICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2ZyZXFEaXNwbGF5JykuaW5uZXJUZXh0ID0gZnJlcS50b
+  //0ZpeGVkKDIpICsgIiBIeiI7DQogICAgICAgICAgICBjb25zdCBsb2cgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbG9nJyk7DQogICAgICAgICAgICBsb2cuaW5uZXJIVE1MID0gXGBbXCR7dC50b0ZpeGVkKDMpfXNdIE5vdGU6IFwke25vdGV9IChcJHtmcmVxLnRvRml4Z
+  //WQoMil9SHopPGJyPlxgICsgbG9nLmlubmVySFRNTDsNCiAgICAgICAgfQ0KDQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhdWRpb0ZpbGUnKS5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCAoZSkgPT4gew0KICAgICAgICAgICAgY29uc3QgdXJsID0gVVJML
+  //mNyZWF0ZU9iamVjdFVSTChlLnRhcmdldC5maWxlc1swXSk7DQogICAgICAgICAgICBpbml0QXVkaW8odXJsKTsNCiAgICAgICAgfSk7DQogICAgPC9zY3JpcHQ+DQo8L2JvZHk+DQo8L2h0bWw+
 </script>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>AudioWorklet Precision Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ultimate Audio Analyzer for Kakaomame">
+    <meta name="author" content="Gemini Programming Team">
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    <title>Precision Note Capture Unit</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #000; color: #0f0; text-align: center; }
-        .monitor { border: 2px solid #0f0; padding: 20px; margin: 20px auto; width: 300px; font-size: 3rem; }
-        #log { width: 90%; height: 200px; background: #111; color: #0f0; overflow-y: scroll; border: 1px solid #333; margin: auto; text-align: left; padding: 10px; font-size: 0.8rem; }
-        button { padding: 10px 20px; font-weight: bold; cursor: pointer; background: #0f0; border: none; }
+        body { font-family: 'Courier New', monospace; background: #050505; color: #00ff00; text-align: center; margin: 0; padding: 20px; }
+        h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
+        .logo { width: 60px; margin: 10px; }
+        .monitor-panel { background: #111; border: 2px solid #00ffff; padding: 20px; margin: 20px auto; width: 90%; max-width: 800px; box-shadow: 0 0 20px rgba(0,255,255,0.3); border-radius: 10px; }
+        #noteDisplay { font-size: 6rem; color: #fff; text-shadow: 0 0 30px #00ff00; margin: 10px 0; font-weight: bold; }
+        #freqDisplay { font-size: 1.5rem; color: #00ffff; margin-bottom: 20px; font-family: sans-serif; }
+        canvas { background: #000; border: 1px solid #333; width: 100%; height: 150px; border-radius: 5px; }
+        .controls { margin: 20px; padding: 15px; background: #222; border-radius: 8px; }
+        button { background: #00ff00; color: #000; border: none; padding: 12px 24px; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 1rem; margin: 5px; transition: 0.2s; }
+        button:hover { background: #fff; transform: scale(1.05); }
+        #log { width: 100%; height: 150px; background: #000; color: #0f0; overflow-y: scroll; border: 1px solid #00ff00; margin-top: 20px; text-align: left; padding: 10px; font-size: 0.85rem; box-sizing: border-box; }
     </style>
 </head>
 <body>
-    <h1>🚀 AudioWorklet Engine 🚀</h1>
-    <input type="file" id="audioFile" accept="audio/*">
-    <div class="monitor" id="noteDisplay">READY</div>
-    <div id="freqDisplay">0.00 Hz</div>
-    <div id="log"></div>
+    <img src="https://kakaomames.github.io/rei/logo.png" alt="Gemini Programming Team Logo" class="logo">
+    <h1>🛰️ PRECISION NOTE CAPTURE UNIT 🛰️</h1>
+
+    <div class="controls">
+        <p>【ミッション】音声ファイルを読み込み、ドレミをJSON配列化せよ！</p>
+        <input type="file" id="audioFile" accept="audio/*">
+        <br><br>
+        <button onclick="downloadJSON()">💾 JSONをダウンロード</button>
+        <button onclick="clearData()" style="background: #ff4444; color: white;">🗑️ データをクリア</button>
+    </div>
+
+    <div class="monitor-panel">
+        <div id="noteDisplay">READY</div>
+        <div id="freqDisplay">--- Hz</div>
+        <canvas id="waveCanvas"></canvas>
+    </div>
+    
+    <div id="log">ログ待機中...</div>
 
     <script>
-        // 1. AudioWorkletProcessorの中身（超高速レーンで動くコード）
+        // --- AudioWorkletProcessor Code (自己相関法) ---
         const processorCode = `
             class PitchProcessor extends AudioWorkletProcessor {
                 constructor() {
                     super();
-                    this.lastSampleTime = 0;
+                    this.noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
                 }
-                process(inputs, outputs) {
+                autoCorrelate(buffer, sampleRate) {
+                    let n = buffer.length;
+                    let rms = 0;
+                    for (let i = 0; i < n; i++) rms += buffer[i] * buffer[i];
+                    rms = Math.sqrt(rms / n);
+                    if (rms < 0.02) return -1;
+
+                    let bestOffset = -1;
+                    let bestCorrelation = 0;
+                    for (let offset = 20; offset < n; offset++) {
+                        let correlation = 0;
+                        for (let i = 0; i < n - offset; i++) {
+                            correlation += buffer[i] * buffer[i + offset];
+                        }
+                        if (correlation > bestCorrelation) {
+                            bestCorrelation = correlation;
+                            bestOffset = offset;
+                        }
+                    }
+                    return bestOffset > 0 ? sampleRate / bestOffset : -1;
+                }
+                process(inputs) {
                     const input = inputs[0];
                     if (input.length > 0) {
                         const samples = input[0];
-                        // 128サンプルごとにメインスレッドへ報告（約2.9ms間隔）
-                        this.port.postMessage({
-                            samples: samples,
-                            t: currentTime
-                        });
+                        const freq = this.autoCorrelate(samples, sampleRate);
+                        let note = null;
+                        if (freq !== -1) {
+                            const n = Math.round(12 * (Math.log(freq / 440) / Math.log(2))) + 69;
+                            note = this.noteStrings[n % 12] + (Math.floor(n / 12) - 1);
+                        }
+                        this.port.postMessage({ samples: Array.from(samples), freq, note, t: currentTime });
                     }
                     return true;
                 }
@@ -54,24 +122,34 @@
             registerProcessor('pitch-processor', PitchProcessor);
         `;
 
-        let audioCtx, analyzer, source, workletNode;
-        const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        let audioCtx, workletNode, musicScore = [], lastNote = "";
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
 
-        async function initAudio(fileUrl) {
+        async function startSystem(file) {
+            if (audioCtx) await audioCtx.close();
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Blobを使ってProcessorを読み込む
             const blob = new Blob([processorCode], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            await audioCtx.audioWorklet.addModule(url);
+            await audioCtx.audioWorklet.addModule(URL.createObjectURL(blob));
 
-            const audio = new Audio(fileUrl);
-            source = audioCtx.createMediaElementSource(audio);
+            const audio = new Audio(URL.createObjectURL(file));
+            const source = audioCtx.createMediaElementSource(audio);
             workletNode = new AudioWorkletNode(audioCtx, 'pitch-processor');
 
-            // 超高速レーンからのメッセージを受信
-            workletNode.port.onmessage = (event) => {
-                detectPitch(event.data.samples, event.data.t);
+            workletNode.port.onmessage = (e) => {
+                const { samples, freq, note, t } = e.data;
+                draw(samples);
+                if (note && note !== lastNote) {
+                    const time = parseFloat(t.toFixed(3));
+                    musicScore.push({ t: time, n: note });
+                    document.getElementById('noteDisplay').innerText = note;
+                    document.getElementById('freqDisplay').innerText = freq.toFixed(2) + " Hz";
+                    const log = document.getElementById('log');
+                    log.innerHTML = \`[\${time}s] DETECTED: \${note}<br>\` + log.innerHTML;
+                    lastNote = note;
+                } else if (!note) {
+                    lastNote = "";
+                }
             };
 
             source.connect(workletNode);
@@ -79,40 +157,31 @@
             audio.play();
         }
 
-        // ピッチ検出アルゴリズム（ゼロ交差法：簡易版）
-        let lastNote = "";
-        function detectPitch(samples, time) {
-            let crossings = 0;
-            for (let i = 1; i < samples.length; i++) {
-                if (samples[i-1] < 0 && samples[i] >= 0) crossings++;
+        function draw(samples) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#00ffff';
+            ctx.beginPath();
+            const sliceWidth = canvas.width / samples.length;
+            let x = 0;
+            for (let i = 0; i < samples.length; i++) {
+                const y = (samples[i] * 0.5 + 0.5) * canvas.height;
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                x += sliceWidth;
             }
-            
-            const frequency = crossings * (audioCtx.sampleRate / samples.length) / 2;
-            if (frequency > 20 && frequency < 4000) {
-                const note = getNote(frequency);
-                if (note && note !== lastNote) {
-                    updateDisplay(note, frequency, time);
-                    lastNote = note;
-                }
-            }
+            ctx.stroke();
         }
 
-        function getNote(f) {
-            const n = Math.round(12 * (Math.log(f / 440) / Math.log(2))) + 69;
-            return noteStrings[n % 12] + (Math.floor(n / 12) - 1);
+        function downloadJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(musicScore, null, 2));
+            const link = document.createElement('a');
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "gemini_score.json");
+            link.click();
         }
 
-        function updateDisplay(note, freq, t) {
-            document.getElementById('noteDisplay').innerText = note;
-            document.getElementById('freqDisplay').innerText = freq.toFixed(2) + " Hz";
-            const log = document.getElementById('log');
-            log.innerHTML = \`[\${t.toFixed(3)}s] Note: \${note} (\${freq.toFixed(2)}Hz)<br>\` + log.innerHTML;
-        }
+        function clearData() { musicScore = []; document.getElementById('log').innerHTML = "Cleared."; lastNote = ""; }
 
-        document.getElementById('audioFile').addEventListener('change', (e) => {
-            const url = URL.createObjectURL(e.target.files[0]);
-            initAudio(url);
-        });
+        document.getElementById('audioFile').addEventListener('change', e => startSystem(e.target.files[0]));
     </script>
 </body>
 </html>
