@@ -2,78 +2,109 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Turbo Audio Analyzer">
     <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
-    <title>ドレミ摘出　爆速版 - by Gemini</title>
+    <title>Turbo Analyzer v2 - Gemini</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #001100; color: #00ff00; text-align: center; padding: 20px; }
-        .panel { border: 2px solid #00ff00; background: #000; padding: 30px; border-radius: 15px; display: inline-block; }
-        #progress { width: 100%; height: 20px; background: #333; margin-top: 10px; }
-        #bar { width: 0%; height: 100%; background: #00ff00; }
-        button { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
-        #status { font-size: 1.5rem; margin: 20px 0; }
+        body { font-family: 'Courier New', monospace; background: #000d00; color: #00ff00; text-align: center; padding: 20px; }
+        .panel { border: 2px solid #00ff00; background: #111; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 0 20px #00ff00; }
+        #progress { width: 400px; height: 30px; background: #222; margin: 20px auto; border: 1px solid #00ff00; overflow: hidden; }
+        #bar { width: 0%; height: 100%; background: #00ff00; transition: width 0.1s; }
+        button { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; font-size: 1.2rem; margin: 10px; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        #status { font-size: 1.5rem; margin: 20px 0; color: #fff; }
     </style>
 </head>
 <body>
-    <img src="https://kakaomames.github.io/rei/logo.png" width="60">
-    <h1>🚀 TURBO ANALYZER 🚀</h1>
+    <img src="https://kakaomames.github.io/rei/logo.png" width="80">
+    <h1>🚀 TURBO ANALYZER v2 🚀</h1>
+    
     <div class="panel">
         <input type="file" id="audioFile" accept="audio/*">
-        <div id="status">待機中...</div>
+        <div id="status">1. ファイルを選択せよ</div>
+        
         <div id="progress"><div id="bar"></div></div>
-        <br>
+        
+        <button id="startBtn" disabled onclick="startTurboAnalysis()">⚡ 解析開始（爆速モード）</button>
         <button id="dlBtn" style="display:none;" onclick="downloadJSON()">💾 JSONを保存</button>
     </div>
 
     <script>
         let musicScore = [];
+        let selectedFile = null;
         const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
-        document.getElementById('audioFile').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            const arrayBuffer = await file.arrayBuffer();
-            const tempCtx = new AudioContext();
+        document.getElementById('audioFile').addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if(selectedFile) {
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('status').innerText = "2. 開始ボタンを押せ！";
+            }
+        });
+
+        async function startTurboAnalysis() {
+            if (!selectedFile) return;
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('status').innerText = "🚀 爆速解析中...（音は出ません）";
+            
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 音声データのデコード
             const audioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
+            const data = audioBuffer.getChannelData(0); // 最初のチャンネルのみ
+            const sampleRate = audioBuffer.sampleRate;
+            const step = 2048; // 解析の細かさ
             
-            document.getElementById('status').innerText = "爆速解析中...";
-            
-            // オフラインコンテキストで一気に処理
-            const offCtx = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
-            
-            // 解析ロジック（簡易高速版）
-            const data = audioBuffer.getChannelData(0);
-            const step = 2048; // 解析間隔
+            musicScore = [];
             let lastNote = "";
 
+            // 非同期でループを回してブラウザのフリーズを防ぐ
             for (let i = 0; i < data.length; i += step) {
                 const segment = data.slice(i, i + step);
-                const freq = autoCorrelate(segment, audioBuffer.sampleRate);
+                const freq = autoCorrelate(segment, sampleRate);
+                
                 if (freq > 0) {
                     const n = Math.round(12 * (Math.log(freq / 440) / Math.log(2))) + 69;
                     const note = noteStrings[n % 12] + (Math.floor(n / 12) - 1);
+                    
                     if (note !== lastNote) {
-                        musicScore.push({ t: parseFloat((i / audioBuffer.sampleRate).toFixed(3)), n: note });
+                        musicScore.push({ t: parseFloat((i / sampleRate).toFixed(3)), n: note });
                         lastNote = note;
                     }
                 }
-                // 進捗表示
-                if (i % (step * 50) === 0) document.getElementById('bar').style.width = (i / data.length * 100) + "%";
+
+                // 100回に1回進捗を更新
+                if (i % (step * 100) === 0) {
+                    const percent = (i / data.length * 100).toFixed(1);
+                    document.getElementById('bar').style.width = percent + "%";
+                    // 描画を許可するために一瞬待つ
+                    if (i % (step * 500) === 0) await new Promise(r => setTimeout(r, 0));
+                }
             }
 
-            document.getElementById('status').innerText = "解析完了！🚀";
             document.getElementById('bar').style.width = "100%";
+            document.getElementById('status').innerText = "✅ 解析完了！";
             document.getElementById('dlBtn').style.display = "inline-block";
-        });
+        }
 
         function autoCorrelate(buffer, sampleRate) {
-            let n = buffer.length; let rms = 0;
+            let n = buffer.length;
+            let rms = 0;
             for (let i = 0; i < n; i++) rms += buffer[i] * buffer[i];
             if (Math.sqrt(rms / n) < 0.02) return -1;
-            let bestOffset = -1, bestCorrelation = 0;
+
+            let bestOffset = -1;
+            let bestCorrelation = 0;
             for (let offset = 20; offset < n; offset++) {
-                let corr = 0; for (let i = 0; i < n - offset; i++) corr += buffer[i] * buffer[i + offset];
-                if (corr > bestCorrelation) { bestCorrelation = corr; bestOffset = offset; }
+                let corr = 0;
+                for (let i = 0; i < n - offset; i++) {
+                    corr += buffer[i] * buffer[i + offset];
+                }
+                if (corr > bestCorrelation) {
+                    bestCorrelation = corr;
+                    bestOffset = offset;
+                }
             }
             return bestOffset > 0 ? sampleRate / bestOffset : -1;
         }
@@ -81,7 +112,9 @@
         function downloadJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(musicScore, null, 2));
             const link = document.createElement('a');
-            link.href = dataStr; link.download = "turbo_score.json"; link.click();
+            link.href = dataStr;
+            link.download = "turbo_score.json";
+            link.click();
         }
     </script>
 </body>
