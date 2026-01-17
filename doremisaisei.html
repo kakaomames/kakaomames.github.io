@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
-    <title>JSON Score Player - Gemini</title>
+    <title>Harmonic Player - Gemini Programming</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #0b0e14; color: #ffcc00; text-align: center; padding: 20px; }
-        .player-panel { border: 3px solid #ffcc00; background: #1a1f29; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 0 30px rgba(255, 204, 0, 0.4); }
-        .monitor { font-size: 5rem; color: #fff; text-shadow: 0 0 15px #ffcc00; margin: 20px 0; min-height: 100px; }
-        button { background: #ffcc00; color: #000; border: none; padding: 15px 40px; font-weight: bold; cursor: pointer; font-size: 1.5rem; border-radius: 50px; margin: 10px; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        #progress-info { color: #aaa; margin-bottom: 10px; }
-        .logo { width: 70px; margin-bottom: 10px; }
+        body { font-family: 'Courier New', monospace; background: #000510; color: #00ffff; text-align: center; padding: 20px; }
+        .player-unit { border: 4px solid #00ffff; background: #0a111a; padding: 40px; border-radius: 30px; display: inline-block; box-shadow: 0 0 40px #00ffff; }
+        .display { font-size: 5rem; color: #fff; text-shadow: 0 0 20px #00ffff; margin: 20px 0; }
+        .harmonics-list { font-size: 1rem; color: #ff00ff; height: 1.5em; }
+        button { background: #00ffff; color: #000; border: none; padding: 20px 50px; font-weight: bold; cursor: pointer; font-size: 1.5rem; border-radius: 10px; margin: 10px; }
+        button:disabled { background: #333; }
+        .logo { width: 80px; }
     </style>
 </head>
 <body>
     <img src="https://kakaomames.github.io/rei/logo.png" class="logo">
-    <h1>🎶 JSON SCORE PLAYER 🎶</h1>
+    <h1>🎹 HARMONIC SYNTH UNIT 🎹</h1>
     
-    <div class="player-panel">
+    <div class="player-unit">
         <input type="file" id="jsonFile" accept=".json">
-        <div id="progress-info">JSONを読み込んでください</div>
+        <div id="info">高精度JSONをロードせよ</div>
         
-        <div class="monitor" id="noteDisplay">STOP</div>
+        <div class="display" id="mainNote">---</div>
+        <div class="harmonics-list" id="hNotes"></div>
         
-        <button id="playBtn" disabled onclick="playScore()">▶️ 演奏開始</button>
-        <button id="stopBtn" onclick="stopScore()">🛑 停止</button>
+        <button id="playBtn" disabled onclick="playUltraScore()">▶️ 演奏開始</button>
+        <button onclick="stopAll()">🛑 停止</button>
     </div>
 
     <script>
         let audioCtx = null;
         let scoreData = [];
         let isPlaying = false;
-        let timeouts = [];
+        let timers = [];
 
-        // 周波数テーブル
         const noteFreqs = {
             "C": 261.63, "C#": 277.18, "D": 293.66, "D#": 311.13, "E": 329.63, 
             "F": 349.23, "F#": 369.99, "G": 392.00, "G#": 415.30, "A": 440.00, 
@@ -46,66 +46,72 @@
             const text = await file.text();
             scoreData = JSON.parse(text);
             document.getElementById('playBtn').disabled = false;
-            document.getElementById('progress-info').innerText = `読み込み完了：${scoreData.length}個の音符`;
+            document.getElementById('info').innerText = `${scoreData.length}音の重層データを検知！`;
         });
 
-        function playScore() {
-            if (scoreData.length === 0) return;
-            stopScore(); // 二重再生防止
+        function getFreq(noteStr) {
+            const match = noteStr.match(/([A-G]#?)(\d)/);
+            if (!match) return null;
+            const name = match[1];
+            const octave = parseInt(match[2]);
+            return noteFreqs[name] * Math.pow(2, octave - 4);
+        }
+
+        async function playUltraScore() {
+            stopAll();
             isPlaying = true;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            const startTime = audioCtx.currentTime;
+            const startT = audioCtx.currentTime;
 
-            scoreData.forEach((item, index) => {
-                // 各ノートの演奏タイミングを予約
-                const t = setTimeout(() => {
-                    if (!isPlaying) return;
-                    renderNote(item.n);
+            scoreData.forEach(item => {
+                // 1. メインの音を表示・予約
+                const t1 = setTimeout(() => {
+                    if(!isPlaying) return;
+                    document.getElementById('mainNote').innerText = item.n;
+                    document.getElementById('hNotes').innerText = "Harmonics: " + (item.h ? item.h.join(", ") : "none");
                 }, item.t * 1000);
-                
-                timeouts.push(t);
+                timers.push(t1);
 
-                // 実際の音を出す（Web Audio API）
-                playTone(item.n, item.t, startTime);
+                // 2. 基本音を鳴らす
+                playSound(item.n, item.t, startT, 0.2); // 音量0.2
+
+                // 3. 倍音(h)をすべて同時に鳴らす！
+                if (item.h) {
+                    item.h.forEach(hNote => {
+                        playSound(hNote, item.t, startT, 0.05); // 倍音は少し小さめ(0.05)で鳴らす
+                    });
+                }
             });
         }
 
-        function playTone(noteStr, onsetTime, globalStartTime) {
-            const match = noteStr.match(/([A-G]#?)(\d)/);
-            if (!match) return;
-            
-            const name = match[1];
-            const octave = parseInt(match[2]);
-            const freq = noteFreqs[name] * Math.pow(2, octave - 4);
+        function playSound(noteStr, delay, startT, vol) {
+            const freq = getFreq(noteStr);
+            if (!freq) return;
 
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
 
-            // 音色設定（'square'にするとマイクラやファミコン風になるぞ！）
-            osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(freq, globalStartTime + onsetTime);
+            // ここを 'square' にするとマイクラ・ファミコン風になるぞ！
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(freq, startT + delay);
 
-            gain.gain.setValueAtTime(0.1, globalStartTime + onsetTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, globalStartTime + onsetTime + 0.2); // 余韻
+            gain.gain.setValueAtTime(vol, startT + delay);
+            gain.gain.exponentialRampToValueAtTime(0.001, startT + delay + 0.3); // 0.3秒かけて消える
 
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            osc.start(globalStartTime + onsetTime);
-            osc.stop(globalStartTime + onsetTime + 0.2);
+            osc.start(startT + delay);
+            osc.stop(startT + delay + 0.3);
         }
 
-        function renderNote(note) {
-            document.getElementById('noteDisplay').innerText = note;
-        }
-
-        function stopScore() {
+        function stopAll() {
             isPlaying = false;
-            timeouts.forEach(clearTimeout);
-            timeouts = [];
+            timers.forEach(clearTimeout);
+            timers = [];
             if (audioCtx) audioCtx.close();
-            document.getElementById('noteDisplay').innerText = "STOP";
+            document.getElementById('mainNote').innerText = "---";
+            document.getElementById('hNotes').innerText = "";
         }
     </script>
 </body>
