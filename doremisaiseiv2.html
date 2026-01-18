@@ -2,130 +2,121 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
-    <title>KP3-MK2.1 FIX - Multi-Track</title>
+    <title>KP3-MK2.2 ENGINE-ARRAY - Gemini Programming</title>
     <style>
         :root { --main: #00ffcc; --sub: #ff00ff; --bg: #0a0a10; }
-        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; margin: 0; }
-        .box { border: 3px solid var(--main); background: #000; padding: 20px; display: inline-block; margin-top: 50px; border-radius: 15px; box-shadow: 0 0 30px var(--main); }
-        #monitor { font-size: 4rem; height: 100px; margin: 10px; text-shadow: 0 0 10px var(--main); }
-        .led-bar { display: flex; justify-content: center; gap: 8px; margin: 15px; }
-        .led { width: 12px; height: 12px; background: #222; border-radius: 50%; border: 1px solid #444; }
-        .led.p { border-color: var(--main); }
-        .led.g { border-color: var(--sub); }
-        .active-p { background: var(--main); box-shadow: 0 0 15px var(--main); }
-        .active-g { background: var(--sub); box-shadow: 0 0 15px var(--sub); }
-        .btn { background: var(--main); color: #000; padding: 15px 30px; border: none; font-weight: bold; cursor: pointer; border-radius: 50px; }
-        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        body { background: var(--bg); color: var(--main); font-family: 'Courier New', monospace; text-align: center; }
+        .deck { border: 3px solid var(--main); background: #000; padding: 30px; display: inline-block; margin-top: 30px; border-radius: 15px; }
+        #monitor { font-size: 3.5rem; height: 80px; text-shadow: 0 0 10px var(--main); }
+        .led-bar { display: flex; justify-content: center; gap: 10px; margin: 15px; }
+        .led { width: 15px; height: 15px; background: #222; border-radius: 50%; border: 1px solid #444; }
+        .active-1 { background: var(--main); box-shadow: 0 0 15px var(--main); }
+        .active-2 { background: var(--sub); box-shadow: 0 0 15px var(--sub); }
+        button { background: var(--main); color: #000; padding: 10px 25px; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
     </style>
-    <meta name="author" content="Gemini Programming Team">
+    <meta name="description" content="Engine-Array Based KP3 Decoder">
 </head>
 <body>
-    <img src="https://kakaomames.github.io/rei/logo.png" style="width:60px; margin-top:30px;">
-    <h2>🛰️ KP3-MK2.1 MULTI-DECODER (FIXED)</h2>
-    <div class="box">
-        <div id="monitor">WAITING...</div>
+    <img src="https://kakaomames.github.io/rei/logo.png" style="width:60px; margin-top:20px;">
+    <h2>🛰️ KP3-MK2.2 ENGINE-ARRAY</h2>
+    
+    <div class="deck">
+        <div id="monitor">SYSTEM READY</div>
         <div class="led-bar">
-            <div id="led1" class="led p" title="Piano Track"></div>
-            <div id="led2" class="led g" title="Guitar Track"></div>
+            <div id="led-1" class="led"></div>
+            <div id="led-2" class="led"></div>
         </div>
-        <input type="file" id="f" accept=".txt,.kp3"><br>
-        <button id="pBtn" class="btn" onclick="start()" disabled>MISSION START</button>
+        <input type="file" id="f"><br><br>
+        <button id="pBtn" onclick="startSystem()" disabled>BOOT ENGINE</button>
     </div>
 
 <script>
-    let ctx = null, isPlaying = false, scoreData = "";
-    const freqs = {"C":261.63,"C#":277.18,"D":293.66,"D#":311.13,"E":329.63,"F":349.23,"F#":369.99,"G":392.00,"G#":415.30,"A":440.00,"A#":466.16,"B":493.88};
+    let audioCtx = null, isPlaying = false, score = "";
 
-    // ファイル読み込み
-    document.getElementById('f').onchange = async(e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        scoreData = await file.text();
-        document.getElementById('pBtn').disabled = false;
-        document.getElementById('monitor').innerText = "READY";
+    // --- 隊員の提案：エンジン（楽器）を配列で定義！ ---
+    const ENGINES = {
+        1: { name: "PIANO",  type: "triangle", volume: 0.12, decay: 0.4 },
+        2: { name: "GUITAR", type: "sawtooth", volume: 0.06, decay: 0.15 }
     };
 
-    function start() {
-        if(isPlaying){ location.reload(); return; }
+    const FREQS = {"C":261.63,"C#":277.18,"D":293.66,"D#":311.13,"E":329.63,"F":349.23,"F#":369.99,"G":392.00,"G#":415.30,"A":440.00,"A#":466.16,"B":493.88};
+
+    document.getElementById('f').onchange = async(e) => {
+        score = await e.target.files[0].text();
+        document.getElementById('pBtn').disabled = false;
+        document.getElementById('monitor').innerText = "LOADED";
+    };
+
+    function startSystem() {
+        if(isPlaying) { location.reload(); return; }
         isPlaying = true;
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         document.getElementById('pBtn').innerText = "🛑 ABORT";
 
-        // セミコロンで各トラックに分解
-        const tracks = scoreData.split(';');
-        tracks.forEach(t => {
-            const trackStr = t.trim();
-            const match = trackStr.match(/^(\d+)→/);
-            if(match) {
-                const id = parseInt(match[1]);
-                const content = trackStr.substring(match[0].length);
-                playTrack(content, id);
+        // セミコロンで各トラックに分割
+        const tracks = score.split(';');
+
+        tracks.forEach(trackData => {
+            const raw = trackData.trim();
+            // 正規表現で「数字→」を安全に抽出
+            const match = raw.match(/^(\d+)→/);
+            if (match) {
+                const engineID = parseInt(match[1]);
+                const music = raw.substring(match[0].length);
+                if (ENGINES[engineID]) {
+                    processTrack(music, engineID);
+                }
             }
         });
     }
 
-    function playTrack(data, id) {
-        let p = 0, time = 0.1;
+    function processTrack(data, id) {
+        let p = 0, timeline = 0.1;
         while(p < data.length) {
             let c = data[p];
-            
-            // --- 時間判定ロジック (FIXED) ---
-            if (c === '\n' || c === '\r') { 
-                time += 0.1; p++; continue; 
-            }
-            if (c === '\\' && data[p+1] === 'n') {
-                time += 0.1; p += 2; continue;
-            }
-            if (c === '.') { time += 0.01; p++; continue; }
-            if (c === ' ') { time += 1.0; p++; continue; }
+            // 改行/タメ判定
+            if (c === '\n' || c === '\r') { timeline += 0.1; p++; continue; }
+            if (c === '\\' && data[p+1] === 'n') { timeline += 0.1; p += 2; continue; }
+            if (c === '.') { timeline += 0.01; p++; continue; }
+            if (c === ' ') { timeline += 1.0; p++; continue; }
 
-            // --- ノート解析 ---
-            let n = data.substring(p).match(/^([A-G]#?\d)/);
-            if(n){
-                sound(n[1], time, id);
-                p += n[1].length;
-            } else { 
-                p++; 
-            }
+            // 音符判定
+            const noteMatch = data.substring(p).match(/^([A-G]#?\d)/);
+            if(noteMatch) {
+                playTone(noteMatch[1], timeline, id);
+                p += noteMatch[1].length;
+            } else { p++; }
         }
     }
 
-    function sound(note, delay, id) {
+    function playTone(note, delay, id) {
+        const engine = ENGINES[id];
         const name = note.match(/[A-G]#?/)[0];
         const oct = parseInt(note.match(/\d/)[0]);
-        const f = freqs[name] * Math.pow(2, oct - 4);
-        const startTime = ctx.currentTime + delay;
-        
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
+        const f = FREQS[name] * Math.pow(2, oct - 4);
+        const startTime = audioCtx.currentTime + delay;
 
-        // 1=Piano(Triangle), 2=Guitar(Sawtooth)
-        if(id === 1) {
-            osc.type = 'triangle';
-            g.gain.setValueAtTime(0.12, startTime);
-            g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
-        } else {
-            osc.type = 'sawtooth';
-            g.gain.setValueAtTime(0.06, startTime);
-            g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
-        }
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+
+        osc.type = engine.type;
+        g.gain.setValueAtTime(engine.volume, startTime);
+        g.gain.exponentialRampToValueAtTime(0.001, startTime + engine.decay);
 
         osc.connect(g);
-        g.connect(ctx.destination);
+        g.connect(audioCtx.destination);
         osc.start(startTime);
         osc.stop(startTime + 0.5);
 
-        // UI更新
+        // LED演出
         setTimeout(() => {
             if(!isPlaying) return;
-            document.getElementById('monitor').innerText = note;
-            const led = document.getElementById('led'+id);
+            document.getElementById('monitor').innerText = `${engine.name}:${note}`;
+            const led = document.getElementById(`led-${id}`);
             if(led) {
-                const cls = (id === 1) ? 'active-p' : 'active-g';
-                led.classList.add(cls);
-                setTimeout(() => led.classList.remove(cls), 80);
+                led.classList.add(`active-${id}`);
+                setTimeout(() => led.classList.remove(`active-${id}`), 100);
             }
         }, delay * 1000);
     }
