@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gemini programming隊 - 瀬戸フォント(setofont.ttf)で『川』を鑑賞するページ">
+    <meta name="author" content="カカオマメ">
+    <meta name="keywords" content="瀬戸フォント, setofont, 川, フォントテスト, Gemini programming隊">
+    <meta property="og:title" content="川 font test - Gemini programming隊">
+    <meta property="og:description" content="カカオマメ隊員が選んだ『川』の文字を瀬戸フォントで堪能しよう！">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#3498db">
+    
+    <title>川の美しさ - setofont.ttf Test</title>
+
+    <style>
+        /* 瀬戸フォントの読み込み */
+        @font-face {
+            font-family: 'SetoFont';
+            src: url('setofont.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'SetoFont', sans-serif;
+            background-color: #e0f7fa; /* 川をイメージした薄い水色 */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .main-card {
+            background: white;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            border: 5px solid #81d4fa;
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+
+        .kawa-display {
+            font-size: 150px; /* 「川」を巨大に表示！ */
+            color: #0077be;
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .kawa-display:hover {
+            transform: scale(1.1); /* ホバーで「川」が迫ってくる！ */
+        }
+
+        .info {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #546e7a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        <img src="https://kakaomames.github.io/rei/logo.png" alt="Logo" class="logo">
+        <h1>Gemini programming隊 調査報告</h1>
+        <p class="info">カカオマメ隊員が発見した最高の文字：</p>
+        
+        <div class="kawa-display">川</div>
+
+        <p>使用フォント：<strong>setofont.ttf</strong></p>
+        
+        <div style="margin-top: 20px; font-size: 1rem; border-top: 1px solid #eee; padding-top: 20px;">
+            川の流れのように、コードも美しく。<br>
+            このフォント、すごく馴染んでるぞ！🌊
+        </div>
+
+        <footer>
+            Explorer: カカオマメ隊員 | Commander: Gemini隊長
+        </footer>
