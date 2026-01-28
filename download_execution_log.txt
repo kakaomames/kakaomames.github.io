@@ -1,0 +1,985 @@
+--- 一括URLダウンロード 実行ログ ---
+
+[1/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/static/js/main.ce3653a9.js
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [78 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/static/js/main.ce3653a9.js
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /static/js/main.ce3653a9.js]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /static/js/main.ce3653a9.js HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:11 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    898      0 --:--:-- --:--:-- --:--:--   903
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'static/js/main.ce3653a9.js' (159 bytes) に追加しました。
+
+[2/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/static/css/main.fa2171d9.css
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [78 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/static/css/main.fa2171d9.css
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /static/css/main.fa2171d9.css]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /static/css/main.fa2171d9.css HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:11 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    862      0 --:--:-- --:--:-- --:--:--   864
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'static/css/main.fa2171d9.css' (159 bytes) に追加しました。
+
+[3/13] 🚀 URL: https://paps.binary-person.dev/ce/pbjs.js
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host paps.binary-person.dev:443 was resolved.
+* IPv6: 2606:4700:3036::6815:23b2, 2606:4700:3034::ac43:b22e
+* IPv4: 104.21.35.178, 172.67.178.46
+*   Trying [2606:4700:3036::6815:23b2]:443...
+* Immediate connect fail for 2606:4700:3036::6815:23b2: Cannot assign requested address
+*   Trying [2606:4700:3034::ac43:b22e]:443...
+* Immediate connect fail for 2606:4700:3034::ac43:b22e: Cannot assign requested address
+*   Trying 104.21.35.178:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2546 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [78 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [52 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=binary-person.dev
+*  start date: Dec 24 03:34:43 2025 GMT
+*  expire date: Mar 24 04:33:15 2026 GMT
+*  subjectAltName: host "paps.binary-person.dev" matched cert's "*.binary-person.dev"
+*  issuer: C=US; O=Google Trust Services; CN=WE1
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA256
+*   Certificate level 1: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 2: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using ecdsa-with-SHA384
+* Connected to paps.binary-person.dev (104.21.35.178) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://paps.binary-person.dev/ce/pbjs.js
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: paps.binary-person.dev]
+* [HTTP/2] [1] [:path: /ce/pbjs.js]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /ce/pbjs.js HTTP/2
+> Host: paps.binary-person.dev
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+* Request completely sent off
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+< HTTP/2 200 
+< date: Wed, 28 Jan 2026 01:36:11 GMT
+< content-type: application/javascript
+< content-length: 1332
+< server: cloudflare
+< access-control-allow-origin: *
+< cache-control: public, max-age=14400
+< cross-origin-resource-policy: cross-origin
+< x-content-type-options: nosniff
+< age: 14293
+< accept-ranges: bytes
+< expires: Wed, 28 Jan 2026 05:36:11 GMT
+< cf-cache-status: HIT
+< last-modified: Tue, 27 Jan 2026 21:37:58 GMT
+< nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+< vary: accept-encoding
+< report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=PNFgW7P%2FYwAU0EmpGm%2BXFaABjSxDMTxpADiu6dus5K0SBdolpT26WILejCgUu4tF9APgATx6efhL7WjhEuXxFxC6WtHLIXPE3Nm4a6p5eq%2FCuGu6mV8%3D"}]}
+< cf-ray: 9c4cc1e9debc5974-IAD
+< alt-svc: h3=":443"; ma=86400
+< 
+{ [5 bytes data]
+100  1332  100  1332    0     0  19545      0 --:--:-- --:--:-- --:--:-- 19588
+* Connection #0 to host paps.binary-person.dev left intact
+✅ 成功: ファイルをZIPパス 'ce/pbjs.js' (1332 bytes) に追加しました。
+
+[4/13] 🚀 URL: https://paps.binary-person.dev/api/event
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host paps.binary-person.dev:443 was resolved.
+* IPv6: 2606:4700:3036::6815:23b2, 2606:4700:3034::ac43:b22e
+* IPv4: 104.21.35.178, 172.67.178.46
+*   Trying [2606:4700:3036::6815:23b2]:443...
+* Immediate connect fail for 2606:4700:3036::6815:23b2: Cannot assign requested address
+*   Trying [2606:4700:3034::ac43:b22e]:443...
+* Immediate connect fail for 2606:4700:3034::ac43:b22e: Cannot assign requested address
+*   Trying 104.21.35.178:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2546 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [79 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [52 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=binary-person.dev
+*  start date: Dec 24 03:34:43 2025 GMT
+*  expire date: Mar 24 04:33:15 2026 GMT
+*  subjectAltName: host "paps.binary-person.dev" matched cert's "*.binary-person.dev"
+*  issuer: C=US; O=Google Trust Services; CN=WE1
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA256
+*   Certificate level 1: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 2: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using ecdsa-with-SHA384
+* Connected to paps.binary-person.dev (104.21.35.178) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://paps.binary-person.dev/api/event
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: paps.binary-person.dev]
+* [HTTP/2] [1] [:path: /api/event]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /api/event HTTP/2
+> Host: paps.binary-person.dev
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+* Request completely sent off
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [230 bytes data]
+< HTTP/2 404 
+< date: Wed, 28 Jan 2026 01:36:12 GMT
+< content-type: text/html; charset=utf-8
+< server: cloudflare
+< access-control-allow-credentials: true
+< access-control-allow-origin: *
+< access-control-expose-headers: 
+< cache-control: max-age=0, private, must-revalidate
+< cross-origin-window-policy: deny
+< x-content-type-options: nosniff
+< x-download-options: noopen
+< x-frame-options: SAMEORIGIN
+< x-permitted-cross-domain-policies: none
+< x-request-id: GI7BPSyZzuVI_kwAy7cj
+< x-xss-protection: 1; mode=block
+< cf-cache-status: DYNAMIC
+< nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+< report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=UVG05PRCSfI9bUNcOagkWVloih%2BcIOLhmskxQ0jZs0aVga%2F6i%2Fq4XeBIn%2FrC70o47g6DgTXfSaf4mlcPI4lo36GijrAIE9MyZE2qlMyhvWFXedP4P98%3D"}]}
+< cf-ray: 9c4cc1ea285757be-IAD
+< alt-svc: h3=":443"; ma=86400
+< 
+{ [5 bytes data]
+100  1074    0  1074    0     0   3900      0 --:--:-- --:--:-- --:--:--  3891100  1074    0  1074    0     0   3899      0 --:--:-- --:--:-- --:--:--  3891
+* Connection #0 to host paps.binary-person.dev left intact
+✅ 成功: ファイルをZIPパス 'api/event' (1074 bytes) に追加しました。
+
+[5/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/generateSessionId
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [79 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/generateSessionId
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /api/generateSessionId]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /api/generateSessionId HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:12 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    869      0 --:--:-- --:--:-- --:--:--   873
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'api/generateSessionId' (159 bytes) に追加しました。
+
+[6/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/sessionStatus?id=6ee1d75cc0d245118237767e5bd730f7
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [78 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/sessionStatus?id=6ee1d75cc0d245118237767e5bd730f7
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /api/sessionStatus?id=6ee1d75cc0d245118237767e5bd730f7]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /api/sessionStatus?id=6ee1d75cc0d245118237767e5bd730f7 HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:12 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    906      0 --:--:-- --:--:-- --:--:--   908
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'api/sessionStatus' (159 bytes) に追加しました。
+
+[7/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/uploadSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D&signed=9Ill0DwJAy6tT4B%2BhkDFAXJv5EzbQgqkdZxoRPEsXrU%3D
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [78 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/uploadSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D&signed=9Ill0DwJAy6tT4B%2BhkDFAXJv5EzbQgqkdZxoRPEsXrU%3D
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /api/uploadSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D&signed=9Ill0DwJAy6tT4B%2BhkDFAXJv5EzbQgqkdZxoRPEsXrU%3D]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /api/uploadSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D&signed=9Ill0DwJAy6tT4B%2BhkDFAXJv5EzbQgqkdZxoRPEsXrU%3D HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:12 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    889      0 --:--:-- --:--:-- --:--:--   893
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'api/uploadSession' (159 bytes) に追加しました。
+
+[8/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/configShuffling?id=6ee1d75cc0d245118237767e5bd730f7&enable=true&reshuffle=true
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [80 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/configShuffling?id=6ee1d75cc0d245118237767e5bd730f7&enable=true&reshuffle=true
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /api/configShuffling?id=6ee1d75cc0d245118237767e5bd730f7&enable=true&reshuffle=true]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /api/configShuffling?id=6ee1d75cc0d245118237767e5bd730f7&enable=true&reshuffle=true HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:12 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    879      0 --:--:-- --:--:-- --:--:--   883
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'api/configShuffling' (159 bytes) に追加しました。
+
+[9/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/getSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [80 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/api/getSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /api/getSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /api/getSession?id=6ee1d75cc0d245118237767e5bd730f7&signedId=6LqQnoUWlCAhJq6KlHVG7ExCckQ13DxbA0MIZ1BD8UU%3D HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:13 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    872      0 --:--:-- --:--:-- --:--:--   873
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'api/getSession' (159 bytes) に追加しました。
+
+[10/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/CHANGELOG.md
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [78 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/CHANGELOG.md
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /CHANGELOG.md]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /CHANGELOG.md HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:13 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    898      0 --:--:-- --:--:-- --:--:--   898
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'CHANGELOG.md' (159 bytes) に追加しました。
+
+[11/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/version
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [79 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/version
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /version]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /version HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:13 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    799      0 --:--:-- --:--:-- --:--:--   803
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'version' (159 bytes) に追加しました。
+
+[12/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/version-opensource
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [79 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/version-opensource
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /version-opensource]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /version-opensource HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:13 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    905      0 --:--:-- --:--:-- --:--:--   908
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'version-opensource' (159 bytes) に追加しました。
+
+[13/13] 🚀 URL: https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/logo.png
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host rammer-bynyanko.digitalartscloud.com.polishmc.pl:443 was resolved.
+* IPv6: (none)
+* IPv4: 108.181.32.77
+*   Trying 108.181.32.77:443...
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [15 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2116 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [80 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / id-ecPublicKey
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=rammer-bynyanko.digitalartscloud.com.polishmc.pl
+*  start date: Jan 24 07:30:08 2026 GMT
+*  expire date: Apr 24 07:30:07 2026 GMT
+*  subjectAltName: host "rammer-bynyanko.digitalartscloud.com.polishmc.pl" matched cert's "rammer-bynyanko.digitalartscloud.com.polishmc.pl"
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type EC/prime256v1 (256/128 Bits/secBits), signed using ecdsa-with-SHA384
+*   Certificate level 1: Public key type EC/secp384r1 (384/192 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+* Connected to rammer-bynyanko.digitalartscloud.com.polishmc.pl (108.181.32.77) port 443
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://rammer-bynyanko.digitalartscloud.com.polishmc.pl/logo.png
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: rammer-bynyanko.digitalartscloud.com.polishmc.pl]
+* [HTTP/2] [1] [:path: /logo.png]
+* [HTTP/2] [1] [user-agent: curl/8.11.1]
+* [HTTP/2] [1] [accept: */*]
+} [5 bytes data]
+> GET /logo.png HTTP/2
+> Host: rammer-bynyanko.digitalartscloud.com.polishmc.pl
+> User-Agent: curl/8.11.1
+> Accept: */*
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [122 bytes data]
+* Request completely sent off
+{ [5 bytes data]
+< HTTP/2 403 
+< alt-svc: h3=":443"; ma=2592000
+< content-type: text/html
+< date: Wed, 28 Jan 2026 01:36:13 GMT
+< server: Caddy
+< server: openresty/1.21.4.1
+< content-length: 159
+< 
+{ [5 bytes data]
+100   159  100   159    0     0    881      0 --:--:-- --:--:-- --:--:--   883
+* Connection #0 to host rammer-bynyanko.digitalartscloud.com.polishmc.pl left intact
+✅ 成功: ファイルをZIPパス 'logo.png' (159 bytes) に追加しました。
