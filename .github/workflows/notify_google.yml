@@ -8,24 +8,25 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GOOGLE_KEY_JSON }}
-          # 🌟 ここにIndexing API用のスコープを明示的に追加！
-          access_token_scopes: https://www.googleapis.com/auth/indexing
-
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Notify Google
+      - name: Install gcloud
         run: |
-          # トークンの取得と通知の実行
-          TOKEN=$(gcloud auth print-access-token)
-          URL="${{ github.event.client_payload.url }}"
+          sudo apt-get update
+          sudo apt-get install -y google-cloud-cli
+
+      - name: Create Key File
+        run: echo '${{ secrets.GOOGLE_KEY_JSON }}' > key.json
+
+      - name: Authenticate and Notify
+        run: |
+          # 鍵を登録して認証
+          gcloud auth activate-service-account --key-file=key.json
           
+          # トークンを取得（Indexing API用のスコープを明示）
+          TOKEN=$(gcloud auth print-access-token --scopes="https://www.googleapis.com/auth/indexing")
+          
+          # 通知を送信
           curl -X POST \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $TOKEN" \
-            -d "{\"url\": \"$URL\", \"type\": \"URL_UPDATED\"}" \
+            -d "{\"url\": \"${{ github.event.client_payload.url }}\", \"type\": \"URL_UPDATED\"}" \
             "https://indexing.googleapis.com/v3/urlNotifications:publish"
