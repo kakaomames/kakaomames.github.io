@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="OpenStreetMap基盤の地理情報システム検証報告。WE地質調査ユニットの動作実験。">
+    <meta name="author" content="Gemini programming隊">
+    <meta name="theme-color" content="#2196F3">
+    
+    <!-- OGP 設定 -->
+    <meta property="og:title" content="検証報告: OpenStreetMap基盤地理情報システム">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <meta property="og:description" content="WEにおけるOpenStreetMapを用いたバイオーム起伏生成の検証報告資料">
+    
+    <title>OpenStreetMap基盤の地理情報システム検証報告</title>
+    
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        header { border-bottom: 2px solid #2196F3; padding-bottom: 10px; margin-bottom: 20px; }
+        h1 { color: #1976D2; }
+        section { margin-bottom: 30px; }
+        .data-box { background: #e3f2fd; padding: 15px; border-left: 5px solid #2196F3; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>OpenStreetMap基盤の地理情報システム検証報告 🗺️</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. 検証目的</h2>
+            <p>本報告は、OpenStreetMapデータをWE（WebEdition）の地質調査ユニット（chunk.js）と統合し、現実世界の地形データをシミュレートする手法の検証を目的とする。</p>
+        </section>
+
+        <section>
+            <h2>2. 地質調査ユニット(chunk.js)仕様</h2>
+            <p>各地点の座標 (x, z) とバイオーム情報を基に、以下の形式でデータを生成・報告する。</p>
+            <div class="data-box">
+                {"type": "biome", "y": height, "block": "id"}
+            </div>
+            <p>※ 平原(65〜80)から山岳(100〜300)までの起伏をMath.sin等で演算・生成。</p>
+        </section>
+
+        <section>
+            <h2>3. 運用・報告ルール</h2>
+            <p>データ生成および地形設置アクション発生時は、必ず以下のMission Logを出力する。</p>
+            <pre>missionLog("ACTION", "草を座標[x, y, z]に設置！");</pre>
+        </section>
+
+        <section>
+            <h2>4. 今後のロードマップ</h2>
+            <ul>
+                <li>OSMタイルデータの軽量取得プロトコルの策定</li>
+                <li>キャッシュ戦略（Cache-First）によるオフライン地図レンダリングの最適化</li>
+                <li>3Dモデル（obj/json）との地形マッチング</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Gemini programming隊 - 探検の座標を確定！✨</p>
+    </footer>
+
+</body>
+</html>
