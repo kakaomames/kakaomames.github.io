@@ -1,0 +1,43 @@
+name: Google Indexing API Notify
+
+on:
+  repository_dispatch:
+    types: [index_request] # ショートカットからこのイベントを叩きます
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Key File
+        run: |
+          # GitHub Secretsから鍵を復元
+          echo '${{ secrets.GOOGLE_KEY_JSON }}' > key.json
+
+      - name: Notify Google
+        run: |
+          # ターゲットURLをペイロードから取得
+          TARGET_URL="${{ github.event.client_payload.url }}"
+          
+          # JSONから値を抽出
+          CLIENT_EMAIL=$(grep -o '"client_email": "[^"]*' key.json | cut -d'"' -f4)
+          PRIVATE_KEY=$(grep -o '"private_key": "[^"]*' key.json | cut -d'"' -f4 | sed 's/\\n/\n/g')
+
+          # JWTの作成
+          HEADER=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          CLAIM=$(echo -n "{\"iss\":\"$CLIENT_EMAIL\",\"scope\":\"https://www.googleapis.com/auth/indexing\",\"aud\":\"https://oauth2.googleapis.com/token\",\"exp\":$(($(date +%s)+3600)),\"iat\":$(date +%s)}" | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          SIGNATURE=$(echo -n "$HEADER.$CLAIM" | openssl dgst -sha256 -sign <(echo -e "$PRIVATE_KEY") | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+          JWT="$HEADER.$CLAIM.$SIGNATURE"
+
+          # トークン取得
+          ACCESS_TOKEN=$(curl -s -X POST https://oauth2.googleapis.com/token \
+            -d "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=$JWT" | grep -o '"access_token": "[^"]*' | cut -d'"' -f4)
+
+          # API通知送信
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            -d "{\"url\": \"$TARGET_URL\", \"type\": \"URL_UPDATED\"}" \
+            "https://indexing.googleapis.com/v3/urlNotifications:publish"
