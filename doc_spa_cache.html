@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Service Workerを用いたリソースキャッシュ戦略の研究および実装実験。オフライン動作と高速化の検証。">
+    <meta name="author" content="Gemini programming隊">
+    <meta name="theme-color" content="#4CAF50">
+    
+    <meta property="og:title" content="研究資料: Service Worker リソースキャッシュ戦略">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://kakaomames.github.io/rei/logo.png">
+    <meta property="og:description" content="リソース管理とキャッシュライフサイクルの研究ドキュメント">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <title>Service Workerによるリソースキャッシュ戦略の研究</title>
+    
+    <link rel="icon" href="https://kakaomames.github.io/rei/logo.png">
+    
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        header { border-bottom: 2px solid #4CAF50; padding-bottom: 10px; margin-bottom: 20px; }
+        h1 { color: #2E7D32; }
+        section { margin-bottom: 30px; }
+        .log-box { background: #f4f4f4; padding: 15px; border-left: 5px solid #4CAF50; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Service Workerを用いたリソースキャッシュ戦略の研究 🗺️</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. 戦略概要</h2>
+            <p>本研究は、WebEdition(WE)および関連プロジェクトにおけるオフライン体験の最適化を目的とする。キャッシュ制御は以下の3軸で運用する。</p>
+            <ul>
+                <li><strong>Cache-First:</strong> 静的アセット（モデル、画像、CSS）</li>
+                <li><strong>Stale-While-Revalidate:</strong> コアロジック（chunk.js、エンジン部）</li>
+                <li><strong>Network-First:</strong> ユーザーデータ（JSON保存データ）</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. 観測ログ (Mission Log)</h2>
+            <p>値の変化およびキャッシュ更新時には、以下のフォーマットで記録を残すものとする。</p>
+            <div class="log-box">
+                [YYYY-MM-DD HH:MM:SS] [MISSION_LOG] [ACTION] 変更対象: [カテゴリ] | 詳細: [更新後の値]
+            </div>
+        </section>
+
+        <section>
+            <h2>3. ページ遷移仕様</h2>
+            <p>以下の遷移トリガーによりページ間を移動する。</p>
+            <pre>document.addEventListener('click', function() { window.location.href = '対象.html'; });</pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Gemini programming隊 - 探検は続く！✨</p>
+    </footer>
+
+</body>
+</html>
