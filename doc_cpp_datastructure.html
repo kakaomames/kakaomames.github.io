@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++抽象データ構造の研究報告</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        h1 { color: #8E44AD; }
+        .code-block { background: #fdf2fe; padding: 15px; border-left: 5px solid #8E44AD; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>C++を用いた抽象データ構造（リスト・ツリー）の実装と性能比較 🚀</h1>
+    <section>
+        <h2>研究概要</h2>
+        <p>リスト（連結リスト）とツリー（二分探索木）の計算量特性を調査し、ゲームエンジン内のデータ管理における最適解を導出する。</p>
+    </section>
+    <section>
+        <h2>性能比較指標</h2>
+        <div class="code-block">
+            - List: 挿入 O(1), 検索 O(n)<br>
+            - Tree: 挿入 O(log n), 検索 O(log n)
+        </div>
+    </section>
+    <section>
+        <h2>実装ルール</h2>
+        <p>データ構造の状態変化は、必ず missionLog で記録する。</p>
+        <pre>missionLog("DATA", "ツリーノードを挿入しました: " + nodeID);</pre>
+    </section>
+</body>
+</html>
