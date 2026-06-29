@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Python JSON処理の厳密性に関する考察</title>
+    <style>body{font-family:sans-serif;line-height:1.6;max-width:800px;margin:20px auto;padding:0 15px;}</style>
+</head>
+<body>
+    <h1>Python JSONエンコーディングの厳密性に関する考察 🐍</h1>
+    <section>
+        <p>バックスラッシュや特殊文字を維持したままJSONを扱うための仕様検討。</p>
+        <pre>json.dumps(data, ensure_ascii=False)</pre>
+        <p>※ バックスラッシュはそのまま維持し、データ整合性を最優先する設計とする。</p>
+    </section>
+</body>
+</html>
