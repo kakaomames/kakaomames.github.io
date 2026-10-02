@@ -1,0 +1,24 @@
+name: サイトマップ
+
+on:
+  workflow_dispatch: # ボタンをポチッと押して手動実行も可能！
+
+jobs:
+  turbo-compress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: 📁 出力フォルダの設営
+        run: mkdir -p sitemap
+      - name: ⚡ ミッション
+        run: |
+          find . > sitemap/site.txt
+
+      - name: 📥 成果物をアップロード
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitemapList
+          path: sitemap/
+          retention-days: 1 # 1日経ったら消える設定（エコ！）
